@@ -6,7 +6,7 @@ from peewee import (SqliteDatabase,
 import os
 
 db = SqliteDatabase(os.path.realpath(os.path.dirname(__file__)
-                    + 'database.sqlite'))
+                    + '/database.sqlite'))
 
 
 class Degree(Model):
