@@ -17,8 +17,9 @@ class Degree(Model):
 
 
 class Participant(Model):
-    name = CharField()
-    email = CharField()
+    firstname = CharField()
+    lastname = CharField()
+    email = CharField(unique=True)
     numberOfGuests = IntegerField()
     degree = ForeignKeyField(Degree)
 
