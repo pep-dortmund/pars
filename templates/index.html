@@ -12,40 +12,56 @@
               <h3>Anmeldung zur Absolventenfeier 2015</h3>
             </div>
           </div>
+          {% if error %}
+          <div class="row">
+            <div id="alert-error" class="alert alert-danger">
+              <strong>Upsi!</strong> {{ error }}
+            </div>
+          </div>
+          {% endif %}
+          <div class="row">
+            <div id="alert-added-successfully" class="alert alert-success alert-dismissable hidden">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <strong>Vielen Dank!</strong> Wir freuen uns, Dich bei der Absolventenfeier zu begrüßen.<br>
+              Du solltest eine Email in Deinem Postfach haben, die weitere Informationen beinhaltet.
+            </div>
+          </div>
           <form id="form" method="POST" action="{{ url_for('post') }}" class="form-horizontal">
             <div class="form-group">
               <label class="col-sm-2 control-label" for="vorname">Name</label>
               <div class="col-sm-5">
-                <input type="text" name="vorname" placeholder="Vorname" class="form-control">
+                <input type="text" name="vorname" placeholder="Vorname" class="required form-control">
               </div>
               <div class="col-sm-5">
-                <input type="text" name="name" placeholder="Nachname" class="form-control">
+                <input type="text" name="name" placeholder="Nachname" class="required form-control">
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-2 control-label" for="email">Email</label>
               <div class="col-sm-10">
-                <input type="text" name="email" placeholder="muster@tu-dortmund.de" class="form-control">
+                <input type="text" name="email" placeholder="muster@tu-dortmund.de" class="required form-control">
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-2 control-label" for="abschluss">Abschluss</label>
               <div class="col-sm-10">
                 <label class="radio-inline">
-                  <input type="radio" name="abschluss" id="ba" value="option1"> Bachelor
+                  <input type="radio" name="abschluss" value="ba" checked> Bachelor
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="abschluss" id="ma" value="option1"> Master
+                  <input type="radio" name="abschluss" value="ma"> Master
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="abschluss" id="dr" value="option1"> Doktor
+                  <input type="radio" name="abschluss" value="dr"> Doktor
                 </label>
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-2 control-label" for="email">Anz. Gäste</label>
               <div class="col-sm-10">
-                <input type="number" name="gaeste" placeholder="2" class="form-control">
+                <input type="number" name="gaeste" placeholder="2" class="required form-control">
               </div>
             </div>
             <div class="form-group">
