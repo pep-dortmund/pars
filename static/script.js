@@ -25,12 +25,19 @@ function highlightMissing(){
 $(document).ready(function(){
     $("#form").submit(function(){
         event.preventDefault();
+        $(".alert").addClass("hidden");
         var data = $(this).serializeArray();
         highlightMissing();
         if(checkValues(data)) {
+            console.log("Values ok, sending request");
             $.post($(this).attr("action"), data, function(){
                 console.log("success");
                 $("#alert-added-successfully").removeClass("hidden");
+            }).fail(function(data){
+                $("#email").parent().parent().addClass("has-error");
+                $("#alert-error").removeClass("hidden");
+                $("#alert-error span").html(data.responseText);
+                console.log("Error", data);
             });
         }
     })
