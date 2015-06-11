@@ -15,6 +15,12 @@ def index():
     return render_template('index.html')
 
 
+@parsapp.route('/edit/<int:participant_id>!<token>')
+def edit(participant_id, token):
+    participant = Participant.get(Participant.id == participant_id)
+    return participant
+
+
 @parsapp.route('/post/', methods=['POST'])
 def post():
     try:
@@ -33,6 +39,28 @@ def post():
                              'Postfach finden, in der ein Link zur Änderung '
                              'Deiner Daten aufgeführt ist.',
                              400)
+
+
+@parsapp.route('/admin/', methods=['GET'])
+def admin():
+    parts = Participant.select()
+    variables = {
+        'parts': parts,
+        'ba_count': Participant.select().join(Degree)
+                               .where(Degree.name == 'ba').count(),
+        'ma_count': Participant.select().join(Degree)
+                               .where(Degree.name == 'ma').count(),
+        'dr_count': Participant.select().join(Degree)
+                               .where(Degree.name == 'dr').count(),
+        'guest_count': Participant.select(fn.Sum(Participant.numberOfGuests))
+                                  .scalar()
+    }
+    return render_template('admin.html', **variables)
+
+
+@parsapp.route('/admin/delete/<pid>/', methods=['POST'])
+def delete():
+    return 'foo'
 
 if __name__ == '__main__':
     parsapp.run(debug=True)

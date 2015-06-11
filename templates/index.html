@@ -9,9 +9,10 @@
         <div class="col-sm-8 col-sm-offset-2">
           <div class="row">
             <div class="col-sm-offset-2 col-sm-10">
-              <h3>Anmeldung zur Absolventenfeier 2015</h3>
+              {% block title %} <h3>Anmeldung zur Absolventenfeier 2015</h3> {% endblock %}
             </div>
           </div>
+          {% block alerts %}
           <div class="row">
             <div id="alert-error" class="alert alert-danger hidden">
               <strong>Upsi!</strong> <span></span>
@@ -26,6 +27,8 @@
               Du solltest eine Email in Deinem Postfach haben, die weitere Informationen beinhaltet.
             </div>
           </div>
+          {% endblock %}
+          {% block content %}
           <form id="form" method="POST" action="{{ url_for('post') }}" class="form-horizontal">
             <div class="form-group">
               <label class="col-sm-2 control-label" for="firstname">Name</label>
@@ -68,6 +71,7 @@
               </div>
             </div>
           </form>
+          {% endblock %}
         </div>
       </div>
     </div>
