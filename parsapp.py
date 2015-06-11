@@ -10,8 +10,6 @@ parsapp = Flask(__name__)
 
 @parsapp.route('/')
 def index():
-    variables = {}
-    return render_template('index.html', **variables)
 
 
 @parsapp.route('/post/', methods=['POST'])
