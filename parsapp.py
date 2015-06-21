@@ -6,6 +6,9 @@ from flask import (Flask,
                    make_response)
 from database import Participant, Degree
 from peewee import IntegrityError, fn
+from email.mime.text import MIMEText
+import smtplib
+from config import MAIL_ADDRESS, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
 
 parsapp = Flask(__name__)
 
@@ -32,6 +35,20 @@ def post():
             degree=degree,
             numberOfGuests=request.form.get('numberOfGuests'),
         )
+        participant = Participant.get(Participant.id == participant_id)
+        message = render_template('email.html')
+        msg = MIMEText(message)
+        msg['From'] = MAIL_ADDRESS
+        msg['To'] = participant.email
+        msg['Subject'] = 'Anmeldung zur Absolventenfeier'
+        try:
+            s = smtplib.SMTP(MAIL_SERVER)
+            s.starttls()
+            s.login(MAIL_LOGIN, MAIL_PASSWORD)
+            s.sendmail(MAIL_ADDRESS, [participant.email], msg.as_string())
+            s.quit()
+        except:
+            return make_response('Error!')
         return str(participant_id)
     except IntegrityError:
         return make_response('Diese Email wurde bereits eingetragen. '
