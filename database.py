@@ -5,8 +5,9 @@ from peewee import (SqliteDatabase,
                     ForeignKeyField)
 import os
 
-db = SqliteDatabase(os.path.realpath(os.path.dirname(__file__)
-                    + '/database.sqlite'))
+DBPATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                      'database.sqlite')
+db = SqliteDatabase(DBPATH)
 
 
 class Degree(Model):
