@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
   </head>
   <body>
     <div class="container">
@@ -15,7 +15,10 @@
           {% block alerts %}
           <div class="row">
             <div id="alert-error" class="alert alert-danger hidden">
-              <strong>Upsi!</strong> <span></span>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <div class="alert-text"></div>
             </div>
           </div>
           <div class="row">
@@ -25,6 +28,7 @@
               </button>
               <strong>Vielen Dank!</strong> Wir freuen uns, Dich bei der Absolventenfeier zu begrüßen.<br>
               Du solltest eine Email in Deinem Postfach haben, die weitere Informationen beinhaltet.
+              <div class="alert-text"></div>
             </div>
           </div>
           {% endblock %}
@@ -75,8 +79,8 @@
         </div>
       </div>
     </div>
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-2.1.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   </body>
 </html>

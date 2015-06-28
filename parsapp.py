@@ -13,6 +13,23 @@ from config import MAIL_ADDRESS, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
 parsapp = Flask(__name__)
 
 
+def sendmail(participant, template='email.html'):
+    message = render_template(template)
+    msg = MIMEText(message)
+    msg['From'] = MAIL_ADDRESS
+    msg['To'] = participant.email
+    msg['Subject'] = 'Anmeldung zur Absolventenfeier'
+    try:
+        s = smtplib.SMTP(MAIL_SERVER)
+        s.starttls()
+        s.login(MAIL_LOGIN, MAIL_PASSWORD)
+        s.sendmail(MAIL_ADDRESS, [participant.email], msg.as_string())
+        s.quit()
+        return 200
+    except:
+        return 400
+
+
 @parsapp.route('/')
 def index():
     return render_template('index.html')
@@ -22,6 +39,13 @@ def index():
 def edit(participant_id, token):
     participant = Participant.get(Participant.id == participant_id)
     return participant
+
+
+@parsapp.route('/resend/<int:participant_id>!<token>', methods=['POST'])
+def resend(participant_id, token):
+    participant = Participant.get(Participant.id == participant_id)
+    status = sendmail(participant)
+    return make_response('foo', status)
 
 
 @parsapp.route('/post/', methods=['POST'])
@@ -36,26 +60,10 @@ def post():
             numberOfGuests=request.form.get('numberOfGuests'),
         )
         participant = Participant.get(Participant.id == participant_id)
-        message = render_template('email.html')
-        msg = MIMEText(message)
-        msg['From'] = MAIL_ADDRESS
-        msg['To'] = participant.email
-        msg['Subject'] = 'Anmeldung zur Absolventenfeier'
-        try:
-            s = smtplib.SMTP(MAIL_SERVER)
-            s.starttls()
-            s.login(MAIL_LOGIN, MAIL_PASSWORD)
-            s.sendmail(MAIL_ADDRESS, [participant.email], msg.as_string())
-            s.quit()
-        except:
-            return make_response('Error!')
-        return str(participant_id)
+        status = sendmail(participant)
+        return make_response('Foo', status)
     except IntegrityError:
-        return make_response('Diese Email wurde bereits eingetragen. '
-                             'Du solltest eine Bestätigungsmail in Deinem '
-                             'Postfach finden, in der ein Link zur Änderung '
-                             'Deiner Daten aufgeführt ist.',
-                             400)
+        return make_response(render_template('alerts/email_exists.html'), 400)
 
 
 @parsapp.route('/admin/', methods=['GET'])

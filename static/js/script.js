@@ -30,13 +30,14 @@ $(document).ready(function(){
         highlightMissing();
         if(checkValues(data)) {
             console.log("Values ok, sending request");
-            $.post($(this).attr("action"), data, function(){
+            var jqxhr = $.post($(this).attr("action"), data, function(){
                 console.log("success");
                 $("#alert-added-successfully").removeClass("hidden");
-            }).fail(function(data){
+            });
+            jqxhr.fail(function(data){
                 $("#email").parent().parent().addClass("has-error");
                 $("#alert-error").removeClass("hidden");
-                $("#alert-error span").html(data.responseText);
+                $("#alert-error div.alert-text").html(data.responseText);
                 console.log("Error", data);
             });
         }
