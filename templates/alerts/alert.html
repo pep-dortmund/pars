@@ -1,0 +1,9 @@
+<div id="alert-{{ type }}" class="alert alert-{{ type }}">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <div class="alert-text">
+  {% block message %}
+  {% endblock %}
+  </div>
+</div>

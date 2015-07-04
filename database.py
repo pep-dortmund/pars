@@ -23,6 +23,12 @@ class Participant(Model):
     email = CharField(unique=True)
     numberOfGuests = IntegerField()
     degree = ForeignKeyField(Degree)
+    token = CharField()
+
+    def generate_token():
+        import hashlib
+        import random
+        return hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()
 
     class Meta:
         database = db

@@ -13,24 +13,13 @@
             </div>
           </div>
           {% block alerts %}
-          <div class="row">
-            <div id="alert-error" class="alert alert-danger hidden">
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-              <div class="alert-text"></div>
-            </div>
-          </div>
-          <div class="row">
-            <div id="alert-added-successfully" class="alert alert-success alert-dismissable hidden">
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-              <strong>Vielen Dank!</strong> Wir freuen uns, Dich bei der Absolventenfeier zu begrüßen.<br>
-              Du solltest eine Email in Deinem Postfach haben, die weitere Informationen beinhaltet.
-              <div class="alert-text"></div>
-            </div>
-          </div>
+            {% with messages = get_flashed_messages() %}
+              {% for message in messages%}
+              <div class="row">
+                {{ message|safe }}
+              </div>
+              {% endfor %}
+            {% endwith %}
           {% endblock %}
           {% block content %}
           <form id="form" method="POST" action="{{ url_for('post') }}" class="form-horizontal">

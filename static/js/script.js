@@ -24,22 +24,11 @@ function highlightMissing(){
 
 $(document).ready(function(){
     $("#form").submit(function(){
-        event.preventDefault();
-        $(".alert").addClass("hidden");
         var data = $(this).serializeArray();
-        highlightMissing();
         if(checkValues(data)) {
-            console.log("Values ok, sending request");
-            var jqxhr = $.post($(this).attr("action"), data, function(){
-                console.log("success");
-                $("#alert-added-successfully").removeClass("hidden");
-            });
-            jqxhr.fail(function(data){
-                $("#email").parent().parent().addClass("has-error");
-                $("#alert-error").removeClass("hidden");
-                $("#alert-error div.alert-text").html(data.responseText);
-                console.log("Error", data);
-            });
+            return;
         }
+        highlightMissing();
+        event.preventDefault();
     })
 });
