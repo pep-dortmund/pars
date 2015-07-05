@@ -24,38 +24,34 @@
           {% block content %}
           <form id="form" method="POST" action="{{ url_for('post') }}" class="form-horizontal">
             <div class="form-group">
-              <label class="col-sm-2 control-label" for="firstname">Name</label>
+              {{ form.firstname.label(class='col-sm-2 control-label') }}
               <div class="col-sm-5">
-                <input type="text" name="firstname" placeholder="Vorname" class="required form-control">
+                {{ form.firstname(class='required form-control', placeholder='Max') }}
               </div>
               <div class="col-sm-5">
-                <input type="text" name="lastname" placeholder="Nachname" class="required form-control">
+                {{ form.lastname(class='required form-control', placeholder='Mustermann') }}
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-2 control-label" for="email">Email</label>
+              {{ form.email.label(class='col-sm-2 control-label') }}
               <div class="col-sm-10">
-                <input type="email" name="email" id="email" placeholder="muster@tu-dortmund.de" class="required form-control">
+                {{ form.email(class='required form-control', placeholder='muster@tu-dortmund.de') }}
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-2 control-label" for="degree">Abschluss</label>
+              {{ form.degree.label(class='col-sm-2 control-label') }}
               <div class="col-sm-10">
+              {% for d in form.degree %}
                 <label class="radio-inline">
-                  <input type="radio" name="degree" value="ba" checked> Bachelor
+                  {{ d }} {{ d.label }}
                 </label>
-                <label class="radio-inline">
-                  <input type="radio" name="degree" value="ma"> Master
-                </label>
-                <label class="radio-inline">
-                  <input type="radio" name="degree" value="dr"> Doktor
-                </label>
+              {% endfor %}
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-2 control-label" for="numberOfGuests">Anz. Gäste</label>
+              {{ form.guests.label(class='col-sm-2 control-label') }}
               <div class="col-sm-10">
-                <input type="number" name="numberOfGuests" placeholder="2" class="required form-control" min="0">
+                {{ form.guests(class='required form-control', placeholder='1', type='number', min='0') }}
               </div>
             </div>
             <div class="form-group">

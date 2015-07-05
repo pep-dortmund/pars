@@ -9,6 +9,7 @@ from database import Participant, Degree
 from peewee import IntegrityError, fn
 from email.mime.text import MIMEText
 import smtplib
+from forms import RegForm
 from config import MAIL_ADDRESS, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
 
 parsapp = Flask(__name__)
@@ -31,20 +32,22 @@ def sendmail(participant, template='email.html'):
         flash(render_template('generic', message='Mailserver Error.'))
 
 
-@parsapp.route('/')
+@parsapp.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    form = RegForm()
+    return render_template('index.html', form=form)
 
 
 @parsapp.route('/edit/<int:participant_id>!<token>')
 def edit(participant_id, token):
     try:
+        form = RegForm(request.POST)
         participant = Participant.get(Participant.id == participant_id,
                                       Participant.token == token)
         print(participant.id)
     except:
         pass
-    return redirect(url_for('index'))
+    return render_template('index.html', form=form)
 
 
 @parsapp.route('/resend/<int:participant_id>!<token>', methods=['GET'])
