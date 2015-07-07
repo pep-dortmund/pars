@@ -9,6 +9,9 @@ class RegForm(Form):
     firstname = StringField('Vorname')
     lastname = StringField('Nachname')
     email = StringField('Email')
-    degrees = [(d.name, d.name) for d in Degree.select()]
-    degree = RadioField('Abschluss', choices=degrees)
-    guests = IntegerField('Anz. Gäste')
+    degree = RadioField(
+        'Abschluss',
+        choices=[(d.id, d.name) for d in Degree.select()],
+        coerce=int
+    )
+    numberOfGuests = IntegerField('Anz. Gäste')
