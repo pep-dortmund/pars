@@ -38,16 +38,23 @@ def index():
     return render_template('index.html', form=form)
 
 
-@parsapp.route('/edit/<int:participant_id>!<token>')
+@parsapp.route('/edit/<int:participant_id>!<token>', methods=['GET', 'POST'])
 def edit(participant_id, token):
     try:
-        form = RegForm(request.POST)
         participant = Participant.get(Participant.id == participant_id,
                                       Participant.token == token)
-        print(participant.id)
+        form = RegForm(request.form, participant)
+        if request.method == 'POST' and form.validate():
+            form.populate_obj(participant)
+            participant.save()
+            flash(render_template('alerts/edit_successfull.html'))
+            return redirect(url_for('index'))
+        form.degree.data = participant.degree.id
+        return render_template('index.html', form=form,
+                               participant_id=participant_id, token=token)
     except:
-        pass
-    return render_template('index.html', form=form)
+        flash(render_template('alerts/no_permission.html'))
+        return redirect(url_for('index'))
 
 
 @parsapp.route('/resend/<int:participant_id>!<token>', methods=['GET'])
@@ -64,26 +71,28 @@ def resend(participant_id, token):
 
 @parsapp.route('/post/', methods=['POST'])
 def post():
-    try:
-        degree, created = Degree.get_or_create(name=request.form.get('degree'))
-        participant_id = Participant.create(
-            firstname=request.form.get('firstname'),
-            lastname=request.form.get('lastname'),
-            email=request.form.get('email'),
-            degree=degree,
-            token=Participant.generate_token(),
-            numberOfGuests=request.form.get('numberOfGuests'),
-        )
-        participant = Participant.get(Participant.id == participant_id)
-        sendmail(participant)
-        flash(render_template('alerts/subscription_successfull.html'))
-    except IntegrityError:
-        participant = Participant.get(
-            Participant.email == request.form.get('email')
-        )
-        print(participant.token)
-        flash(render_template('alerts/email_exists.html',
-              participant=participant))
+    form = RegForm(request.form)
+    if form.validate():
+        try:
+            participant = Participant(
+                firstname=form.firstname.data,
+                lastname=form.lastname.data,
+                email=form.email.data,
+                token=Participant.generate_token(),
+                degree=form.degree.data,
+                numberOfGuests=form.numberOfGuests.data
+            )
+            participant.save()
+            sendmail(participant)
+            flash(render_template('alerts/subscription_successfull.html'))
+        except IntegrityError:
+            participant = Participant.get(Participant.email == form.email.data)
+            flash(render_template('alerts/email_exists.html',
+                  participant=participant))
+    else:
+        flash(render_template('alerts/alert.html',
+              message=form.errors,
+              type='danger'))
     return redirect(url_for('index'))
 
 

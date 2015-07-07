@@ -22,7 +22,7 @@
             {% endwith %}
           {% endblock %}
           {% block content %}
-          <form id="form" method="POST" action="{{ url_for('post') }}" class="form-horizontal">
+          <form id="form" method="POST" action="{% if token %}{{ url_for('edit', participant_id=participant_id, token=token) }}{% else %}{{ url_for('post') }}{% endif %}" class="form-horizontal">
             <div class="form-group">
               {{ form.firstname.label(class='col-sm-2 control-label') }}
               <div class="col-sm-5">
@@ -49,9 +49,9 @@
               </div>
             </div>
             <div class="form-group">
-              {{ form.guests.label(class='col-sm-2 control-label') }}
+              {{ form.numberOfGuests.label(class='col-sm-2 control-label') }}
               <div class="col-sm-10">
-                {{ form.guests(class='required form-control', placeholder='1', type='number', min='0') }}
+                {{ form.numberOfGuests(class='required form-control', placeholder='1', type='number', min='0') }}
               </div>
             </div>
             <div class="form-group">
