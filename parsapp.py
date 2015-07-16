@@ -10,23 +10,26 @@ from peewee import IntegrityError, fn
 from email.mime.text import MIMEText
 import smtplib
 from forms import RegForm
-from config import MAIL_ADDRESS, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD
+from config import (MAIL_ADDRESS, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD,
+                    ALLOWED_MAIL_SERVER)
+
 
 parsapp = Flask(__name__)
 parsapp.secret_key = 'ABC'
 
 
 def sendmail(participant, template='email.html'):
+    print("Sending mail to {}".format(participant._email))
     message = render_template(template, participant=participant)
     msg = MIMEText(message, 'html')
     msg['From'] = MAIL_ADDRESS
-    msg['To'] = participant.email
+    msg['To'] = participant._email
     msg['Subject'] = 'Anmeldung zur Absolventenfeier'
     try:
         s = smtplib.SMTP(MAIL_SERVER)
         s.starttls()
         s.login(MAIL_LOGIN, MAIL_PASSWORD)
-        s.sendmail(MAIL_ADDRESS, [participant.email], msg.as_string())
+        s.sendmail(MAIL_ADDRESS, msg['To'], msg.as_string())
         s.quit()
     except:
         flash(render_template('generic', message='Mailserver Error.'))
@@ -35,7 +38,8 @@ def sendmail(participant, template='email.html'):
 @parsapp.route('/', methods=['GET'])
 def index():
     form = RegForm()
-    return render_template('index.html', form=form)
+    return render_template('index.html', form=form,
+                           mailextension=ALLOWED_MAIL_SERVER)
 
 
 @parsapp.route('/edit/<int:participant_id>!<token>', methods=['GET', 'POST'])
@@ -51,7 +55,8 @@ def edit(participant_id, token):
             return redirect(url_for('index'))
         form.degree.data = participant.degree.id
         return render_template('index.html', form=form,
-                               participant_id=participant_id, token=token)
+                               participant_id=participant_id, token=token,
+                               mailextension=ALLOWED_MAIL_SERVER)
     except:
         flash(render_template('alerts/no_permission.html'))
         return redirect(url_for('index'))
@@ -86,7 +91,9 @@ def post():
             sendmail(participant)
             flash(render_template('alerts/subscription_successfull.html'))
         except IntegrityError:
-            participant = Participant.get(Participant.email == form.email.data)
+            participant = Participant.get(
+                Participant._email == form.email.data + ALLOWED_MAIL_SERVER
+            )
             flash(render_template('alerts/email_exists.html',
                   participant=participant))
     else:

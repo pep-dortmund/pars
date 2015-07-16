@@ -4,6 +4,7 @@ from peewee import (SqliteDatabase,
                     IntegerField,
                     ForeignKeyField)
 import os
+from config import ALLOWED_MAIL_SERVER
 
 DBPATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                       'database.sqlite')
@@ -20,10 +21,22 @@ class Degree(Model):
 class Participant(Model):
     firstname = CharField()
     lastname = CharField()
-    email = CharField(unique=True)
+    _email = CharField(unique=True)
     numberOfGuests = IntegerField()
     degree = ForeignKeyField(Degree)
     token = CharField()
+
+    @property
+    def email(self):
+        return self._email.replace(ALLOWED_MAIL_SERVER, '')
+
+    @email.setter
+    def email(self, value):
+        self._email = value + ALLOWED_MAIL_SERVER
+
+    @email.deleter
+    def email(self):
+        del self._email
 
     def generate_token():
         import hashlib
