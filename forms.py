@@ -6,7 +6,7 @@ from database import Degree
 
 
 class RegForm(Form):
-    firstname = StringField('Vorname')
+    firstname = StringField('Name')
     lastname = StringField('Nachname')
     email = StringField('Email')
     degree = RadioField(
