@@ -7,19 +7,11 @@
             templateUrl: 'templates/main-form.html',
             controller: function(){
                 this.mailDomain = '@tu-dortmund.de';
-                this.degrees = [
-                    {
-                        name: 'Bachelor',
-                        id: 'ba'
-                    },
-                    {
-                        name: 'Master',
-                        id: 'ma'
-                    },
-                    {
-                        name: 'Doktor',
-                        id: 'dr'
-                    }];
+                this.degrees = {
+                    'ba': {'id': 'ba', 'name': 'Bachelor'},
+                    'ma': {'id': 'ma', 'name': 'Master'},
+                    'dr': {'id': 'dr', 'name': 'Doktor'}
+                }
 
                 var participant = this;
                 this.save = function(){
