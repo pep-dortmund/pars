@@ -1,40 +1,44 @@
 <form name="form" novalidate class="form-horizontal" ng-submit="participant.save()">
-  <div class="form-group">
+  <div class="form-group" ng-class="form.$submitted && (form.firstname.$error.required || form.lastname.$error.required) ? 'has-error' : ''">
     <label for="firstname" class="col-sm-2 control-label">Name</label>
-    <div class="col-sm-5" ng-class="form.$submitted ? {'has-error': form.firstname.$error.required} : ''">
-      <input name="firstname" type="text" class="form-control" ng-model="participant.firstname" required>
+    <div class="col-sm-5">
+      <input name="firstname" type="text" placeholder="Max" class="form-control" ng-model="participant.firstname" required>
     </div>
-    <div class="col-sm-5" ng-class="form.$submitted ? {'has-error': form.lastname.$error.required} : ''">
-      <input name="lastname" type="text" class="form-control" ng-model="participant.lastname" required>
+    <div class="col-sm-5">
+      <input name="lastname" type="text" placeholder="Musternöthe" class="form-control" ng-model="participant.lastname" required>
     </div>
+    <span id="helpBlock" class="help-block col-sm-offset-2 col-sm-10" ng-show="form.$submitted && (form.firstname.$error.required || form.lastname.$error.required)">Bitte trage Vor- und Nachnamen ein. So wirst du bei der Absolventenfeier aufgerufen.</span>
   </div>
-  <div class="form-group">
+  <div class="form-group" ng-class="{'has-error': form.email.$error.pattern || form.$submitted && form.email.$error.required}">
     <label for="email" class="col-sm-2 control-label">Email</label>
-    <div class="col-sm-10" ng-class="{'has-error': form.email.$error.pattern || form.$submitted && form.email.$error.required}">
+    <div class="col-sm-10">
       <div class="input-group">
-        <input type="text" name="email" class="form-control" ng-pattern="/^(\w*\d*\.*)*$/" ng-model="participant.email" required>
+        <input type="text" placeholder="max.musternoethe" name="email" class="form-control" ng-pattern="/^(\w*\d*\.*)*$/" ng-model="participant.email" required>
         <div class="input-group-addon">{{ participant.mailDomain }}</div>
       </div>
     </div>
+    <span id="helpBlock" class="help-block col-sm-offset-2 col-sm-10" ng-show="form.$submitted && (form.email.$error.required)">Bitte trage Deine TU-Mailadresse ein.</span>
+    <span id="helpBlock" class="help-block col-sm-offset-2 col-sm-10" ng-show="form.email.$error.pattern">Du kannst dich nur mit einer gültigen <code>@tu-dortmund</code>-Mailadresse eintragen.</span>
   </div>
-  <div class="form-group">
+  <div class="form-group" ng-class="{'has-error' : form.$submitted && form.degree.$error.required}">
     <label for="degree" class="col-sm-2 control-label">Abschluss</label>
     <div class="col-sm-10">
       <label class="radio-inline" ng-repeat="degree in participant.degrees">
-        <input type="radio" ng-model="participant.degree" ng-value="degree.id">{{ degree.name }}
+        <input type="radio" name="degree" ng-model="participant.degree" ng-value="degree.id" required>{{ degree.name }}
       </label>
     </div>
+    <span id="helpBlock" class="help-block col-sm-offset-2 col-sm-10" ng-show="form.$submitted && form.degree.$error.required">Bitte triff eine Auswahl.</span>
   </div>
-  <div class="form-group">
+  <div class="form-group" ng-class="{'has-error' : form.$submitted && form.guests.$error.required}">
     <label for="guests" class="col-sm-2 control-label">Anz. Gäste</label>
     <div class="col-sm-10">
-      <input type="number" class="form-control" ng-model="participant.guests" min="0">
+      <input type="number" name="guests" class="form-control" ng-model="participant.guests" min="0" required>
     </div>
+    <span id="helpBlock" class="help-block col-sm-offset-2 col-sm-10" ng-show="form.$submitted && form.guests.$error.required">Wie viele Gäste bringst du mit (einschließlich Dir)?</span>
   </div>
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <button id="submit" type="submit" class="btn btn-default">Eintragen</button>
     </div>
   </div>
-  {{ main.input.$error.required }}
 </form>
