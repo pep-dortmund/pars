@@ -1,34 +1,32 @@
-function checkValues(data){
-    var required = 0;
-    $(data).each(function(index, value){
-        if(value.value == ""){
-            required = required + 1;
+(function(){
+    var app = angular.module("app", []);
+
+    app.directive('mainFormular', function(){
+        return {
+            restrict: 'E',
+            templateUrl: 'templates/test.html',
+            controller: function(){
+                this.mailDomain = '@tu-dortmund.de';
+                this.degrees = [
+                    {
+                        name: 'Bachelor',
+                        id: 'ba'
+                    },
+                    {
+                        name: 'Master',
+                        id: 'ma'
+                    },
+                    {
+                        name: 'Doktor',
+                        id: 'dr'
+                    }];
+
+                var participant = this;
+                this.save = function(){
+                    console.log("Saving Participant. " + participant.firstname);
+                };
+            },
+            controllerAs: 'participant'
         }
     });
-    if(required == 0){
-        return true;
-    }
-    return false;
-}
-
-function highlightMissing(){
-    $("input.required").each(function(index, input){
-        console.log($(input).val());
-        if(!$(input).val()){
-            $(input).parent().parent().addClass("has-error");
-        } else {
-            $(input).parent().parent().removeClass("has-error");
-        }
-    });
-}
-
-$(document).ready(function(){
-    $("#form").submit(function(){
-        var data = $(this).serializeArray();
-        if(checkValues(data)) {
-            return;
-        }
-        highlightMissing();
-        event.preventDefault();
-    })
-});
+}());
