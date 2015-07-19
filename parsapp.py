@@ -1,11 +1,8 @@
 #! /usr/bin/env python3
 from flask import (Flask,
                    render_template,
-                   url_for,
-                   request,
-                   redirect,
-                   flash,
-                   send_from_directory)
+                   send_from_directory,
+                   jsonify)
 from database import Participant, Degree
 from email.mime.text import MIMEText
 import smtplib
