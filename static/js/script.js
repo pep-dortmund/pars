@@ -4,7 +4,7 @@
     app.directive('mainFormular', function(){
         return {
             restrict: 'E',
-            templateUrl: 'templates/test.html',
+            templateUrl: 'templates/main-form.html',
             controller: function(){
                 this.mailDomain = '@tu-dortmund.de';
                 this.degrees = [
