@@ -6,8 +6,14 @@ from peewee import (SqliteDatabase,
 import os
 from config import ALLOWED_MAIL_SERVER
 
-DBPATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                      'database.sqlite')
+DBPATH = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    'database.sqlite',
+)
+
+if not os.path.isfile(DBPATH):
+    raise IOError('database must be created with setup_db.py first')
+
 db = SqliteDatabase(DBPATH)
 
 
@@ -47,4 +53,3 @@ class Participant(Model):
         database = db
 
 db.connect()
-db.create_tables([Participant, Degree], safe=True)
