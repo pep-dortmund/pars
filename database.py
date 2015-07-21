@@ -47,4 +47,3 @@ class Participant(Model):
         database = db
 
 db.connect()
-db.create_tables([Participant, Degree], safe=True)
