@@ -19,7 +19,7 @@
   {% for p in parts %}
   <tr id="{{ p.id }}">
     <td>{{ p.firstname }} {{ p.lastname }}</td>
-    <td>{{ p.email }}</td>
+    <td>{{ p._email }}</td>
     <td>{{ p.degree.name }}</td>
     <td>{{ p.numberOfGuests }}</td>
     <td><a class="btn btn-xs btn-default" href="{{ url_for('delete', pid=p.id) }}">⨉</a></td>
