@@ -7,7 +7,7 @@
     <div class="col-md-4">
       <input name="lastname" type="text" placeholder="Musternöthe" class="form-control" ng-model="participant.lastname" required>
     </div>
-    <span id="helpBlock" class="help-block col-md-offset-2 col-md-10" ng-show="form.$submitted && (form.firstname.$error.required || form.lastname.$error.required)">Bitte trage Vor- und Nachnamen ein. So wirst du bei der Absolventenfeier aufgerufen.</span>
+    <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.$submitted && (form.firstname.$error.required || form.lastname.$error.required)">Bitte trage Vor- und Nachnamen ein. So wirst du bei der Absolventenfeier aufgerufen.</span>
   </div>
   <div class="form-group" ng-class="{'has-error': form.email.$error.pattern || form.$submitted && form.email.$error.required}">
     <label for="email" class="col-md-4 control-label">Email</label>
@@ -17,8 +17,8 @@
         <div class="input-group-addon">{{ participant.mailDomain }}</div>
       </div>
     </div>
-    <span id="helpBlock" class="help-block col-md-offset-2 col-md-10" ng-show="form.$submitted && (form.email.$error.required)">Bitte trage Deine TU-Mailadresse ein.</span>
-    <span id="helpBlock" class="help-block col-md-offset-2 col-md-10" ng-show="form.email.$error.pattern">Du kannst dich nur mit einer gültigen <code>@tu-dortmund</code>-Mailadresse eintragen.</span>
+    <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.$submitted && (form.email.$error.required)">Bitte trage Deine TU-Mailadresse ein.</span>
+    <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.email.$error.pattern">Du kannst dich nur mit einer gültigen <code>@tu-dortmund</code>-Mailadresse eintragen.</span>
   </div>
   <div class="form-group" ng-class="{'has-error' : form.$submitted && form.degree.$error.required}">
     <label for="degree" class="col-md-4 control-label">Abschluss</label>
@@ -27,21 +27,23 @@
         <input type="radio" name="degree" ng-model="participant.degree" ng-value="degree.id" required>{{ degree.name }}
       </label>
     </div>
-    <span id="helpBlock" class="help-block col-md-offset-2 col-md-10" ng-show="form.$submitted && form.degree.$error.required">Bitte triff eine Auswahl.</span>
+    <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.$submitted && form.degree.$error.required">Bitte triff eine Auswahl.</span>
   </div>
   <div class="form-group" ng-class="{'has-error' : form.$submitted && form.title.$error.required}">
     <label for="title" class="col-md-4 control-label">Titel der {{ participant.degree ? participant.degrees[participant.degree].name + '-' : ' ' }}Arbeit</label>
     <div class="col-md-8">
-      <input type="text" name="title" class="form-control" ng-model="participant.title" required>
+      <input type="text" name="title" class="form-control" ng-model="participant.title" ng-change="participant.updateTex()" required>
     </div>
-    <span id="helpBlock" class="help-block col-md-offset-2 col-md-10" ng-show="form.$submitted && form.title.$error.required">Bitte gibt hier den Titel Deiner Abschlussarbeit ein (schön mit TeX und so).</span>
+    <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.$submitted && form.title.$error.required">Bitte gibt hier den Titel Deiner Abschlussarbeit ein (schön mit TeX und so).</span>
+    <div ng-bind-html="participant.tex" class="tex-title col-md-offset-4 col-md-8">
+    </div>
   </div>
   <div class="form-group" ng-class="{'has-error' : form.$submitted && form.guests.$error.required}">
     <label for="guests" class="col-md-4 control-label">Anz. Gäste</label>
     <div class="col-md-8">
       <input type="number" name="guests" class="form-control" ng-model="participant.guests" min="0" required>
     </div>
-    <span id="helpBlock" class="help-block col-md-offset-2 col-md-10" ng-show="form.$submitted && form.guests.$error.required">Wie viele Gäste bringst du mit (einschließlich Dir)?</span>
+    <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.$submitted && form.guests.$error.required">Wie viele Gäste bringst du mit (einschließlich Dir)?</span>
   </div>
   <div class="form-group">
     <div class="col-md-offset-4 col-md-8">
