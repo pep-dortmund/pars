@@ -23,16 +23,16 @@ function seperateTeX(string){
         return {
             restrict: 'E',
             templateUrl: 'templates/main-form.html',
-            controller: ['$sce', function($sce){
-                this.mailDomain = '@tu-dortmund.de';
-                this.degrees = {
+            controller: ['$sce', '$scope', '$http', function($sce, $scope, $http){
+                $scope.mailDomain = '@tu-dortmund.de';
+                $scope.degrees = {
                     'ba': {'id': 'ba', 'name': 'Bachelor'},
                     'ma': {'id': 'ma', 'name': 'Master'},
                     'dr': {'id': 'dr', 'name': 'Doktor'}
                 }
-                this.title = "";
-
                 var participant = this;
+
+                participant.title = "";
 
                 this.updateTex = function(){
                     try {
@@ -49,7 +49,7 @@ function seperateTeX(string){
                                 completeString += string;
                             }
                         }
-                        participant.tex = $sce.trustAsHtml(completeString);
+                        $scope.tex = $sce.trustAsHtml(completeString);
                     }
                     catch(ParseError){ }
                 }

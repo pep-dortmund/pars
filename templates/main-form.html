@@ -14,7 +14,7 @@
     <div class="col-md-8">
       <div class="input-group">
         <input type="text" placeholder="max.musternoethe" name="email" class="form-control" ng-pattern="/^(\w*\d*\.*)*$/" ng-model="participant.email" required>
-        <div class="input-group-addon">{{ participant.mailDomain }}</div>
+        <div class="input-group-addon">{{ mailDomain }}</div>
       </div>
     </div>
     <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.$submitted && (form.email.$error.required)">Bitte trage Deine TU-Mailadresse ein.</span>
@@ -23,20 +23,20 @@
   <div class="form-group" ng-class="{'has-error' : form.$submitted && form.degree.$error.required}">
     <label for="degree" class="col-md-4 control-label">Abschluss</label>
     <div class="col-md-8">
-      <label class="radio-inline" ng-repeat="degree in participant.degrees">
+      <label class="radio-inline" ng-repeat="degree in degrees">
         <input type="radio" name="degree" ng-model="participant.degree" ng-value="degree.id" required>{{ degree.name }}
       </label>
     </div>
     <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.$submitted && form.degree.$error.required">Bitte triff eine Auswahl.</span>
   </div>
   <div class="form-group" ng-class="{'has-error' : form.$submitted && form.title.$error.required}">
-    <label for="title" class="col-md-4 control-label">Titel der {{ participant.degree ? participant.degrees[participant.degree].name + '-' : ' ' }}Arbeit</label>
+    <label for="title" class="col-md-4 control-label">Titel der {{ participant.degree ? degrees[participant.degree].name + '-' : ' ' }}Arbeit</label>
     <div class="col-md-8">
       <input type="text" name="title" class="form-control" ng-model="participant.title" ng-change="participant.updateTex()" required>
     </div>
     <span id="helpBlock" class="help-block col-md-offset-4 col-md-8" ng-show="form.$submitted && form.title.$error.required">Bitte gibt hier den Titel Deiner Abschlussarbeit ein (schön mit TeX und so).</span>
-    <div class="tex-title col-md-offset-4 col-md-8" ng-show="participant.tex">
-      <p ng-bind-html="participant.tex"></p>
+    <div class="tex-title col-md-offset-4 col-md-8" ng-show="tex">
+      <p ng-bind-html="tex"></p>
     </div>
   </div>
   <div class="form-group" ng-class="{'has-error' : form.$submitted && form.guests.$error.required}">
