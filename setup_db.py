@@ -15,8 +15,8 @@ db.connect()
 from database import Degree, Participant
 db.create_tables([Participant, Degree], safe=True)
 
-ba = Degree.create(name='Bachelor')
-ma = Degree.create(name='Master')
-phd = Degree.create(name='Promotion')
+ba = Degree.create(id='ba', name='Bachelor')
+ma = Degree.create(id='ma', name='Master')
+phd = Degree.create(id='dr', name='Doktor')
 
 db.close()

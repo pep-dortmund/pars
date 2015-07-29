@@ -12,6 +12,7 @@ db = SqliteDatabase(DBPATH)
 
 
 class Degree(Model):
+    id = CharField(primary_key=True)
     name = CharField()
 
     class Meta:
