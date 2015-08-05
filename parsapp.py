@@ -2,8 +2,11 @@
 from flask import (Flask,
                    render_template,
                    send_from_directory,
-                   jsonify)
+                   jsonify,
+                   request,
+                   make_response)
 from database import Participant, Degree
+from peewee import IntegrityError
 from email.mime.text import MIMEText
 import smtplib
 from config import (MAIL_ADDRESS, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD,
@@ -28,12 +31,42 @@ def sendmail(participant, template='email.html'):
         s.sendmail(MAIL_ADDRESS, msg['To'], msg.as_string())
         s.quit()
     except:
-        flash(render_template('generic', message='Mailserver Error.'))
+        pass
 
 
 @parsapp.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
+
+
+@parsapp.route('/api/', methods=['POST'])
+@parsapp.route('/api/<function>/', methods=['GET'])
+def api(function=None):
+    if not function:
+        try:
+            participant = Participant(**request.get_json())
+            participant.degree = Degree.get(
+                Degree.id == request.get_json().get('degree')
+            )
+            participant.token = Participant.generate_token()
+            participant.save()
+            response = make_response(
+                jsonify(message='Success', token=participant.token),
+                200
+            )
+        except IntegrityError:
+            response = make_response(
+                jsonify(errormessage='User already in Database.'),
+                400
+            )
+        return response
+    else:
+        if function == 'degrees':
+            degrees = {}
+            for d in Degree.select():
+                degrees[str(d.id)] = {'id': d.id, 'name': d.name}
+            return jsonify(**degrees)
+        return ''
 
 
 @parsapp.route('/templates/<path:path>')
