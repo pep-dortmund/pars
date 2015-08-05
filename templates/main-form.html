@@ -30,7 +30,7 @@
     <span id="helpBlock" class="help-block col-sm-offset-4 col-sm-8" ng-show="form.$submitted && form.degree.$error.required">Bitte triff eine Auswahl.</span>
   </div>
   <div class="form-group" ng-class="{'has-error' : form.$submitted && form.title.$error.required}">
-    <label for="title" class="col-sm-4 control-label">Titel der {{ participantCtrl.participant.degree ? degrees[participantCtrl.participant.degree].name + '-' : ' ' }}Arbeit</label>
+    <label for="title" class="col-sm-4 control-label">Titel der {{ participantCtrl.participant.degree ? degrees[participantCtrl.participant.degree].name + '-' : ' ' }}Arbeit (LaTeX-Formeln möglich in $ $)</label>
     <div class="col-sm-8">
       <input type="text" name="title" class="form-control" ng-model="participantCtrl.participant.title" ng-change="participantCtrl.updateTex()" required>
     </div>
