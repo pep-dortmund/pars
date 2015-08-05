@@ -17,27 +17,51 @@ function seperateTeX(string){
 }
 
 (function(){
-    var app = angular.module("app", []);
+    var app = angular.module("app", ["ngCookies"]);
+
+    app.directive('alertMessages', function(){
+        return {
+            restrict: 'E',
+            templateUrl: 'templates/messages.html',
+            controller: ['$scope', function($scope){
+                $scope.messages = [];
+                this.messages = $scope.messages;
+                this.resetMessages = function(){
+                    while($scope.messages.length){
+                        $scope.messages.pop();
+                    }
+                };
+                this.resendMail = function(){
+                    var mail = $scope.email;
+                    console.log("Resend Email to " + mail);
+                };
+                $scope.resetMessages = this.resetMessages;
+            }],
+            controllerAs: 'messageCtrl'
+        }
+    });
 
     app.directive('mainFormular', function(){
         return {
             restrict: 'E',
             templateUrl: 'templates/main-form.html',
-            controller: ['$sce', '$scope', '$http', function($sce, $scope, $http){
+            controller: ['$sce', '$scope', '$http', '$compile', '$cookies', function($sce, $scope, $http, $compile, $cookies){
                 $scope.mailDomain = '@tu-dortmund.de';
-                $scope.degrees = {
-                    'ba': {'id': 'ba', 'name': 'Bachelor'},
-                    'ma': {'id': 'ma', 'name': 'Master'},
-                    'dr': {'id': 'dr', 'name': 'Doktor'}
-                }
-                var participant = this;
-
-                participant.title = "";
-
+                $http.get("/api/degrees")
+                    .success(function(data, status, headers, config){
+                        $scope.degrees = data;
+                    })
+                    .error(function(data, status, headers, config){
+                        $scope.messages.push({
+                            text: 'Es konnten nicht alle Ressourcen geladen werden. Versuche es später noch einmal.',
+                            type: 'error'
+                        })
+                    });
                 this.updateTex = function(){
                     try {
-                        participant.title = participant.title || "";
-                        var stringArray = seperateTeX(participant.title);
+                        var p = participantCtrl.participant;
+                        p.title = p.title || "";
+                        var stringArray = seperateTeX(p.title);
                         var completeString = "";
                         for(var i=0; i<stringArray.length; i++){
                             var string = stringArray[i];
@@ -53,12 +77,33 @@ function seperateTeX(string){
                     }
                     catch(ParseError){ }
                 }
-
                 this.save = function(){
-                    console.log("Saving Participant. " + participant.firstname);
+                    $scope.loading = true;
+                    $scope.resetMessages();
+                    var p = participantCtrl.participant;
+                    $scope.email = p.email;
+                    $http.post("/api/", p)
+                        .success(function(data, status, headers, config){
+                            $scope.loading = false;
+                            $scope.messages.push('subscriptionSuccessfull');
+                            p.token = data.token;
+                            $cookies.putObject('participant', p);
+                        }).error(function(data, status, headers, config){
+                            $scope.loading = false;
+                            $scope.messages.push('mailExists');
+                        });
                 };
+
+                var participantCtrl = this;
+                var pCookie = $cookies.getObject("participant");
+                if(pCookie){
+                    participantCtrl.participant = pCookie;
+                    this.updateTex();
+                } else {
+                    participantCtrl.participant = {title: ""};
+                }
             }],
-            controllerAs: 'participant'
+            controllerAs: 'participantCtrl'
         }
     });
 }());

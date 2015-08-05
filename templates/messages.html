@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-sm-8 col-sm-offset-4">
+    <div class="alert alert-warning" ng-show="messages.indexOf('mailExists') > -1">
+      Diese Email wurde bereits eingetragen. 
+      Du solltest eine Bestätigungsmail in Deinem 
+      Postfach finden, in der ein Link zur Änderung 
+      Deiner Daten aufgeführt ist. 
+      <a href="" class="alert-link" ng-click="messageCtrl.resendMail()">Email erneut versenden.</a> 
+    </div>
+    <div class="alert alert-success" ng-show="messages.indexOf('subscriptionSuccessfull') > -1">
+      Du hast Dich erfolgreich zur Absolventenfeier angemeldet.
+      Überprüfe dein Postfach für weitere Informationen.
+    </div>
+  </div>
+</div>
