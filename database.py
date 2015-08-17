@@ -25,6 +25,7 @@ class Participant(Model):
     guests = IntegerField()
     degree = ForeignKeyField(Degree)
     token = CharField()
+    title = CharField()
 
     @property
     def email(self):
