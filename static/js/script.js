@@ -87,7 +87,9 @@ function seperateTeX(string){
                             $scope.loading = false;
                             $scope.messages.push('subscriptionSuccessfull');
                             p.token = data.token;
-                            $cookies.putObject('participant', p);
+                            now = new Date();
+                            $cookies.putObject( 'participant', p,
+                                { expires: new Date(now.getTime() + 90*24*3600*1000) });
                         }).error(function(data, status, headers, config){
                             $scope.loading = false;
                             $scope.messages.push('mailExists');
