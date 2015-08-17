@@ -1,0 +1,5 @@
+ALLOWED_MAIL_SERVER = '@tu-dortmund.de'
+MAIL_ADDRESS = 'noreply@server.com'
+MAIL_SERVER = 'server.com'
+MAIL_LOGIN = 'noreply-username'
+MAIL_PASSWORD = 'securepassword'
