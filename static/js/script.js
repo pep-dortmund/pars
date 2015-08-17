@@ -45,7 +45,7 @@ function seperateTeX(string){
         return {
             restrict: 'E',
             templateUrl: 'templates/main-form.html',
-            controller: ['$sce', '$scope', '$http', '$compile', '$cookies', function($sce, $scope, $http, $compile, $cookies){
+            controller: ['$sce', '$scope', '$http', '$compile', '$cookies', '$window', function($sce, $scope, $http, $compile, $cookies, $window){
                 $scope.mailDomain = '@tu-dortmund.de';
                 $http.get("/api/degrees")
                     .success(function(data, status, headers, config){
@@ -95,6 +95,14 @@ function seperateTeX(string){
                             $scope.messages.push('mailExists');
                         });
                 };
+                this.update = function(){
+                    console.log("updating participant");
+                    console.log(participantCtrl.participant);
+                }
+                this.reset = function(){
+                    $cookies.remove("participant");
+                    $window.location.reload();
+                }
 
                 var participantCtrl = this;
                 var pCookie = $cookies.getObject("participant");
