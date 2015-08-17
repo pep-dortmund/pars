@@ -125,6 +125,7 @@ function seperateTeX(string){
                 }
                 this.reset = function(){
                     $cookies.remove("participant");
+                    $location.url('/');
                     $window.location.reload();
                 }
 
