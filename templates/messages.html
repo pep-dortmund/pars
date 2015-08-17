@@ -1,6 +1,7 @@
 <div class="row">
   <div class="col-sm-8 col-sm-offset-4">
     <div class="alert alert-warning" ng-show="messages.indexOf('mailExists') > -1">
+      <button type="button" class="close" ng-click="messages.splice(messages.indexOf('mailExists'), 1)" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       Diese Email wurde bereits eingetragen. 
       Du solltest eine Bestätigungsmail in Deinem 
       Postfach finden, in der ein Link zur Änderung 
@@ -10,6 +11,10 @@
     <div class="alert alert-success" ng-show="messages.indexOf('subscriptionSuccessfull') > -1">
       Du hast Dich erfolgreich zur Absolventenfeier angemeldet.
       Überprüfe dein Postfach für weitere Informationen.
+    </div>
+    <div class="alert alert-success" ng-show="messages.indexOf('updateSuccessfull') > -1">
+      <button type="button" class="close" ng-click="messages.splice(messages.indexOf('updateSuccessfull'), 1)" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      Deine Angaben wurden aktualisiert.
     </div>
   </div>
 </div>

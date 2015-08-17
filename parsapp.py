@@ -22,7 +22,6 @@ parsapp.secret_key = 'ABC'
 
 
 def sendmail(participant, template='email.html'):
-    print("Sending mail to {}".format(participant._email))
     message = render_template(template, participant=participant)
     msg = MIMEText(message, 'html')
     msg['From'] = MAIL_ADDRESS
@@ -45,7 +44,7 @@ def index(participant_id=None, token=None):
 
 
 @parsapp.route('/api/', methods=['POST'])
-@parsapp.route('/api/<function>/', methods=['GET'])
+@parsapp.route('/api/<function>/', methods=['GET', 'POST'])
 def api(function=None):
     if not function:
         try:
@@ -80,7 +79,6 @@ def api(function=None):
             return jsonify(**degrees)
         if function == 'participant':
             p = Participant.get(id=request.args.get('participant_id'))
-            print(p.token)
             if p.token == request.args.get('token'):
                 pObj = {'firstname': p.firstname,
                         'lastname': p.lastname,
@@ -106,6 +104,21 @@ def api(function=None):
             except:
                 return(jsonify(errormessage='Fail'), 500)
             return(jsonify(message='Success'), 200)
+        if function == 'update':
+            p = Participant.get(id=request.args.get('participant_id'))
+            if p.token == request.args.get('token'):
+                p.firstname = request.get_json()['firstname']
+                p.lastname = request.get_json()['lastname']
+                p.degree = request.get_json()['degree']
+                p.title = request.get_json()['title']
+                p.guests = request.get_json()['guests']
+                p.save()
+                return make_response(jsonify(message='Success'), 200)
+            else:
+                return make_response(
+                    jsonify(errormessage='No access!'),
+                    401
+                )
         return ''
 
 

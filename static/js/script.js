@@ -68,19 +68,20 @@ function seperateTeX(string){
                         })
                     });
                 var currentLocation = $location.url();
-                if(currentLocation){
+                if(currentLocation && currentLocation != '/'){
                     var id = currentLocation.substr(1, currentLocation.indexOf('!') - 1);
                     var token = currentLocation.substr(currentLocation.indexOf('!') + 1);
                     $http.get("/api/participant/?participant_id=" + id + "&token=" + token)
                         .success(function(data, status, headers, config){
                             console.log(data);
                             participantCtrl.participant = data;
-                            participantCtrl.updateTex()
+                            participantCtrl.participant.id = id;
+                            participantCtrl.updateTex();
                         })
                         .error(function(data, status, headers, config){
                             console.log(data);
                         });
-                }
+                };
                 this.updateTex = function(){
                     try {
                         var p = participantCtrl.participant;
@@ -120,14 +121,20 @@ function seperateTeX(string){
                         });
                 };
                 this.update = function(){
-                    console.log("updating participant");
-                    console.log(participantCtrl.participant);
-                }
+                    var p = participantCtrl.participant;
+                    $http.post('/api/update/?participant_id=' + p.id + "&token=" + p.token, p)
+                        .success(function(data, status, headers, config){
+                            $scope.messages.push('updateSuccessfull');
+                        })
+                        .error(function(data, status, headers, config){
+                            console.log("fail");
+                        });
+                };
                 this.reset = function(){
                     $cookies.remove("participant");
                     $location.url('/');
                     $window.location.reload();
-                }
+                };
 
                 var participantCtrl = this;
                 var pCookie = $cookies.getObject("participant");

@@ -13,7 +13,7 @@
     <label for="email" class="col-sm-4 control-label">Email</label>
     <div class="col-sm-8">
       <div class="input-group">
-        <input type="text" placeholder="max.musternoethe" name="email" class="form-control" ng-pattern="/^(\w*\d*\.*)*$/" ng-model="participantCtrl.participant.email" required>
+        <input type="text" placeholder="max.musternoethe" name="email" class="form-control" ng-pattern="/^(\w*\d*\.*)*$/" ng-disabled="participantCtrl.participant.token" ng-model="participantCtrl.participant.email" required>
         <div class="input-group-addon">{{ mailDomain }}</div>
       </div>
     </div>
@@ -50,8 +50,8 @@
   <div class="form-group">
     <div class="col-sm-offset-4 col-sm-8">
       <button id="submit" type="submit" class="btn btn-default" ng-show="!participantCtrl.participant.token" ng-class="{'disabled': loading && form.$valid}">Eintragen</button>
-      <button id="update" type="button" ng-click="participantCtrl.updateParticipant()" class="btn btn-default" ng-show="participantCtrl.participant.token" ng-class="{'disabled': loading && form.$valid}">Aktualisieren</button>
-      <button id="update" type="button" ng-click="participantCtrl.reset()" class="btn btn-default" ng-show="participantCtrl.participant.token" ng-class="{'disabled': loading && form.$valid}">Neu</button>
+      <button id="update" type="button" ng-click="participantCtrl.update()" class="btn btn-default" ng-show="participantCtrl.participant.token" ng-class="{'disabled': loading && form.$valid}">Aktualisieren</button>
+      <button id="new" type="button" ng-click="participantCtrl.reset()" class="btn btn-default" ng-show="participantCtrl.participant.token" ng-class="{'disabled': loading && form.$valid}">Neu</button>
     </div>
   </div>
 </form>
