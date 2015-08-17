@@ -18,3 +18,18 @@
     </div>
   </div>
 </div>
+<div class="row" ng-show="loading">
+  <div id="loader" class="col-sm-8 col-sm-offset-4">
+    <svg width="70" height="20" class="center-block">
+      <rect width="20" height="20" x="0" y="0" rx="3" ry="3" fill="#ccc" fill-opacity="0.6">
+        <animate attributeName="opacity" values="1;0.15;1" dur="1000ms" repeatCount="indefinite"></animate>
+      </rect>
+      <rect width="20" height="20" x="25" y="0" rx="3" ry="3" fill="#ccc" fill-opacity="0.6">
+        <animate attributeName="opacity" values="1;0.15;1" dur="1000ms" begin="250ms" repeatCount="indefinite"></animate>
+      </rect>
+      <rect width="20" height="20" x="50" y="0" rx="3" ry="3" fill="#ccc" fill-opacity="0.6">
+        <animate attributeName="opacity" values="1;0.15;1" dur="1000ms" begin="500ms" repeatCount="indefinite"></animate>
+      </rect>
+    </svg>
+  </div>
+</div>

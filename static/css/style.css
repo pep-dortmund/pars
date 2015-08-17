@@ -2,3 +2,7 @@ div.tex-title {
     padding: 25px 25px 0px 25px;
     text-align: center;
 }
+
+div#loader {
+    margin-bottom: 15px;
+}

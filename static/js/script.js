@@ -33,12 +33,12 @@ function seperateTeX(string){
                 };
                 this.resendMail = function(){
                     var mail = $scope.email;
-                    $http.get("/api/resend/?email=" + mail)
-                        .success(function(data, status, headers, config){
-                            console.log(status);
-                        })
-                        .error(function(data, status, headers, config){
-                            console.log(status);
+                    $scope.loading = true;
+                    $http.get("/api/resend/?email=" + mail).then(
+                        function(){
+                            $scope.loading = false;
+                        }, function(){
+                            $scope.loading = false;
                         });
                 };
                 $scope.resetMessages = this.resetMessages;
@@ -57,11 +57,10 @@ function seperateTeX(string){
                                   $window, $location)
             {
                 $scope.mailDomain = '@tu-dortmund.de';
-                $http.get("/api/degrees")
-                    .success(function(data, status, headers, config){
-                        $scope.degrees = data;
-                    })
-                    .error(function(data, status, headers, config){
+                $http.get("/api/degrees/").then(
+                    function(r){
+                        $scope.degrees = r.data;
+                    }, function(){
                         $scope.messages.push({
                             text: 'Es konnten nicht alle Ressourcen geladen werden. Versuche es später noch einmal.',
                             type: 'error'
@@ -71,15 +70,15 @@ function seperateTeX(string){
                 if(currentLocation && currentLocation != '/'){
                     var id = currentLocation.substr(1, currentLocation.indexOf('!') - 1);
                     var token = currentLocation.substr(currentLocation.indexOf('!') + 1);
-                    $http.get("/api/participant/?participant_id=" + id + "&token=" + token)
-                        .success(function(data, status, headers, config){
-                            console.log(data);
-                            participantCtrl.participant = data;
+                    $scope.loading = true;
+                    $http.get("/api/participant/?participant_id=" + id + "&token=" + token).then(
+                        function(r){
+                            participantCtrl.participant = r.data;
                             participantCtrl.participant.id = id;
                             participantCtrl.updateTex();
-                        })
-                        .error(function(data, status, headers, config){
-                            console.log(data);
+                            $scope.loading = false;
+                        }, function(){
+                            $scope.loading = false;
                         });
                 };
                 this.updateTex = function(){
@@ -107,26 +106,29 @@ function seperateTeX(string){
                     $scope.resetMessages();
                     var p = participantCtrl.participant;
                     $scope.email = p.email;
-                    $http.post("/api/", p)
-                        .success(function(data, status, headers, config){
+                    $http.post("/api/", p).then(
+                        function(r){
+                            console.log(r);
                             $scope.loading = false;
                             $scope.messages.push('subscriptionSuccessfull');
-                            p.token = data.token;
+                            p.token = r.data.token;
                             now = new Date();
                             $cookies.putObject( 'participant', p,
                                 { expires: new Date(now.getTime() + 90*24*3600*1000) });
-                        }).error(function(data, status, headers, config){
+                        }, function(){
                             $scope.loading = false;
                             $scope.messages.push('mailExists');
                         });
                 };
                 this.update = function(){
                     var p = participantCtrl.participant;
-                    $http.post('/api/update/?participant_id=' + p.id + "&token=" + p.token, p)
-                        .success(function(data, status, headers, config){
+                    $scope.loading = true;
+                    $http.post('/api/update/?participant_id=' + p.id + "&token=" + p.token, p).then(
+                        function(){
+                            $scope.loading = false;
                             $scope.messages.push('updateSuccessfull');
-                        })
-                        .error(function(data, status, headers, config){
+                        }, function(){
+                            $scope.loading = false;
                             console.log("fail");
                         });
                 };
