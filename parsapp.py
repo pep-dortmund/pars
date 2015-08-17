@@ -9,7 +9,11 @@ from database import Participant, Degree
 from peewee import IntegrityError
 from email.mime.text import MIMEText
 import smtplib
-from config import (MAIL_ADDRESS, MAIL_SERVER, MAIL_LOGIN, MAIL_PASSWORD,
+from config import (MAIL_ADDRESS,
+                    MAIL_SERVER,
+                    MAIL_LOGIN,
+                    MAIL_PASSWORD,
+                    MAIL_PORT,
                     ALLOWED_MAIL_SERVER)
 
 
@@ -25,17 +29,18 @@ def sendmail(participant, template='email.html'):
     msg['To'] = participant._email
     msg['Subject'] = 'Anmeldung zur Absolventenfeier'
     try:
-        s = smtplib.SMTP(MAIL_SERVER)
+        s = smtplib.SMTP(MAIL_SERVER, MAIL_PORT)
         s.starttls()
         s.login(MAIL_LOGIN, MAIL_PASSWORD)
         s.sendmail(MAIL_ADDRESS, msg['To'], msg.as_string())
         s.quit()
     except:
-        pass
+        print('Error: Mail send failed')
 
 
 @parsapp.route('/', methods=['GET'])
-def index():
+@parsapp.route(u'/#/<int:participant_id>!<token>/', methods=['GET'])
+def index(participant_id=None, token=None):
     return render_template('index.html')
 
 
@@ -54,6 +59,13 @@ def api(function=None):
                 jsonify(message='Success', token=participant.token),
                 200
             )
+            try:
+                sendmail(participant)
+            except:
+                response = make_response(
+                    jsonify(errormessage='Error while mailing.'),
+                    500
+                )
         except IntegrityError:
             response = make_response(
                 jsonify(errormessage='User already in Database.'),
@@ -66,6 +78,34 @@ def api(function=None):
             for d in Degree.select():
                 degrees[str(d.id)] = {'id': d.id, 'name': d.name}
             return jsonify(**degrees)
+        if function == 'participant':
+            p = Participant.get(id=request.args.get('participant_id'))
+            print(p.token)
+            if p.token == request.args.get('token'):
+                pObj = {'firstname': p.firstname,
+                        'lastname': p.lastname,
+                        'guests': p.guests,
+                        'degree': p.degree.id,
+                        'email': p.email,
+                        'title': p.title,
+                        'token': p.token}
+                return jsonify(pObj)
+            else:
+                return make_response(
+                    jsonify(errormessage='No access!'),
+                    401
+                )
+        if function == 'resend':
+            try:
+                p = Participant\
+                    .select()\
+                    .where(Participant._email
+                           == request.args.get('email') + ALLOWED_MAIL_SERVER)\
+                    .get()
+                sendmail(p)
+            except:
+                return(jsonify(errormessage='Fail'), 500)
+            return(jsonify(message='Success'), 200)
         return ''
 
 

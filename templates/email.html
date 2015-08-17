@@ -1,0 +1,31 @@
+<p>Hallo {{ participant.firstname }} {{ participant.lastname }},</p>
+
+<p>Vielen Dank für Deine Anmeldung für die kommende Absolventenfeier!
+Wir freuen uns auf Dich! Bitte behalte diese Email als Reminder in deinem
+Postfach.</p>
+
+<p>
+Die Absolventenfeier wird stattfinden<br />
+am <b>10.01.2015</b><br />
+Einlass ab <b>15:00 Uhr</b><br />
+im <b>Hörsaal des Seminarraumgebäudes</b><br />
+Friedrich-Wöhler-Weg 6<br />
+44227 Dortmund<br />
+</p>
+
+<p>
+Hier sind noch einmal die von Dir eingetragenen Daten:
+Eingetragene Gäste: {{ participant.numberOfGuests }}<br />
+Abschluss: {{ participant.degree.name }}
+</p>
+
+<p>
+Falls Du deine Angaben verändern, oder Dich abmelden möchtest, benutze bitte
+den folgenden Link. Gib diesen Link am besten an keine Dritten weiter.
+<a href="{{ url_for('index', _external=True) }}#/{{ participant.id }}!{{ participant.token }}">Anmeldung bearbeiten</a>
+</p>
+
+<p> Mit freundlichen Grüßen<br />
+Dein Alumniverein </p>
+
+<p> Pep et. Al. e.V.  </p>

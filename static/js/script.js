@@ -17,13 +17,13 @@ function seperateTeX(string){
 }
 
 (function(){
-    var app = angular.module("app", ["ngCookies"]);
+    var app = angular.module("app", ["ngCookies", "ngRoute"]);
 
     app.directive('alertMessages', function(){
         return {
             restrict: 'E',
-            templateUrl: 'templates/messages.html',
-            controller: ['$scope', function($scope){
+            templateUrl: '/templates/messages.html',
+            controller: ['$scope', '$http', function($scope, $http){
                 $scope.messages = [];
                 this.messages = $scope.messages;
                 this.resetMessages = function(){
@@ -33,7 +33,13 @@ function seperateTeX(string){
                 };
                 this.resendMail = function(){
                     var mail = $scope.email;
-                    console.log("Resend Email to " + mail);
+                    $http.get("/api/resend/?email=" + mail)
+                        .success(function(data, status, headers, config){
+                            console.log(status);
+                        })
+                        .error(function(data, status, headers, config){
+                            console.log(status);
+                        });
                 };
                 $scope.resetMessages = this.resetMessages;
             }],
@@ -44,8 +50,12 @@ function seperateTeX(string){
     app.directive('mainFormular', function(){
         return {
             restrict: 'E',
-            templateUrl: 'templates/main-form.html',
-            controller: ['$sce', '$scope', '$http', '$compile', '$cookies', '$window', function($sce, $scope, $http, $compile, $cookies, $window){
+            templateUrl: '/templates/main-form.html',
+            controller: ['$sce', '$scope', '$http', '$compile', '$cookies',
+                         '$window', '$location',
+                         function($sce, $scope, $http, $compile, $cookies,
+                                  $window, $location)
+            {
                 $scope.mailDomain = '@tu-dortmund.de';
                 $http.get("/api/degrees")
                     .success(function(data, status, headers, config){
@@ -57,6 +67,20 @@ function seperateTeX(string){
                             type: 'error'
                         })
                     });
+                var currentLocation = $location.url();
+                if(currentLocation){
+                    var id = currentLocation.substr(1, currentLocation.indexOf('!') - 1);
+                    var token = currentLocation.substr(currentLocation.indexOf('!') + 1);
+                    $http.get("/api/participant/?participant_id=" + id + "&token=" + token)
+                        .success(function(data, status, headers, config){
+                            console.log(data);
+                            participantCtrl.participant = data;
+                            participantCtrl.updateTex()
+                        })
+                        .error(function(data, status, headers, config){
+                            console.log(data);
+                        });
+                }
                 this.updateTex = function(){
                     try {
                         var p = participantCtrl.participant;
