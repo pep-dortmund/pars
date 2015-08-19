@@ -16,138 +16,80 @@ function seperateTeX(string){
     return stringArray;
 }
 
-(function(){
-    var app = angular.module("app", ["ngCookies", "ngRoute"]);
-
-    app.directive('alertMessages', function(){
+var NameInput = React.createClass({
+    getInitialState: function(){
         return {
-            restrict: 'E',
-            templateUrl: '/templates/messages.html',
-            controller: ['$scope', '$http', function($scope, $http){
-                $scope.messages = [];
-                this.messages = $scope.messages;
-                this.resetMessages = function(){
-                    while($scope.messages.length){
-                        $scope.messages.pop();
-                    }
-                };
-                this.resendMail = function(){
-                    var mail = $scope.email;
-                    $scope.loading = true;
-                    $http.get("/api/resend/?email=" + mail).then(
-                        function(){
-                            $scope.loading = false;
-                        }, function(){
-                            $scope.loading = false;
-                        });
-                };
-                $scope.resetMessages = this.resetMessages;
-            }],
-            controllerAs: 'messageCtrl'
+            error: false
         }
-    });
-
-    app.directive('mainFormular', function(){
-        return {
-            restrict: 'E',
-            templateUrl: '/templates/main-form.html',
-            controller: ['$sce', '$scope', '$http', '$compile', '$cookies',
-                         '$window', '$location',
-                         function($sce, $scope, $http, $compile, $cookies,
-                                  $window, $location)
-            {
-                $scope.mailDomain = '@tu-dortmund.de';
-                $http.get("/api/degrees/").then(
-                    function(r){
-                        $scope.degrees = r.data;
-                    }, function(){
-                        $scope.messages.push({
-                            text: 'Es konnten nicht alle Ressourcen geladen werden. Versuche es später noch einmal.',
-                            type: 'error'
-                        })
-                    });
-                var currentLocation = $location.url();
-                if(currentLocation && currentLocation != '/'){
-                    var id = currentLocation.substr(1, currentLocation.indexOf('!') - 1);
-                    var token = currentLocation.substr(currentLocation.indexOf('!') + 1);
-                    $scope.loading = true;
-                    $http.get("/api/participant/?participant_id=" + id + "&token=" + token).then(
-                        function(r){
-                            participantCtrl.participant = r.data;
-                            participantCtrl.participant.id = id;
-                            participantCtrl.updateTex();
-                            $scope.loading = false;
-                        }, function(){
-                            $scope.loading = false;
-                        });
-                };
-                this.updateTex = function(){
-                    try {
-                        var p = participantCtrl.participant;
-                        p.title = p.title || "";
-                        var stringArray = seperateTeX(p.title);
-                        var completeString = "";
-                        for(var i=0; i<stringArray.length; i++){
-                            var string = stringArray[i];
-                            if(string.substring(0, 1) == "$"){
-                                completeString += katex.renderToString(
-                                    string.substring(1, string.length)
-                                );
-                            } else {
-                                completeString += string;
-                            }
-                        }
-                        $scope.tex = $sce.trustAsHtml(completeString);
-                    }
-                    catch(ParseError){ }
-                }
-                this.save = function(){
-                    $scope.loading = true;
-                    $scope.resetMessages();
-                    var p = participantCtrl.participant;
-                    $scope.email = p.email;
-                    $http.post("/api/", p).then(
-                        function(r){
-                            console.log(r);
-                            $scope.loading = false;
-                            $scope.messages.push('subscriptionSuccessfull');
-                            p.token = r.data.token;
-                            now = new Date();
-                            $cookies.putObject( 'participant', p,
-                                { expires: new Date(now.getTime() + 90*24*3600*1000) });
-                        }, function(){
-                            $scope.loading = false;
-                            $scope.messages.push('mailExists');
-                        });
-                };
-                this.update = function(){
-                    var p = participantCtrl.participant;
-                    $scope.loading = true;
-                    $http.post('/api/update/?participant_id=' + p.id + "&token=" + p.token, p).then(
-                        function(){
-                            $scope.loading = false;
-                            $scope.messages.push('updateSuccessfull');
-                        }, function(){
-                            $scope.loading = false;
-                            console.log("fail");
-                        });
-                };
-                this.reset = function(){
-                    $cookies.remove("participant");
-                    $location.url('/');
-                    $window.location.reload();
-                };
-
-                var participantCtrl = this;
-                var pCookie = $cookies.getObject("participant");
-                if(pCookie){
-                    participantCtrl.participant = pCookie;
-                    this.updateTex();
-                } else {
-                    participantCtrl.participant = {title: ""};
-                }
-            }],
-            controllerAs: 'participantCtrl'
+    },
+    handleChange: function() {
+        this.firstname = this.refs.firstname.getDOMNode().value;
+        this.lastname = this.refs.lastname.getDOMNode().value;
+        this.props.onUserInput(this.firstname, this.lastname);
+    },
+    check: function() {
+        if(!this.firstname || !this.lastname){
+            this.setState({error: true});
+        } else {
+            this.setState({error: false});
         }
-    });
-}());
+    },
+    render: function(){
+        var classes = React.addons.classSet({
+            'form-group': true,
+            'has-error': this.state.error
+        });
+        var hint = !this.state.error ? '' : (
+            <span className="help-block col-sm-offset-4 col-sm-8">
+                Bitte trage Vor- und Nachnamen ein.
+                So wirst du bei der Absolventenfeier aufgerufen.
+            </span>);
+        return (
+            <div className={classes}>
+                <label className="col-sm-4 control-label">Name</label>
+                <div className="col-sm-4">
+                    <input
+                        className="form-control"
+                        placeholder="Max"
+                        ref="firstname"
+                        onChange={this.handleChange}/>
+                </div>
+                <div className="col-sm-4">
+                    <input
+                        className="form-control"
+                        placeholder="Mustermann"
+                        ref="lastname"
+                        onChange={this.handleChange}/>
+                </div>
+                {hint}
+            </div>
+        );
+    }
+});
+
+var ParticipantForm = React.createClass({
+    handleSubmit: function(e) {
+        e.preventDefault();
+        this.refs.name.check();
+        return;
+    },
+    nameInput: function(firstname, lastname){
+        this.props.firstname = firstname;
+        this.props.lastname = lastname;
+        console.log(this.props);
+    },
+    render: function(){
+        return (
+            <form className="form-horizontal" onSubmit={this.handleSubmit}>
+                <NameInput ref="name" onUserInput={this.nameInput} />
+                <div className="form-group">
+                    <div className="col-sm-offset-4 col-sm-8">
+                        <input type="submit" className="btn btn-default" value="Post" />
+                    </div>
+                </div>
+            </form>
+        );
+    }
+});
+
+React.render(<ParticipantForm />, document.getElementById('main'));
