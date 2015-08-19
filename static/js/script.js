@@ -19,6 +19,8 @@ function seperateTeX(string){
 var NameInput = React.createClass({
     getInitialState: function(){
         return {
+            firstname: '',
+            lastname: '',
             error: false
         }
     },
@@ -87,9 +89,10 @@ var EmailInput = React.createClass({
     check: function(){
         this.setState({error: (!this.email || !this.email.match(/^\w+\.\w+$/i))});
     },
-    handleChange: function(){
-        this.email = this.refs.email.getDOMNode().value;
-        this.props.onUserInput(this.email);
+    handleChange: function(e){
+        var val = e.currentTarget.value;
+        this.email = val;
+        this.props.onUserInput(val);
         if(this.state.error){
             this.check();
         }
@@ -121,6 +124,55 @@ var EmailInput = React.createClass({
     }
 })
 
+var DegreeSelect = React.createClass({
+    getInitialState: function(){
+        return {
+            degrees: [],
+        };
+    },
+    handleChange: function(e){
+        this.degree = e.currentTarget.value;
+        this.props.onUserInput(this.degree);
+    },
+    componentDidMount: function(){
+        $.getJSON(this.props.source, function(data){
+            this.setState({degrees: data});
+        }.bind(this))
+        .fail(function(){
+            console.log("Error while downloading degrees.");
+        })
+    },
+    render: function(){
+        var degrees = [];
+        for(key in this.state.degrees){
+            var degree = this.state.degrees[key];
+            degrees.push(
+                <label key={degree.id} className="radio-inline">
+                    <input name="degree" ref="degree" type="radio" onChange={this.handleChange} value={degree.id}/>{degree.name}
+                </label>
+            )
+        }
+        var classes = React.addons.classSet({
+            'form-group': true,
+            'has-error': this.state.error
+        });
+        var hint = !this.state.error ? '' : (
+                <span className="help-block">
+                    Bla
+                </span>
+            );
+        return (
+            <fieldset className={classes}>
+                <label className="control-label">Abschluss</label>
+                <div className="input-group">
+                    {degrees}
+                </div>
+                {hint}
+            </fieldset>
+        );
+    }
+})
+
 var ParticipantForm = React.createClass({
     handleSubmit: function(e) {
         e.preventDefault();
@@ -129,14 +181,20 @@ var ParticipantForm = React.createClass({
         return;
     },
     nameInput: function(firstname, lastname){
+        console.log(firstname, lastname);
     },
     emailInput: function(email){
+        console.log(email);
+    },
+    degreeInput: function(degree){
+        console.log(degree);
     },
     render: function(){
         return (
             <form onSubmit={this.handleSubmit}>
                 <NameInput ref="name" onUserInput={this.nameInput} />
                 <EmailInput ref="email" onUserInput={this.emailInput} />
+                <DegreeSelect ref="degrees" source="/api/degrees/" onUserInput={this.degreeInput}/>
                 <input type="submit" className="btn btn-secondary" value="Post" />
             </form>
         );
