@@ -19,8 +19,8 @@ function seperateTeX(string){
 var NameInput = React.createClass({
     getInitialState: function(){
         return {
-            firstname: '',
-            lastname: '',
+            firstname: this.props.firstname,
+            lastname: this.props.lastname,
             error: false
         }
     },
@@ -66,13 +66,16 @@ var NameInput = React.createClass({
                             className={firstnameClasses}
                             placeholder="Max"
                             ref="firstname"
-                            onChange={this.handleChange}/>
+                            onChange={this.handleChange}
+                            value={this.props.firstname}
+                            />
                     </div>
                     <div className="col-sm-6">
                         <input
                             className={lastnameClasses}
                             placeholder="Mustermann"
                             ref="lastname"
+                            value={this.props.lastname}
                             onChange={this.handleChange}/>
                     </div>
                 </div>
@@ -84,6 +87,7 @@ var NameInput = React.createClass({
 
 var EmailInput = React.createClass({
     getInitialState: function(){
+        this.email = this.props.value;
         return {
             error: false
         }
@@ -130,7 +134,9 @@ var EmailInput = React.createClass({
                         className="form-control"
                         placeholder="max.mustermann"
                         ref="email"
-                        onChange={this.handleChange}/>
+                        onChange={this.handleChange}
+                        value={this.email}
+                        />
                     <div className="input-group-addon">@tu-dortmund.de</div>
                 </div>
                 {hint}
@@ -141,7 +147,7 @@ var EmailInput = React.createClass({
 
 var DegreeSelect = React.createClass({
     getInitialState: function(){
-        this.degree = 0;
+        this.degree = this.props.value;
         return {
             degrees: [],
             error: false
@@ -171,6 +177,7 @@ var DegreeSelect = React.createClass({
         var degrees = [];
         for(key in this.state.degrees){
             var degree = this.state.degrees[key];
+            var checked = this.degree == degree.id ? 'checked' : '';
             degrees.push(
                 <label key={degree.id} className="radio-inline">
                     <input
@@ -179,6 +186,7 @@ var DegreeSelect = React.createClass({
                         type="radio"
                         onChange={this.handleChange}
                         value={degree.id}
+                        checked={checked}
                         />
                     {degree.name}
                 </label>
@@ -206,28 +214,83 @@ var DegreeSelect = React.createClass({
 })
 
 var ParticipantForm = React.createClass({
+    getInitialState: function(){
+        this.participant = {
+            firstname: 'Kevin',
+            lastname: 'Heinicke',
+            email: 'kevin.heinicke',
+            degree: 1
+        };
+        return {};
+    },
     handleSubmit: function(e) {
         e.preventDefault();
-        this.refs.name.check();
-        this.refs.email.check();
+        this.refs.name.validate();
+        this.refs.email.validate();
+        this.refs.degrees.validate();
         return;
     },
     nameInput: function(firstname, lastname){
-        console.log(firstname, lastname);
+        this.participant.firstname = firstname;
+        this.participant.lastname = lastname;
     },
     emailInput: function(email){
-        console.log(email);
+        this.participant.email = email;
     },
     degreeInput: function(degree){
-        console.log(degree);
+        this.participant.degree = degree;
     },
     render: function(){
+        var buttons = [];
+        if(!this.participant.token){
+            buttons.push(
+                <button
+                    type="submit"
+                    className="btn btn-secondary"
+                    key={buttons.length + 1}>
+                    Eintragen
+                </button>
+                );
+        } else {
+            buttons.push(
+                <button
+                    type="button"
+                    onClick={this.updateParticipant}
+                    className="btn btn-secondary"
+                    key={buttons.length + 1}>
+                    Aktualisieren
+                </button>
+            );
+            buttons.push(
+                <button
+                    type="button"
+                    onClick={this.resetForm}
+                    className="btn btn-secondary"
+                    key={buttons.length + 1}>
+                    Neu
+                </button>
+            );
+        }
         return (
             <form onSubmit={this.handleSubmit}>
-                <NameInput ref="name" onUserInput={this.nameInput} />
-                <EmailInput ref="email" onUserInput={this.emailInput} />
-                <DegreeSelect ref="degrees" source="/api/degrees/" onUserInput={this.degreeInput}/>
-                <input type="submit" className="btn btn-secondary" value="Post" />
+                <NameInput
+                    ref="name"
+                    onUserInput={this.nameInput}
+                    firstname={this.participant.firstname}
+                    lastname={this.participant.lastname}
+                    />
+                <EmailInput
+                    ref="email"
+                    onUserInput={this.emailInput}
+                    value={this.participant.email}
+                    />
+                <DegreeSelect
+                    ref="degrees"
+                    source="/api/degrees/"
+                    onUserInput={this.degreeInput}
+                    value={this.participant.degree}
+                    />
+                {buttons}
             </form>
         );
     }
