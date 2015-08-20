@@ -2,14 +2,14 @@ function seperateTeX(string){
     var stringArray = [];
     var index = 0;
     while(index > -1){
-        index = string.indexOf("$") > -1 ? string.indexOf("$") : string.length;
+        index = string.indexOf('$') > -1 ? string.indexOf('$') : string.length;
         string.substring(0, index) ?
             stringArray.push(string.substring(0, index)) : undefined;
         string = string.substring(index + 1, string.length);
-        index = string.indexOf("$");
+        index = string.indexOf('$');
         if(index > -1){
             string.substring(0, index) ?
-                stringArray.push("$" + string.substring(0, index)) : undefined;
+                stringArray.push('$' + string.substring(0, index)) : undefined;
             string = string.substring(index+1, string.length);
         }
     }
@@ -31,11 +31,13 @@ var NameInput = React.createClass({
         });
         this.props.onUserInput(this.state.firstname, this.state.lastname);
         if(this.state.error){
-            this.check();
+            this.validate();
         }
     },
-    check: function() {
-        this.setState({error: (!this.state.firstname || !this.state.lastname)});
+    validate: function() {
+        var error = (!this.state.firstname || !this.state.lastname);
+        this.setState({error: error});
+        return error;
     },
     render: function(){
         var classes = React.addons.classSet({
@@ -51,10 +53,10 @@ var NameInput = React.createClass({
             'form-control-error': this.state.error && !this.state.lastname,
         });
         var hint = !this.state.error ? '' : (
-            <span className="help-block">
+            <span className="help-block"><small>
                 Bitte trage Vor- und Nachnamen ein.
                 So wirst du bei der Absolventenfeier aufgerufen.
-            </span>);
+            </small></span>);
         return (
             <fieldset className={classes}>
                 <label className="control-label">Name</label>
@@ -86,23 +88,36 @@ var EmailInput = React.createClass({
             error: false
         }
     },
-    check: function(){
-        this.setState({error: (!this.email || !this.email.match(/^\w+\.\w+$/i))});
+    validate: function(){
+        var error = (!this.email || !this.email.match(/^\w+\.\w+$/i));
+        this.setState({error: error});
+        return error;
     },
     handleChange: function(e){
         var val = e.currentTarget.value;
         this.email = val;
         this.props.onUserInput(val);
         if(this.state.error){
-            this.check();
+            this.validate();
         }
     },
     render: function(){
-        var hint = !this.state.error ? '' : (
-                <span className="help-block">
-                    Bla
-                </span>
-            );
+        var hint = '';
+        if(this.state.error){
+            if(!this.email){
+                hint = (
+                    <span className="help-block"><small>
+                        Bitte trage Deine TU-Mailadresse ein.
+                    </small></span>);
+            } else {
+                hint = (
+                    <span className="help-block"><small>
+                        Du kannst dich nur mit einer gültigen
+                        <code>@tu-dortmund</code>-Mailadresse eintragen.
+                    </small></span>
+                );
+            }
+        };
         var classes = React.addons.classSet({
             'form-group': true,
             'has-error': this.state.error
@@ -126,13 +141,18 @@ var EmailInput = React.createClass({
 
 var DegreeSelect = React.createClass({
     getInitialState: function(){
+        this.degree = 0;
         return {
             degrees: [],
+            error: false
         };
     },
     handleChange: function(e){
         this.degree = e.currentTarget.value;
         this.props.onUserInput(this.degree);
+        if(this.state.error){
+            this.validate();
+        }
     },
     componentDidMount: function(){
         $.getJSON(this.props.source, function(data){
@@ -142,13 +162,25 @@ var DegreeSelect = React.createClass({
             console.log("Error while downloading degrees.");
         })
     },
+    validate: function(){
+        var error = !this.degree ? true : false;
+        this.setState({error: error});
+        return error;
+    },
     render: function(){
         var degrees = [];
         for(key in this.state.degrees){
             var degree = this.state.degrees[key];
             degrees.push(
                 <label key={degree.id} className="radio-inline">
-                    <input name="degree" ref="degree" type="radio" onChange={this.handleChange} value={degree.id}/>{degree.name}
+                    <input
+                        name="degree"
+                        ref="degree"
+                        type="radio"
+                        onChange={this.handleChange}
+                        value={degree.id}
+                        />
+                    {degree.name}
                 </label>
             )
         }
@@ -157,9 +189,9 @@ var DegreeSelect = React.createClass({
             'has-error': this.state.error
         });
         var hint = !this.state.error ? '' : (
-                <span className="help-block">
-                    Bla
-                </span>
+                <span className="help-block"><small>
+                    Triff bitte eine Auswahl.
+                </small></span>
             );
         return (
             <fieldset className={classes}>
