@@ -1,20 +1,35 @@
-function seperateTeX(string){
-    var stringArray = [];
-    var index = 0;
-    while(index > -1){
-        index = string.indexOf('$') > -1 ? string.indexOf('$') : string.length;
-        string.substring(0, index) ?
-            stringArray.push(string.substring(0, index)) : undefined;
-        string = string.substring(index + 1, string.length);
-        index = string.indexOf('$');
-        if(index > -1){
-            string.substring(0, index) ?
-                stringArray.push('$' + string.substring(0, index)) : undefined;
-            string = string.substring(index+1, string.length);
+var AlertMessage = React.createClass({
+    resendMail: function(){
+        console.log('Resend Email somehow');
+    },
+    render: function(){
+        var messages = {
+            1: (
+                <div className="alert alert-success">
+                    Du hast Dich erfolgreich zur Absolventenfeier angemeldet.
+                    Überprüfe dein Postfach für weitere Informationen.
+                    Bis bald!
+                </div>
+            ),
+            10: (
+                <div className="alert alert-warning">
+                    Diese Email wurde bereits eingetragen. 
+                    Du solltest eine Bestätigungsmail in Deinem 
+                    Postfach finden, in der ein Link zur Änderung 
+                    Deiner Daten aufgeführt ist.  <a 
+                        href="#"
+                        className="alert-link"
+                        onClick={this.resendMail}>
+                        Email erneut versenden.
+                    </a>
+                </div>
+            )
         }
+        return (
+            <div className="col-md-12">{messages[this.props.code]}</div>
+        );
     }
-    return stringArray;
-}
+});
 
 var NameInput = React.createClass({
     getInitialState: function(){
@@ -37,7 +52,7 @@ var NameInput = React.createClass({
     validate: function() {
         var error = (!this.state.firstname || !this.state.lastname);
         this.setState({error: error});
-        return error;
+        return !error;
     },
     render: function(){
         var classes = React.addons.classSet({
@@ -95,7 +110,7 @@ var EmailInput = React.createClass({
     validate: function(){
         var error = (!this.email || !this.email.match(/^\w+\.\w+$/i));
         this.setState({error: error});
-        return error;
+        return !error;
     },
     handleChange: function(e){
         var val = e.currentTarget.value;
@@ -163,6 +178,9 @@ var DegreeSelect = React.createClass({
     componentDidMount: function(){
         $.getJSON(this.props.source, function(data){
             this.setState({degrees: data});
+            if(this.props.sendDegrees){
+                this.props.sendDegrees(data);
+            }
         }.bind(this))
         .fail(function(){
             console.log("Error while downloading degrees.");
@@ -171,13 +189,13 @@ var DegreeSelect = React.createClass({
     validate: function(){
         var error = !this.degree ? true : false;
         this.setState({error: error});
-        return error;
+        return !error;
     },
     render: function(){
         var degrees = [];
         for(key in this.state.degrees){
             var degree = this.state.degrees[key];
-            var checked = this.degree == degree.id ? 'checked' : '';
+            var checked = this.degree == degree.id;
             degrees.push(
                 <label key={degree.id} className="radio-inline">
                     <input
@@ -186,7 +204,7 @@ var DegreeSelect = React.createClass({
                         type="radio"
                         onChange={this.handleChange}
                         value={degree.id}
-                        checked={checked}
+                        defaultChecked={checked}
                         />
                     {degree.name}
                 </label>
@@ -213,21 +231,112 @@ var DegreeSelect = React.createClass({
     }
 })
 
+var TitleInput = React.createClass({
+    getInitialState: function(){
+        this.title = this.props.value;
+        return {
+            error: false,
+            degree: this.props.degree,
+            degrees: {},
+            renderedTex: ''
+        };
+    },
+    seperateTex: function(string){
+        var stringArray = [];
+        var index = 0;
+        while(index > -1){
+            index = string.indexOf('$') > -1 ? string.indexOf('$') : string.length;
+            string.substring(0, index) ?
+                stringArray.push(string.substring(0, index)) : undefined;
+            string = string.substring(index + 1, string.length);
+            index = string.indexOf('$');
+            if(index > -1){
+                string.substring(0, index) ?
+                    stringArray.push('$' + string.substring(0, index)) : undefined;
+                string = string.substring(index+1, string.length);
+            }
+        }
+        return stringArray;
+    },
+    handleChange: function(e){
+        var stringArray = this.seperateTex(e.currentTarget.value);
+        try {
+            this.title = this.title || "";
+            var completeString = "";
+            for(var i=0; i<stringArray.length; i++){
+                var string = stringArray[i];
+                if(string.substring(0, 1) == "$"){
+                    completeString += katex.renderToString(
+                        string.substring(1, string.length)
+                    );
+                } else {
+                    completeString += string;
+                }
+            }
+            this.setState({renderedTex: completeString});
+        }
+        catch(ParseError){ }
+    },
+    render: function(){
+        var hint = !this.state.error ? '' : (
+            <span className="help-block"><small>
+                Bitte gib hier den Titel Deiner Abschlussarbeit ein
+                (Du kannst auch inline-LaTeX innerhalb <code>$$</code>
+                 benutzen).
+            </small></span>
+        );
+        var degreeText = '';
+        if(this.state.degree in this.state.degrees){
+            degreeText = this.state.degrees[this.state.degree].name + '-';
+        };
+        return (
+            <fieldset className="form-group">
+                <label className="control-label">
+                    Titel der {degreeText}Arbeit
+                </label>
+                <input
+                    type="text"
+                    name="title"
+                    className="form-control"
+                    defaultValue={this.title}
+                    onChange={this.handleChange}
+                     />
+                {hint}
+                <p className="text-center" dangerouslySetInnerHTML={{__html: this.state.renderedTex}}></p>
+                <p className="text-center"><small>
+                    (Du kannst auch Inline-LaTeX innerhalb
+                     <code>$ $</code> nutzen.)
+                </small></p>
+            </fieldset>
+        );
+    }
+});
+
 var ParticipantForm = React.createClass({
     getInitialState: function(){
-        this.participant = {
-            firstname: 'Kevin',
-            lastname: 'Heinicke',
-            email: 'kevin.heinicke',
-            degree: 1
-        };
+        this.participant = {};
         return {};
+    },
+    pushMessage: function(id){
+        React.render(
+            <AlertMessage code={id} />,
+            document.getElementById('alert')
+        );
     },
     handleSubmit: function(e) {
         e.preventDefault();
-        this.refs.name.validate();
-        this.refs.email.validate();
-        this.refs.degrees.validate();
+        if(this.refs.name.validate()
+           && this.refs.email.validate()
+           && this.refs.degrees.validate()
+        ){
+            $.post('/api/', JSON.stringify(this.participant), function(){
+                this.pushMessage(1);
+            }.bind(this))
+            .fail(function(data){
+                console.log('fail');
+                this.pushMessage(10);
+            }.bind(this));
+        }
         return;
     },
     nameInput: function(firstname, lastname){
@@ -239,6 +348,13 @@ var ParticipantForm = React.createClass({
     },
     degreeInput: function(degree){
         this.participant.degree = degree;
+        this.refs.title.setState({degree: degree});
+    },
+    degreesUpdated: function(degrees){
+        this.refs.title.setState({degrees: degrees});
+    },
+    titleInput: function(title){
+        this.participant.title = title;
     },
     render: function(){
         var buttons = [];
@@ -289,6 +405,13 @@ var ParticipantForm = React.createClass({
                     source="/api/degrees/"
                     onUserInput={this.degreeInput}
                     value={this.participant.degree}
+                    sendDegrees={this.degreesUpdated}
+                    />
+                <TitleInput
+                    ref="title"
+                    onUserInput={this.titleInput}
+                    degree={this.participant.degree}
+                    value={this.participant.title}
                     />
                 {buttons}
             </form>

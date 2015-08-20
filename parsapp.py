@@ -48,9 +48,9 @@ def index(participant_id=None, token=None):
 def api(function=None):
     if not function:
         try:
-            participant = Participant(**request.get_json())
+            participant = Participant(**request.get_json(force=True))
             participant.degree = Degree.get(
-                Degree.id == request.get_json().get('degree')
+                Degree.id == request.get_json(force=True).get('degree')
             )
             participant.token = Participant.generate_token()
             participant.save()
