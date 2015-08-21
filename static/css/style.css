@@ -3,6 +3,24 @@ div.tex-title {
     text-align: center;
 }
 
+@keyframes loader {
+    50% { background-color: #aaa; }
+}
+
 div#loader {
-    margin-bottom: 15px;
+    text-align: center;
+    margin: 10px auto 0px auto;
+}
+
+div.loader-rect {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #ddd;
+    animation-name: loader;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-funciton: ease-in;
+    border-radius: 5px;
+    margin-left: 5px;
 }

@@ -31,6 +31,43 @@ var AlertMessage = React.createClass({
     }
 });
 
+var Loader = React.createClass({
+    getInitialState: function(){
+        return {
+            display: false
+        }
+    },
+    render: function(){
+        var rects = []
+        var number = 3;
+        var duration = 1;
+        for(var i=0; i<number; i++){
+            var rectStyle = {};
+            rectStyle.animationDelay = rectStyle.WebkitAnimationDelay =
+                i * duration / (number + 1) + 's';
+            rectStyle.animationDuration = rectStyle.WebkitAnimationDuration =
+                duration + 's';
+            rects.push(
+                <div key={i} style={rectStyle} className="loader-rect"></div>
+            );
+        };
+        var html = (
+            <div className="row">
+                <div id="loader" className="col-sm-12">
+                    {rects}
+                </div>
+            </div>
+        );
+        if(this.state.display){
+            return html;
+        } else {
+            return <div></div>;
+        }
+    }
+});
+
+var loader = React.render(<Loader />, document.getElementById('loader'));
+
 var NameInput = React.createClass({
     getInitialState: function(){
         return {
@@ -259,6 +296,8 @@ var TitleInput = React.createClass({
         return stringArray;
     },
     handleChange: function(e){
+        this.title = e.currentTarget.value;
+        this.props.onUserInput(this.title);
         var stringArray = this.seperateTex(e.currentTarget.value);
         try {
             this.title = this.title || "";
@@ -325,17 +364,22 @@ var ParticipantForm = React.createClass({
     },
     handleSubmit: function(e) {
         e.preventDefault();
-        if(this.refs.name.validate()
-           && this.refs.email.validate()
-           && this.refs.degrees.validate()
-        ){
+        var valid = true;
+        valid = this.refs.name.validate() && valid; 
+        valid = this.refs.email.validate() && valid; 
+        valid = this.refs.degrees.validate() && valid; 
+        valid = this.refs.title.validate() && valid; 
+        if(valid){
+            loader.setState({display: true});
             $.post('/api/', JSON.stringify(this.participant), function(){
                 this.pushMessage(1);
             }.bind(this))
             .fail(function(data){
-                console.log('fail');
                 this.pushMessage(10);
-            }.bind(this));
+            }.bind(this))
+            .always(function(){
+                loader.setState({display: false});
+            });
         }
         return;
     },
