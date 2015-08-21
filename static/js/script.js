@@ -187,7 +187,7 @@ var EmailInput = React.createClass({
                         placeholder="max.mustermann"
                         ref="email"
                         onChange={this.handleChange}
-                        value={this.email}
+                        defaultValue={this.email}
                         />
                     <div className="input-group-addon">@tu-dortmund.de</div>
                 </div>
@@ -271,12 +271,18 @@ var DegreeSelect = React.createClass({
 var TitleInput = React.createClass({
     getInitialState: function(){
         this.title = this.props.value;
+        this.parseError = false;
         return {
             error: false,
             degree: this.props.degree,
             degrees: {},
             renderedTex: ''
         };
+    },
+    validate: function(){
+        var hasError = !this.title || this.parseError;
+        this.setState({error: hasError});
+        return !hasError;
     },
     seperateTex: function(string){
         var stringArray = [];
@@ -313,23 +319,47 @@ var TitleInput = React.createClass({
                 }
             }
             this.setState({renderedTex: completeString});
+            this.parseError = false;
         }
-        catch(ParseError){ }
+        catch(err){
+            this.parseError = true;
+        };
+        if(this.state.error){
+            this.validate();
+        };
     },
     render: function(){
-        var hint = !this.state.error ? '' : (
-            <span className="help-block"><small>
-                Bitte gib hier den Titel Deiner Abschlussarbeit ein
-                (Du kannst auch inline-LaTeX innerhalb <code>$$</code>
-                 benutzen).
-            </small></span>
-        );
+        var hint = ''
+        if(this.state.error){
+            if(!this.title){
+                hint = (
+                    <span className="help-block"><small>
+                        Bitte gib hier den Titel Deiner Abschlussarbeit ein
+                        (Du kannst auch inline-LaTeX innerhalb <code>$$</code>
+                         benutzen).
+                    </small></span>
+                )
+            } else {
+                hint = (
+                    <span className="help-block"><small>
+                        Anscheinend konnte dein <code>LaTeX</code>-nicht
+                        richtig interpretiert werden. Versuche es bitte erneut
+                        oder schaue Dir <a href="">hier</a> die unterstützten
+                        Befehle an.
+                    </small></span>
+                )
+            }
+        }
         var degreeText = '';
         if(this.state.degree in this.state.degrees){
             degreeText = this.state.degrees[this.state.degree].name + '-';
         };
+        var classes = React.addons.classSet({
+            'form-group': true,
+            'has-error': this.state.error
+        });
         return (
-            <fieldset className="form-group">
+            <fieldset className={classes}>
                 <label className="control-label">
                     Titel der {degreeText}Arbeit
                 </label>
@@ -353,7 +383,9 @@ var TitleInput = React.createClass({
 
 var ParticipantForm = React.createClass({
     getInitialState: function(){
-        this.participant = {};
+        this.participant = {
+            guests: 5
+        };
         return {};
     },
     pushMessage: function(id){
