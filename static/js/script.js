@@ -88,14 +88,15 @@ var NameInput = React.createClass({
         this.setState({
             firstname: this.refs.firstname.getDOMNode().value,
             lastname: this.refs.lastname.getDOMNode().value
+        }, function(){
+            if(this.state.error){
+                this.validate();
+            }
         });
         this.props.onUserInput({
             firstname: this.refs.firstname.getDOMNode().value,
             lastname: this.refs.lastname.getDOMNode().value
         });
-        if(this.state.error){
-            this.validate();
-        }
     },
     validate: function() {
         var error = (!this.state.firstname || !this.state.lastname);
@@ -163,11 +164,12 @@ var EmailInput = React.createClass({
     },
     handleChange: function(e){
         var val = e.currentTarget.value;
-        this.setState({email: val});
+        this.setState({email: val}, function(){
+            if(this.state.error){
+                this.validate();
+            }
+        });
         this.props.onUserInput({email: val});
-        if(this.state.error){
-            this.validate();
-        }
     },
     render: function(){
         var hint = '';
@@ -219,22 +221,12 @@ var DegreeSelect = React.createClass({
     },
     handleChange: function(e){
         var val = e.currentTarget.value;
-        this.setState({degree: val});
-        this.props.onUserInput({degree: val});
-        if(this.state.error){
-            this.validate();
-        }
-    },
-    componentDidMount: function(){
-        $.getJSON(this.props.source, function(data){
-            this.setState({degrees: data});
-            if(this.props.sendDegrees){
-                this.props.sendDegrees(data);
+        this.setState({degree: val}, function(){
+            if(this.state.error){
+                this.validate();
             }
-        }.bind(this))
-        .fail(function(){
-            console.log("Error while downloading degrees.");
-        })
+        });
+        this.props.onUserInput({degree: val});
     },
     validate: function(){
         var error = !this.state.degree;
@@ -314,8 +306,8 @@ var TitleInput = React.createClass({
         }
         return stringArray;
     },
-    titleToTex: function(){
-        var stringArray = this.seperateTex(this.state.title);
+    toTex: function(str){
+        var stringArray = this.seperateTex(str);
         try {
             this.title = this.title || "";
             var completeString = "";
@@ -337,11 +329,12 @@ var TitleInput = React.createClass({
     },
     handleChange: function(e){
         var val = e.currentTarget.value
-        this.setState({title: val});
+        this.setState({title: val, renderedTex: this.toTex(val)}, function(){
+            if(this.state.error){
+                this.validate();
+            }
+        });
         this.props.onUserInput({title: val});
-        if(this.state.error){
-            this.validate();
-        };
     },
     render: function(){
         var hint = ''
@@ -388,7 +381,7 @@ var TitleInput = React.createClass({
                 {hint}
                 <p className="text-center"
                     dangerouslySetInnerHTML={{
-                        __html: this.titleToTex()
+                        __html: this.state.renderedTex
                     }}></p>
                 <p className="text-center"><small>
                     (Du kannst auch Inline-LaTeX innerhalb
@@ -412,15 +405,17 @@ var GuestInput = React.createClass({
             || this.state.guests < 1
             || this.state.guests > this.guestMax);
         this.setState({error: hasError});
+        console.log("validating");
         return !hasError;
     },
     handleChange: function(e){
         var value = e.currentTarget.value;
-        this.setState({guests: value});
+        this.setState({guests: value}, function(){
+            if(this.state.error){
+                this.validate();
+            }
+        });
         this.props.onUserInput({guests: value});
-        if(this.state.error){
-            this.validate();
-        }
     },
     render: function(){
         var hint = '';
@@ -468,6 +463,13 @@ var ParticipantForm = React.createClass({
         );
     },
     componentDidMount: function(){
+        $.getJSON('/api/degrees/', function(data){
+            this.refs.degrees.setState({degrees: data});
+            this.refs.title.setState({degrees: data});
+        }.bind(this))
+        .fail(function(){
+            console.log("Error while downloading degrees.");
+        });
         // check for edit-page
         var url = window.location.href;
         var params = url.match(/\d+!\w+\/$/);
@@ -536,6 +538,10 @@ var ParticipantForm = React.createClass({
         $.extend(true, part, participantObject);
         this.setState({participant: part});
     },
+    handleDegreeInput: function(obj){
+        this.handleUserInput(obj);
+        this.refs.title.setState({degree: obj.degree});
+    },
     render: function(){
         var buttons = [];
         if(!this.state.participant.token){
@@ -581,13 +587,11 @@ var ParticipantForm = React.createClass({
                 <DegreeSelect
                     ref="degrees"
                     source="/api/degrees/"
-                    onUserInput={this.handleUserInput}
-                    sendDegrees={this.degreesUpdated}
+                    onUserInput={this.handleDegreeInput}
                     />
                 <TitleInput
                     ref="title"
                     onUserInput={this.handleUserInput}
-                    degree={this.participant.degree}
                     />
                 <GuestInput
                     ref="guests"
