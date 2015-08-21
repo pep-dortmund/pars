@@ -381,11 +381,61 @@ var TitleInput = React.createClass({
     }
 });
 
+var GuestInput = React.createClass({
+    guestMax: 10,
+    getInitialState: function(){
+        this.guests = this.props.value;
+        return {
+            error: false
+        }
+    },
+    validate: function(){
+        var hasError = false;
+        hasError = this.guests < 1 || this.guests > this.guestMax;
+        return !hasError;
+    },
+    handleChange: function(e){
+        this.guests = e.currentTarget.value;
+        this.props.onUserInput(this.guests);
+        if(this.state.error){
+            this.validate();
+        }
+    },
+    render: function(){
+        var hint = '';
+        if(this.state.error){
+            hint = (
+                <span className="help-block"><small>
+                    Wie viele Gäste bringst du mit (einschließlich Dir)?
+                    Momentan darfst du bis zu {this.guestMax} Gäste mitbringen.
+                </small></span>
+            )
+        };
+        var classes = React.addons.classSet({
+            'form-group': true,
+            'has-error': this.state.error
+        });
+        return (
+            <fieldset className={classes}>
+                <label className="control-label">
+                    Anzahl der Gäste
+                </label>
+                <input
+                    type="number"
+                    name="guests"
+                    className="form-control"
+                    defaultValue={this.guests}
+                    onChange={this.handleChange}
+                     />
+                {hint}
+            </fieldset>
+        )
+    }
+});
+
 var ParticipantForm = React.createClass({
     getInitialState: function(){
-        this.participant = {
-            guests: 5
-        };
+        this.participant = {};
         return {};
     },
     pushMessage: function(id){
@@ -401,6 +451,7 @@ var ParticipantForm = React.createClass({
         valid = this.refs.email.validate() && valid; 
         valid = this.refs.degrees.validate() && valid; 
         valid = this.refs.title.validate() && valid; 
+        valid = this.refs.guests.validate() && valid;
         if(valid){
             loader.setState({display: true});
             $.post('/api/', JSON.stringify(this.participant), function(){
@@ -431,6 +482,9 @@ var ParticipantForm = React.createClass({
     },
     titleInput: function(title){
         this.participant.title = title;
+    },
+    guestsInput: function(guests){
+        this.participant.guests = guests;
     },
     render: function(){
         var buttons = [];
@@ -488,6 +542,11 @@ var ParticipantForm = React.createClass({
                     onUserInput={this.titleInput}
                     degree={this.participant.degree}
                     value={this.participant.title}
+                    />
+                <GuestInput
+                    ref="guests"
+                    onUserInput={this.guestsInput}
+                    value={this.participant.guests}
                     />
                 {buttons}
             </form>
