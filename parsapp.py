@@ -35,10 +35,11 @@ def sendmail(participant, template='email.html'):
         s.quit()
     except:
         print('Error: Mail send failed')
+        raise
 
 
 @parsapp.route('/', methods=['GET'])
-@parsapp.route(u'/#/<int:participant_id>!<token>/', methods=['GET'])
+@parsapp.route('/<int:participant_id>!<token>/', methods=['GET'])
 def index(participant_id=None, token=None):
     return render_template('index.html')
 

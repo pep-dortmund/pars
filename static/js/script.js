@@ -1,7 +1,4 @@
 var AlertMessage = React.createClass({
-    resendMail: function(){
-        console.log('Resend Email somehow');
-    },
     render: function(){
         var messages = {
             1: (
@@ -9,6 +6,12 @@ var AlertMessage = React.createClass({
                     Du hast Dich erfolgreich zur Absolventenfeier angemeldet.
                     Überprüfe dein Postfach für weitere Informationen.
                     Bis bald!
+                </div>
+            ),
+            2: (
+                <div className="alert alert-success">
+                    Die Email wurde noch einmal versandt und sollte in ein
+                    paar Minuten in Deinem Postfach sein.
                 </div>
             ),
             10: (
@@ -19,9 +22,14 @@ var AlertMessage = React.createClass({
                     Deiner Daten aufgeführt ist.  <a 
                         href="#"
                         className="alert-link"
-                        onClick={this.resendMail}>
+                        onClick={this.props.callback}>
                         Email erneut versenden.
                     </a>
+                </div>
+            ),
+            20: (
+                <div className="alert alert-danger">
+                    Der Versand der Email ist fehlgeschlagen.
                 </div>
             )
         }
@@ -71,8 +79,8 @@ var loader = React.render(<Loader />, document.getElementById('loader'));
 var NameInput = React.createClass({
     getInitialState: function(){
         return {
-            firstname: this.props.firstname,
-            lastname: this.props.lastname,
+            firstname: '',
+            lastname: '',
             error: false
         }
     },
@@ -81,7 +89,10 @@ var NameInput = React.createClass({
             firstname: this.refs.firstname.getDOMNode().value,
             lastname: this.refs.lastname.getDOMNode().value
         });
-        this.props.onUserInput(this.state.firstname, this.state.lastname);
+        this.props.onUserInput({
+            firstname: this.refs.firstname.getDOMNode().value,
+            lastname: this.refs.lastname.getDOMNode().value
+        });
         if(this.state.error){
             this.validate();
         }
@@ -119,7 +130,7 @@ var NameInput = React.createClass({
                             placeholder="Max"
                             ref="firstname"
                             onChange={this.handleChange}
-                            value={this.props.firstname}
+                            value={this.state.firstname}
                             />
                     </div>
                     <div className="col-sm-6">
@@ -127,7 +138,7 @@ var NameInput = React.createClass({
                             className={lastnameClasses}
                             placeholder="Mustermann"
                             ref="lastname"
-                            value={this.props.lastname}
+                            value={this.state.lastname}
                             onChange={this.handleChange}/>
                     </div>
                 </div>
@@ -139,20 +150,21 @@ var NameInput = React.createClass({
 
 var EmailInput = React.createClass({
     getInitialState: function(){
-        this.email = this.props.value;
         return {
-            error: false
+            error: false,
+            email: ''
         }
     },
     validate: function(){
-        var error = (!this.email || !this.email.match(/^\w+\.\w+$/i));
+        var error = (!this.state.email
+                || !this.state.email.match(/^\w+\.\w+$/i));
         this.setState({error: error});
         return !error;
     },
     handleChange: function(e){
         var val = e.currentTarget.value;
-        this.email = val;
-        this.props.onUserInput(val);
+        this.setState({email: val});
+        this.props.onUserInput({email: val});
         if(this.state.error){
             this.validate();
         }
@@ -160,7 +172,7 @@ var EmailInput = React.createClass({
     render: function(){
         var hint = '';
         if(this.state.error){
-            if(!this.email){
+            if(!this.state.email){
                 hint = (
                     <span className="help-block"><small>
                         Bitte trage Deine TU-Mailadresse ein.
@@ -187,7 +199,7 @@ var EmailInput = React.createClass({
                         placeholder="max.mustermann"
                         ref="email"
                         onChange={this.handleChange}
-                        defaultValue={this.email}
+                        value={this.state.email}
                         />
                     <div className="input-group-addon">@tu-dortmund.de</div>
                 </div>
@@ -199,15 +211,16 @@ var EmailInput = React.createClass({
 
 var DegreeSelect = React.createClass({
     getInitialState: function(){
-        this.degree = this.props.value;
         return {
+            degree: 0,
             degrees: [],
             error: false
         };
     },
     handleChange: function(e){
-        this.degree = e.currentTarget.value;
-        this.props.onUserInput(this.degree);
+        var val = e.currentTarget.value;
+        this.setState({degree: val});
+        this.props.onUserInput({degree: val});
         if(this.state.error){
             this.validate();
         }
@@ -224,7 +237,7 @@ var DegreeSelect = React.createClass({
         })
     },
     validate: function(){
-        var error = !this.degree ? true : false;
+        var error = !this.state.degree;
         this.setState({error: error});
         return !error;
     },
@@ -232,7 +245,7 @@ var DegreeSelect = React.createClass({
         var degrees = [];
         for(key in this.state.degrees){
             var degree = this.state.degrees[key];
-            var checked = this.degree == degree.id;
+            var checked = this.state.degree == degree.id;
             degrees.push(
                 <label key={degree.id} className="radio-inline">
                     <input
@@ -241,7 +254,7 @@ var DegreeSelect = React.createClass({
                         type="radio"
                         onChange={this.handleChange}
                         value={degree.id}
-                        defaultChecked={checked}
+                        checked={checked}
                         />
                     {degree.name}
                 </label>
@@ -270,17 +283,17 @@ var DegreeSelect = React.createClass({
 
 var TitleInput = React.createClass({
     getInitialState: function(){
-        this.title = this.props.value;
-        this.parseError = false;
         return {
             error: false,
-            degree: this.props.degree,
+            parseError: false,
+            degree: undefined,
             degrees: {},
-            renderedTex: ''
+            renderedTex: '',
+            title: ''
         };
     },
     validate: function(){
-        var hasError = !this.title || this.parseError;
+        var hasError = !this.state.title || this.state.parseError;
         this.setState({error: hasError});
         return !hasError;
     },
@@ -301,10 +314,8 @@ var TitleInput = React.createClass({
         }
         return stringArray;
     },
-    handleChange: function(e){
-        this.title = e.currentTarget.value;
-        this.props.onUserInput(this.title);
-        var stringArray = this.seperateTex(e.currentTarget.value);
+    titleToTex: function(){
+        var stringArray = this.seperateTex(this.state.title);
         try {
             this.title = this.title || "";
             var completeString = "";
@@ -318,12 +329,16 @@ var TitleInput = React.createClass({
                     completeString += string;
                 }
             }
-            this.setState({renderedTex: completeString});
-            this.parseError = false;
+            return completeString;
         }
         catch(err){
-            this.parseError = true;
+            this.setState({parseError: true});
         };
+    },
+    handleChange: function(e){
+        var val = e.currentTarget.value
+        this.setState({title: val});
+        this.props.onUserInput({title: val});
         if(this.state.error){
             this.validate();
         };
@@ -331,7 +346,7 @@ var TitleInput = React.createClass({
     render: function(){
         var hint = ''
         if(this.state.error){
-            if(!this.title){
+            if(!this.state.title){
                 hint = (
                     <span className="help-block"><small>
                         Bitte gib hier den Titel Deiner Abschlussarbeit ein
@@ -367,11 +382,14 @@ var TitleInput = React.createClass({
                     type="text"
                     name="title"
                     className="form-control"
-                    defaultValue={this.title}
+                    value={this.state.title}
                     onChange={this.handleChange}
                      />
                 {hint}
-                <p className="text-center" dangerouslySetInnerHTML={{__html: this.state.renderedTex}}></p>
+                <p className="text-center"
+                    dangerouslySetInnerHTML={{
+                        __html: this.titleToTex()
+                    }}></p>
                 <p className="text-center"><small>
                     (Du kannst auch Inline-LaTeX innerhalb
                      <code>$ $</code> nutzen.)
@@ -384,19 +402,22 @@ var TitleInput = React.createClass({
 var GuestInput = React.createClass({
     guestMax: 10,
     getInitialState: function(){
-        this.guests = this.props.value;
         return {
-            error: false
+            error: false,
+            guests: this.props.value
         }
     },
     validate: function(){
-        var hasError = false;
-        hasError = this.guests < 1 || this.guests > this.guestMax;
+        var hasError = (!this.state.guests
+            || this.state.guests < 1
+            || this.state.guests > this.guestMax);
+        this.setState({error: hasError});
         return !hasError;
     },
     handleChange: function(e){
-        this.guests = e.currentTarget.value;
-        this.props.onUserInput(this.guests);
+        var value = e.currentTarget.value;
+        this.setState({guests: value});
+        this.props.onUserInput({guests: value});
         if(this.state.error){
             this.validate();
         }
@@ -424,8 +445,8 @@ var GuestInput = React.createClass({
                     type="number"
                     name="guests"
                     className="form-control"
-                    defaultValue={this.guests}
                     onChange={this.handleChange}
+                    value={this.state.guests}
                      />
                 {hint}
             </fieldset>
@@ -436,13 +457,57 @@ var GuestInput = React.createClass({
 var ParticipantForm = React.createClass({
     getInitialState: function(){
         this.participant = {};
-        return {};
+        return {
+            participant: {}
+        };
     },
-    pushMessage: function(id){
+    pushMessage: function(id, callback){
         React.render(
-            <AlertMessage code={id} />,
+            <AlertMessage code={id} callback={callback} />,
             document.getElementById('alert')
         );
+    },
+    componentDidMount: function(){
+        // check for edit-page
+        var url = window.location.href;
+        var params = url.match(/\d+!\w+\/$/);
+        if(params){
+            loader.setState({display: true});
+            params = params[0].substr(0, params[0].length - 1);
+            var id = params.split('!')[0];
+            var token = params.split('!')[1];
+            var requestUrl = '/api/participant/?participant_id='
+                + id + '&token=' + token;
+            $.get(requestUrl, function(data){
+                this.setState({participant: data});
+                this.refs.name.setState({
+                    firstname: data.firstname,
+                    lastname: data.lastname
+                });
+                this.refs.email.setState({ email: data.email });
+                this.refs.degrees.setState({ degree: data.degree });
+                this.refs.guests.setState({ guests: data.guests });
+                this.refs.title.setState({ title: data.title });
+            }.bind(this))
+            .fail(function(){
+                this.pushMessage(20);
+            }.bind(this))
+            .always(function(){
+                loader.setState({display: false});
+            });
+        }
+    },
+    resendMail: function(){
+        loader.setState({display: true});
+        $.get('/api/resend/?email='+this.participant.email, function(){
+            this.pushMessage(2);
+        }.bind(this))
+        .fail(function(){
+            this.pushMessage(20);
+        }.bind(this))
+        .always(function(){
+            loader.setState({display: false});
+        });
     },
     handleSubmit: function(e) {
         e.preventDefault();
@@ -454,11 +519,11 @@ var ParticipantForm = React.createClass({
         valid = this.refs.guests.validate() && valid;
         if(valid){
             loader.setState({display: true});
-            $.post('/api/', JSON.stringify(this.participant), function(){
+            $.post('/api/', JSON.stringify(this.state.participant), function(){
                 this.pushMessage(1);
             }.bind(this))
             .fail(function(data){
-                this.pushMessage(10);
+                this.pushMessage(10, this.resendMail);
             }.bind(this))
             .always(function(){
                 loader.setState({display: false});
@@ -466,29 +531,14 @@ var ParticipantForm = React.createClass({
         }
         return;
     },
-    nameInput: function(firstname, lastname){
-        this.participant.firstname = firstname;
-        this.participant.lastname = lastname;
-    },
-    emailInput: function(email){
-        this.participant.email = email;
-    },
-    degreeInput: function(degree){
-        this.participant.degree = degree;
-        this.refs.title.setState({degree: degree});
-    },
-    degreesUpdated: function(degrees){
-        this.refs.title.setState({degrees: degrees});
-    },
-    titleInput: function(title){
-        this.participant.title = title;
-    },
-    guestsInput: function(guests){
-        this.participant.guests = guests;
+    handleUserInput: function(participantObject){
+        var part = this.state.participant;
+        $.extend(true, part, participantObject);
+        this.setState({participant: part});
     },
     render: function(){
         var buttons = [];
-        if(!this.participant.token){
+        if(!this.state.participant.token){
             buttons.push(
                 <button
                     type="submit"
@@ -521,32 +571,27 @@ var ParticipantForm = React.createClass({
             <form onSubmit={this.handleSubmit}>
                 <NameInput
                     ref="name"
-                    onUserInput={this.nameInput}
-                    firstname={this.participant.firstname}
-                    lastname={this.participant.lastname}
+                    onUserInput={this.handleUserInput}
                     />
                 <EmailInput
                     ref="email"
-                    onUserInput={this.emailInput}
+                    onUserInput={this.handleUserInput}
                     value={this.participant.email}
                     />
                 <DegreeSelect
                     ref="degrees"
                     source="/api/degrees/"
-                    onUserInput={this.degreeInput}
-                    value={this.participant.degree}
+                    onUserInput={this.handleUserInput}
                     sendDegrees={this.degreesUpdated}
                     />
                 <TitleInput
                     ref="title"
-                    onUserInput={this.titleInput}
+                    onUserInput={this.handleUserInput}
                     degree={this.participant.degree}
-                    value={this.participant.title}
                     />
                 <GuestInput
                     ref="guests"
-                    onUserInput={this.guestsInput}
-                    value={this.participant.guests}
+                    onUserInput={this.handleUserInput}
                     />
                 {buttons}
             </form>
