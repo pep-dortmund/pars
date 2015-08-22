@@ -14,6 +14,11 @@ var AlertMessage = React.createClass({
                     paar Minuten in Deinem Postfach sein.
                 </div>
             ),
+            3: (
+                <div className="alert alert-success">
+                    Deine Daten wurden aktualisiert. Bis dann!
+                </div>
+            ),
             10: (
                 <div className="alert alert-warning">
                     Diese Email wurde bereits eingetragen. 
@@ -30,6 +35,11 @@ var AlertMessage = React.createClass({
             20: (
                 <div className="alert alert-danger">
                     Der Versand der Email ist fehlgeschlagen.
+                </div>
+            ),
+            30: (
+                <div className="alert alert-danger">
+                    Aktualisieren fehlgeschlagen.
                 </div>
             )
         }
@@ -321,6 +331,7 @@ var TitleInput = React.createClass({
                     completeString += string;
                 }
             }
+            this.setState({parseError: false});
             return completeString;
         }
         catch(err){
@@ -405,7 +416,6 @@ var GuestInput = React.createClass({
             || this.state.guests < 1
             || this.state.guests > this.guestMax);
         this.setState({error: hasError});
-        console.log("validating");
         return !hasError;
     },
     handleChange: function(e){
@@ -489,7 +499,11 @@ var ParticipantForm = React.createClass({
                 this.refs.email.setState({ email: data.email });
                 this.refs.degrees.setState({ degree: data.degree });
                 this.refs.guests.setState({ guests: data.guests });
-                this.refs.title.setState({ title: data.title });
+                this.refs.title.setState({
+                    title: data.title,
+                    renderedTex: this.refs.title.toTex(data.title)
+                });
+                this.id = id;
             }.bind(this))
             .fail(function(){
                 this.pushMessage(20);
@@ -501,7 +515,7 @@ var ParticipantForm = React.createClass({
     },
     resendMail: function(){
         loader.setState({display: true});
-        $.get('/api/resend/?email='+this.participant.email, function(){
+        $.get('/api/resend/?email='+this.state.participant.email, function(){
             this.pushMessage(2);
         }.bind(this))
         .fail(function(){
@@ -511,25 +525,45 @@ var ParticipantForm = React.createClass({
             loader.setState({display: false});
         });
     },
-    handleSubmit: function(e) {
-        e.preventDefault();
+    validate: function(){
         var valid = true;
         valid = this.refs.name.validate() && valid; 
         valid = this.refs.email.validate() && valid; 
         valid = this.refs.degrees.validate() && valid; 
         valid = this.refs.title.validate() && valid; 
         valid = this.refs.guests.validate() && valid;
-        if(valid){
+        return valid;
+    },
+    handleSubmit: function(e) {
+        e.preventDefault();
+        if(this.validate()){
             loader.setState({display: true});
-            $.post('/api/', JSON.stringify(this.state.participant), function(){
-                this.pushMessage(1);
-            }.bind(this))
-            .fail(function(data){
-                this.pushMessage(10, this.resendMail);
-            }.bind(this))
-            .always(function(){
-                loader.setState({display: false});
-            });
+            if(this.state.participant.token){
+                var url = '/api/update/?participant_id=';
+                url += this.id;
+                url += '&token=';
+                url += this.state.participant.token;
+                loader.setState({display: true});
+                $.post(url, JSON.stringify(this.state.participant), function(){
+                    this.pushMessage(3);
+                }.bind(this))
+                .fail(function(){
+                    this.pushMessage(30);
+                }.bind(this))
+                .always(function(data){
+                    loader.setState({display: false});
+                });
+            } else {
+                $.post('/api/', JSON.stringify(this.state.participant), function(){
+                    this.pushMessage(1);
+                }.bind(this))
+                .fail(function(data){
+                    this.pushMessage(10, this.resendMail);
+                }.bind(this))
+                .always(function(){
+                    loader.setState({display: false});
+                });
+            }
         }
         return;
     },
@@ -556,21 +590,18 @@ var ParticipantForm = React.createClass({
         } else {
             buttons.push(
                 <button
-                    type="button"
-                    onClick={this.updateParticipant}
+                    type="submit"
                     className="btn btn-secondary"
                     key={buttons.length + 1}>
                     Aktualisieren
                 </button>
             );
             buttons.push(
-                <button
-                    type="button"
-                    onClick={this.resetForm}
+                <a href="/"
                     className="btn btn-secondary"
                     key={buttons.length + 1}>
                     Neu
-                </button>
+                </a>
             );
         }
         return (

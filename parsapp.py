@@ -34,7 +34,6 @@ def sendmail(participant, template='email.html'):
         s.sendmail(MAIL_ADDRESS, msg['To'], msg.as_string())
         s.quit()
     except:
-        print('Error: Mail send failed')
         raise
 
 
@@ -78,6 +77,7 @@ def api(function=None):
             for d in Degree.select():
                 degrees[str(d.id)] = {'id': d.id, 'name': d.name}
             return jsonify(**degrees)
+
         if function == 'participant':
             p = Participant.get(id=request.args.get('participant_id'))
             if p.token == request.args.get('token'):
@@ -94,6 +94,7 @@ def api(function=None):
                     jsonify(errormessage='No access!'),
                     401
                 )
+
         if function == 'resend':
             try:
                 p = Participant\
@@ -105,14 +106,16 @@ def api(function=None):
             except:
                 return(jsonify(errormessage='Fail'), 500)
             return(jsonify(message='Success'), 200)
+
         if function == 'update':
             p = Participant.get(id=request.args.get('participant_id'))
             if p.token == request.args.get('token'):
-                p.firstname = request.get_json()['firstname']
-                p.lastname = request.get_json()['lastname']
-                p.degree = request.get_json()['degree']
-                p.title = request.get_json()['title']
-                p.guests = request.get_json()['guests']
+                data = request.get_json(force=True)
+                p.firstname = data['firstname']
+                p.lastname = data['lastname']
+                p.degree = data['degree']
+                p.title = data['title']
+                p.guests = data['guests']
                 p.save()
                 return make_response(jsonify(message='Success'), 200)
             else:
@@ -120,6 +123,7 @@ def api(function=None):
                     jsonify(errormessage='No access!'),
                     401
                 )
+
         return ''
 
 
