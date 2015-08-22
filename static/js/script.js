@@ -163,7 +163,8 @@ var EmailInput = React.createClass({
     getInitialState: function(){
         return {
             error: false,
-            email: ''
+            email: '',
+            disabled: false
         }
     },
     validate: function(){
@@ -200,8 +201,9 @@ var EmailInput = React.createClass({
         };
         var classes = React.addons.classSet({
             'form-group': true,
-            'has-error': this.state.error
+            'has-error': this.state.error,
         });
+        var disabled = this.state.disabled ? 'disabled' : '';
         return (
             <fieldset className={classes}>
                 <label className="control-label">Unimail-Adresse</label>
@@ -212,6 +214,7 @@ var EmailInput = React.createClass({
                         ref="email"
                         onChange={this.handleChange}
                         value={this.state.email}
+                        disabled={disabled}
                         />
                     <div className="input-group-addon">@tu-dortmund.de</div>
                 </div>
@@ -226,7 +229,7 @@ var DegreeSelect = React.createClass({
         return {
             degree: 0,
             degrees: [],
-            error: false
+            error: false,
         };
     },
     handleChange: function(e){
@@ -496,7 +499,10 @@ var ParticipantForm = React.createClass({
                     firstname: data.firstname,
                     lastname: data.lastname
                 });
-                this.refs.email.setState({ email: data.email });
+                this.refs.email.setState({
+                    email: data.email,
+                    disabled: true
+                });
                 this.refs.degrees.setState({ degree: data.degree });
                 this.refs.guests.setState({ guests: data.guests });
                 this.refs.title.setState({
