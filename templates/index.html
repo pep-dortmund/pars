@@ -20,11 +20,13 @@
         <div id="alert"></div>
         <div id="loader"></div>
       </div>
+      {% block main %}
       <div class="row">
         <div class="col-md-8 col-md-offset-2">
           <div id="main"></div>
         </div>
       </div>
+      {% endblock %}
     </div> 
     <script src="/static/js/jquery-2.1.4.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>

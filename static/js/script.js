@@ -21,10 +21,10 @@ var AlertMessage = React.createClass({
             ),
             10: (
                 <div className="alert alert-warning">
-                    Diese Email wurde bereits eingetragen. 
-                    Du solltest eine Bestätigungsmail in Deinem 
-                    Postfach finden, in der ein Link zur Änderung 
-                    Deiner Daten aufgeführt ist.  <a 
+                    Diese Email wurde bereits eingetragen.
+                    Du solltest eine Bestätigungsmail in Deinem
+                    Postfach finden, in der ein Link zur Änderung
+                    Deiner Daten aufgeführt ist.  <a
                         href="#"
                         className="alert-link"
                         onClick={this.props.callback}>
@@ -533,10 +533,10 @@ var ParticipantForm = React.createClass({
     },
     validate: function(){
         var valid = true;
-        valid = this.refs.name.validate() && valid; 
-        valid = this.refs.email.validate() && valid; 
-        valid = this.refs.degrees.validate() && valid; 
-        valid = this.refs.title.validate() && valid; 
+        valid = this.refs.name.validate() && valid;
+        valid = this.refs.email.validate() && valid;
+        valid = this.refs.degrees.validate() && valid;
+        valid = this.refs.title.validate() && valid;
         valid = this.refs.guests.validate() && valid;
         return valid;
     },
@@ -640,4 +640,67 @@ var ParticipantForm = React.createClass({
     }
 });
 
-React.render(<ParticipantForm />, document.getElementById('main'));
+var AdminPanel = React.createClass({
+    getInitialState: function(){
+        return {
+            participants: [],
+            degrees: {}
+        }
+    },
+    componentDidMount: function(){
+        $.getJSON('/api/degrees/', function(data){
+            this.setState({degrees: data});
+        }.bind(this))
+        .fail(function(){
+            console.log("Error while downloading degrees.");
+        });
+        $.getJSON('/admin/api/participants/', function(data){
+            this.setState({participants: data.participants});
+        }.bind(this))
+        .fail(function(){
+            console.log('fail');
+        });
+    },
+    render: function(){
+        var head = (
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Abschluss</th>
+                <th>Gäste</th>
+                <th>Titel</th>
+            </tr>
+        );
+        var body = [];
+        for(key in this.state.participants){
+            var p = this.state.participants[key];
+            var degree = p.degree in this.state.degrees ?
+                this.state.degrees[p.degree].name :
+                '...';
+            body.push(
+                <tr key={key}>
+                    <td>{p.firstname} {p.lastname}</td>
+                    <td>{p.email}</td>
+                    <td>{degree}</td>
+                    <td>{p.guests}</td>
+                    <td><span title={p.title}>
+                        {p.title.substr(0, 6)}…
+                    </span></td>
+                </tr>
+            );
+        }
+        return(
+            <table className="table table-hover">
+                {head}
+                {body}
+            </table>
+        )
+    }
+});
+
+var admin = window.location.href.match(/\/admin\/$/);
+if(admin){
+    React.render(<AdminPanel />, document.getElementById('admin-panel'));
+} else {
+    React.render(<ParticipantForm />, document.getElementById('main'));
+}
