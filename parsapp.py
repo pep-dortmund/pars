@@ -5,7 +5,8 @@ from flask import (Flask,
                    request,
                    make_response)
 from database import Participant, Degree
-from peewee import IntegrityError
+from peewee import (IntegrityError,
+                    fn)
 from email.mime.text import MIMEText
 import smtplib
 from functools import wraps
@@ -186,6 +187,27 @@ def api(function=None):
                     jsonify(errormessage='No access!'),
                     401
                 )
+
+        if function == 'stats':
+            degrees = Degree.select()
+            degree_counts = {}
+            for d in degrees:
+                degree_counts.update(
+                    {
+                        d.id: (Participant.select().join(Degree)
+                               .where(Degree.id == d.id).count())
+                    }
+                )
+            stats = {
+                'degree_counts': degree_counts,
+                'participant_count': Participant.select().count(),
+                'guest_count': (Participant
+                                .select(fn.SUM(Participant.guests))
+                                .scalar())
+            }
+            return make_response(
+                jsonify(stats)
+            )
 
         return ''
 

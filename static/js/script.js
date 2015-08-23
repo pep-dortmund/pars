@@ -644,12 +644,25 @@ var AdminPanel = React.createClass({
     getInitialState: function(){
         return {
             participants: [],
-            degrees: {}
+            degrees: {},
+            mailExtension: '',
+            stats: {}
         }
     },
     componentDidMount: function(){
-        $.getJSON('/api/degrees/', function(data){
-            this.setState({degrees: data});
+        $.getJSON('/api/config/', function(data){
+            this.setState({
+                degrees: data.degrees,
+                mailExtension: data.allowed_mail
+            });
+        }.bind(this))
+        .fail(function(){
+            console.log("Error while downloading degrees.");
+        });
+        $.getJSON('/api/stats/', function(data){
+            this.setState({
+                stats: data
+            });
         }.bind(this))
         .fail(function(){
             console.log("Error while downloading degrees.");
@@ -662,16 +675,36 @@ var AdminPanel = React.createClass({
         });
     },
     render: function(){
+        var degreeStats = []
+        for(key in this.state.stats.degree_counts){
+            if(key in this.state.degrees){
+                degreeStats.push(
+                    <span key={key}>
+                        <small>{this.state.degrees[key].name}: </small>
+                        {this.state.stats.degree_counts[key]}&nbsp;
+                    </span>
+                );
+            }
+        }
         var head = (
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Abschluss</th>
-                <th>Gäste</th>
-                <th>Titel</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email <small>{this.state.mailExtension}</small></th>
+                    <th>Abschluss</th>
+                    <th>Gäste</th>
+                </tr>
+            </thead>
         );
         var body = [];
+        body.push(
+            <tr>
+                <td colSpan="2">Total: {this.state.stats.participant_count}</td>
+                <td colSpan="2">{degreeStats}</td>
+                <td>Total: {this.state.stats.guest_count}</td>
+            </tr>
+        )
         for(key in this.state.participants){
             var p = this.state.participants[key];
             var degree = p.degree in this.state.degrees ?
