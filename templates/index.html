@@ -7,13 +7,14 @@
   </head>
   <body>
     <div class="container">
-      <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-          <div class="row">
-            <div class="col-md-12">
-              <h3>Anmeldung zur Absolventenfeier 2015</h3>
-            </div>
-          </div>
+      <span class="hidden-sm-up">xs</span>
+      <span class="hidden-xs-down hidden-md-up">sm</span>
+      <span class="hidden-sm-down hidden-lg-up">md</span>
+      <span class="hidden-md-down hidden-xl-up">lg</span>
+      <span class="hidden-lg-down">xl</span>
+      <div id="top-row" class="row">
+        <div class="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
+          <h2>Anmeldung zur Absolventenfeier 2015</h2>
         </div>
       </div>
       <div class="row">
@@ -22,12 +23,21 @@
       </div>
       {% block main %}
       <div class="row">
-        <div class="col-md-8 col-md-offset-2">
+        <div class="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
           <div id="main"></div>
         </div>
       </div>
       {% endblock %}
-    </div> 
+      <div class="row">
+        <div class="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
+          <ul class="list-inline">
+            <li><a href="http://pep-dortmund.org">pep-dortmund.org</a>
+            <li><a href="#">Datenschutz</a>
+            <li><a href="#">Veranstaltungsinformationen</a>
+          </ul>
+        </div>
+      </div>
+    </div>
     <script src="/static/js/jquery-2.1.4.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/katex.min.js"></script>

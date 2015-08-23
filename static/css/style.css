@@ -3,6 +3,10 @@ div.tex-title {
     text-align: center;
 }
 
+div#top-row {
+    margin-top: 15px;
+}
+
 @keyframes loader {
     50% { background-color: #aaa; }
 }
