@@ -15,7 +15,9 @@ from config import (MAIL_ADDRESS,
                     MAIL_LOGIN,
                     MAIL_PASSWORD,
                     MAIL_PORT,
-                    ALLOWED_MAIL_SERVER)
+                    ALLOWED_MAIL_SERVER,
+                    MAXIMUM_GUESTS,
+                    TEST_MAIL_ADDRESS)
 
 
 parsapp = Flask(__name__)
@@ -54,7 +56,7 @@ def sendmail(participant, template='email.html'):
     message = render_template(template, participant=participant)
     msg = MIMEText(message, 'html')
     msg['From'] = MAIL_ADDRESS
-    msg['To'] = 'kevin@kehei.de'  # participant._email
+    msg['To'] = TEST_MAIL_ADDRESS  # participant._email
     msg['Subject'] = 'Anmeldung zur Absolventenfeier'
     try:
         s = smtplib.SMTP(MAIL_SERVER, MAIL_PORT)
@@ -144,7 +146,7 @@ def api(function=None):
             config = {
                 'degrees': degrees,
                 'allowed_mail': ALLOWED_MAIL_SERVER,
-                'maximum_guests': 10
+                'maximum_guests': MAXIMUM_GUESTS
             }
             return jsonify(config)
 
