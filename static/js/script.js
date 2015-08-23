@@ -44,7 +44,9 @@ var AlertMessage = React.createClass({
             )
         }
         return (
-            <div className="col-md-12">{messages[this.props.code]}</div>
+            <div className="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
+                {messages[this.props.code]}
+            </div>
         );
     }
 });
@@ -164,7 +166,8 @@ var EmailInput = React.createClass({
         return {
             error: false,
             email: '',
-            disabled: false
+            disabled: false,
+            mailExtension: ''
         }
     },
     validate: function(){
@@ -188,13 +191,14 @@ var EmailInput = React.createClass({
             if(!this.state.email){
                 hint = (
                     <span className="help-block"><small>
-                        Bitte trage Deine TU-Mailadresse ein.
+                        Bitte trage Deine Emailadresse ein.
                     </small></span>);
             } else {
                 hint = (
                     <span className="help-block"><small>
                         Du kannst dich nur mit einer gültigen
-                        <code>@tu-dortmund</code>-Mailadresse eintragen.
+                        <code>{this.state.mailExtension}</code>
+                        -Mailadresse eintragen.
                     </small></span>
                 );
             }
@@ -356,9 +360,7 @@ var TitleInput = React.createClass({
             if(!this.state.title){
                 hint = (
                     <span className="help-block"><small>
-                        Bitte gib hier den Titel Deiner Abschlussarbeit ein
-                        (Du kannst auch inline-LaTeX innerhalb <code>$$</code>
-                         benutzen).
+                        Bitte gib hier den Titel Deiner Abschlussarbeit ein.
                     </small></span>
                 )
             } else {
@@ -366,7 +368,12 @@ var TitleInput = React.createClass({
                     <span className="help-block"><small>
                         Anscheinend konnte dein <code>LaTeX</code>-nicht
                         richtig interpretiert werden. Versuche es bitte erneut
-                        oder schaue Dir <a href="">hier</a> die unterstützten
+                        oder schaue Dir&nbsp;
+                        <a href={'https://github.com/Khan/KaTeX/wiki/'
+                            + 'Function-Support-in-KaTeX'}
+                            target='_blank'>
+                            hier
+                        </a> die unterstützten
                         Befehle an.
                     </small></span>
                 )
@@ -383,7 +390,11 @@ var TitleInput = React.createClass({
         return (
             <fieldset className={classes}>
                 <label className="control-label">
-                    Titel der {degreeText}Arbeit
+                    Titel der {degreeText}Arbeit&nbsp;
+                    <small>
+                        (Du kannst auch Inline-LaTeX innerhalb
+                        <code>$ $</code> nutzen.)
+                    </small>
                 </label>
                 <input
                     type="text"
@@ -397,27 +408,23 @@ var TitleInput = React.createClass({
                     dangerouslySetInnerHTML={{
                         __html: this.state.renderedTex
                     }}></p>
-                <p className="text-center"><small>
-                    (Du kannst auch Inline-LaTeX innerhalb
-                     <code>$ $</code> nutzen.)
-                </small></p>
             </fieldset>
         );
     }
 });
 
 var GuestInput = React.createClass({
-    guestMax: 10,
     getInitialState: function(){
         return {
             error: false,
-            guests: this.props.value
+            guests: this.props.value,
+            maxGuests: 10
         }
     },
     validate: function(){
         var hasError = (!this.state.guests
-            || this.state.guests < 1
-            || this.state.guests > this.guestMax);
+            || this.state.guests < 0
+            || this.state.guests > this.state.maxGuests);
         this.setState({error: hasError});
         return !hasError;
     },
@@ -435,8 +442,9 @@ var GuestInput = React.createClass({
         if(this.state.error){
             hint = (
                 <span className="help-block"><small>
-                    Wie viele Gäste bringst du mit (einschließlich Dir)?
-                    Momentan darfst du bis zu {this.guestMax} Gäste mitbringen.
+                    Wie viele Gäste bringst du mit (ohne Dich mitzuzählen)?
+                    Momentan darfst du bis zu {this.state.maxGuests}&nbsp;
+                    Gäste mitbringen.
                 </small></span>
             )
         };
@@ -476,9 +484,11 @@ var ParticipantForm = React.createClass({
         );
     },
     componentDidMount: function(){
-        $.getJSON('/api/degrees/', function(data){
-            this.refs.degrees.setState({degrees: data});
-            this.refs.title.setState({degrees: data});
+        $.getJSON('/api/config/', function(data){
+            this.refs.degrees.setState({degrees: data.degrees});
+            this.refs.title.setState({degrees: data.degrees});
+            this.refs.email.setState({mailExtension: data.allowed_mail});
+            this.refs.guests.setState({maxGuests: data.maximum_guests});
         }.bind(this))
         .fail(function(){
             console.log("Error while downloading degrees.");
@@ -588,7 +598,7 @@ var ParticipantForm = React.createClass({
             buttons.push(
                 <button
                     type="submit"
-                    className="btn btn-secondary"
+                    className="btn btn-primary"
                     key={buttons.length + 1}>
                     Eintragen
                 </button>
@@ -597,11 +607,12 @@ var ParticipantForm = React.createClass({
             buttons.push(
                 <button
                     type="submit"
-                    className="btn btn-secondary"
+                    className="btn btn-primary"
                     key={buttons.length + 1}>
                     Aktualisieren
                 </button>
             );
+            buttons.push(<span> </span>);
             buttons.push(
                 <a href="/"
                     className="btn btn-secondary"
@@ -712,20 +723,23 @@ var AdminPanel = React.createClass({
                 '...';
             body.push(
                 <tr key={key}>
+                    <td>#{p.id}</td>
                     <td>{p.firstname} {p.lastname}</td>
-                    <td>{p.email}</td>
+                    <td>
+                        <a href={'mailto:' + p.email + this.state.mailExtension}>
+                        {p.email}</a>
+                    </td>
                     <td>{degree}</td>
                     <td>{p.guests}</td>
-                    <td><span title={p.title}>
-                        {p.title.substr(0, 6)}…
-                    </span></td>
                 </tr>
             );
         }
         return(
-            <table className="table table-hover">
+            <table className="table table-sm table-hover table-striped">
                 {head}
+                <tbody>
                 {body}
+                </tbody>
             </table>
         )
     }

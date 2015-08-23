@@ -95,7 +95,8 @@ def admin_api(function):
                 'guests': p.guests,
                 'email': p.email,
                 'title': p.title,
-                'degree': p.degree.id
+                'degree': p.degree.id,
+                'id': p.id
             })
         return make_response(
             jsonify({
@@ -136,11 +137,16 @@ def api(function=None):
             )
         return response
     else:
-        if function == 'degrees':
+        if function == 'config':
             degrees = {}
             for d in Degree.select():
                 degrees[str(d.id)] = {'id': d.id, 'name': d.name}
-            return jsonify(**degrees)
+            config = {
+                'degrees': degrees,
+                'allowed_mail': ALLOWED_MAIL_SERVER,
+                'maximum_guests': 10
+            }
+            return jsonify(config)
 
         if function == 'participant':
             p = Participant.get(id=request.args.get('participant_id'))
