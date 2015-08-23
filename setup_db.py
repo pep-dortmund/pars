@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 from peewee import SqliteDatabase
 import os
 
