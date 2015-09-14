@@ -4,7 +4,9 @@ from peewee import (SqliteDatabase,
                     IntegerField,
                     ForeignKeyField)
 import os
-from config import ALLOWED_MAIL_SERVER
+from config import DevelopmentConfig
+
+ALLOWED_MAIL_SERVER = DevelopmentConfig.ALLOWED_MAIL_SERVER
 
 DBPATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                       'database.sqlite')

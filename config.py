@@ -1,8 +1,15 @@
-ALLOWED_MAIL_SERVER = '@tu-dortmund.de'
-MAIL_ADDRESS = 'pep-absolventenfeier-test@pep-dortmund.org'
-MAIL_SERVER = 'mail.pep-dortmund.org'
-MAIL_LOGIN = 'pep-absolventenfeier-test'
-MAIL_PASSWORD = 'verysecure'
-MAIL_PORT = 587
-TEST_MAIL_ADDRESS = 'pseudo_recipient@mail.de'
-MAXIMUM_GUESTS = 10
+class Config(object):
+    MAXIMUM_GUESTS = 10
+    MAIL_PORT = 587
+    DEBUG = False
+    TESTING = False
+
+
+class DevelopmentConfig(Config):
+    ALLOWED_MAIL_SERVER = '@tu-dortmund.de'
+    MAIL_ADDRESS = ''
+    MAIL_SERVER = ''
+    MAIL_LOGIN = ''
+    MAIL_PASSWORD = ''
+    TEST_MAIL_ADDRESS = ''
+    DEBUG = True

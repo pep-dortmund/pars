@@ -10,18 +10,12 @@ from peewee import (IntegrityError,
 from email.mime.text import MIMEText
 import smtplib
 from functools import wraps
-from config import (MAIL_ADDRESS,
-                    MAIL_SERVER,
-                    MAIL_LOGIN,
-                    MAIL_PASSWORD,
-                    MAIL_PORT,
-                    ALLOWED_MAIL_SERVER,
-                    MAXIMUM_GUESTS,
-                    TEST_MAIL_ADDRESS)
+import config
 
 
 parsapp = Flask(__name__)
-parsapp.secret_key = 'ABC'
+
+parsapp.config.from_object('config.DevelopmentConfig')
 
 
 def check_auth(username, password):
@@ -55,14 +49,15 @@ def sendmail(participant, template='email.html'):
     print(sendmail)
     message = render_template(template, participant=participant)
     msg = MIMEText(message, 'html')
-    msg['From'] = MAIL_ADDRESS
-    msg['To'] = TEST_MAIL_ADDRESS  # participant._email
+    msg['From'] = parsapp.config['MAIL_ADDRESS']
+    msg['To'] = parsapp.config['TEST_MAIL_ADDRESS']  # participant._email
     msg['Subject'] = 'Anmeldung zur Absolventenfeier'
     try:
-        s = smtplib.SMTP(MAIL_SERVER, MAIL_PORT)
+        s = smtplib.SMTP(parsapp.config['MAIL_SERVER'],
+                         parsapp.config['MAIL_PORT'])
         s.starttls()
-        s.login(MAIL_LOGIN, MAIL_PASSWORD)
-        s.sendmail(MAIL_ADDRESS, msg['To'], msg.as_string())
+        s.login(parsapp.config['MAIL_LOGIN'], parsapp.config['MAIL_PASSWORD'])
+        s.sendmail(parsapp.config['MAIL_ADDRESS'], msg['To'], msg.as_string())
         s.quit()
     except:
         raise
@@ -107,6 +102,14 @@ def admin_api(function):
             200
         )
 
+    if function == 'deactivate':
+        return make_response(
+            jsonify({
+                'status': 'success'
+            }),
+            200
+        )
+
     return ''
 
 
@@ -143,12 +146,12 @@ def api(function=None):
             degrees = {}
             for d in Degree.select():
                 degrees[str(d.id)] = {'id': d.id, 'name': d.name}
-            config = {
+            configObj = {
                 'degrees': degrees,
-                'allowed_mail': ALLOWED_MAIL_SERVER,
-                'maximum_guests': MAXIMUM_GUESTS
+                'allowed_mail': parsapp.config['ALLOWED_MAIL_SERVER'],
+                'maximum_guests': parsapp.config['MAXIMUM_GUESTS']
             }
-            return jsonify(config)
+            return jsonify(configObj)
 
         if function == 'participant':
             p = Participant.get(id=request.args.get('participant_id'))
@@ -172,7 +175,7 @@ def api(function=None):
                 p = Participant\
                     .select()\
                     .where(Participant._email
-                           == request.args.get('email') + ALLOWED_MAIL_SERVER)\
+                           == request.args.get('email') + parsapp.config['ALLOWED_MAIL_SERVER'])\
                     .get()
                 sendmail(p)
             except:
@@ -221,4 +224,4 @@ def api(function=None):
 
 
 if __name__ == '__main__':
-    parsapp.run(debug=True)
+    parsapp.run()
