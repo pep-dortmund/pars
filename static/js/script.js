@@ -265,7 +265,7 @@ var DegreeSelect = React.createClass({
     },
     render: function(){
         var degrees = [];
-        for(key in this.state.degrees){
+        for(var key in this.state.degrees){
             var degree = this.state.degrees[key];
             var checked = this.state.degree == degree.id;
             degrees.push(
@@ -726,7 +726,7 @@ var AdminPanel = React.createClass({
     },
     render: function(){
         var degreeStats = []
-        for(key in this.state.stats.degree_counts){
+        for(var key in this.state.stats.degree_counts){
             if(key in this.state.degrees){
                 degreeStats.push(
                     <span key={key}>
@@ -755,7 +755,7 @@ var AdminPanel = React.createClass({
                 <td>Total: {this.state.stats.guest_count}</td>
             </tr>
         )
-        for(key in this.state.participants){
+        for(var key in this.state.participants){
             var p = this.state.participants[key];
             var degree = p.degree in this.state.degrees ?
                 this.state.degrees[p.degree].name :
@@ -773,8 +773,9 @@ var AdminPanel = React.createClass({
                 </tr>
             );
         }
-        var registrationButtonLabel = 'Anmeldung ' 
-            + (this.state.registrationIsActive ? 'deaktivieren' : 'aktivieren');
+        var registrationButtonLabel = this.state.registrationIsActive
+            ? 'deaktivieren' : 'aktivieren';
+        var buttonType = this.state.registrationIsActive ? 'warning' : 'success';
         return(
             <div>
                 <div className="row">
@@ -783,8 +784,9 @@ var AdminPanel = React.createClass({
                     </div>
                     <div className="col-xs-6 col-lg-4 col-xl-3 text-right">
                         <span id="disable-registration">
+                            Anmeldung {this.state.registrationIsActive ? 'online' : 'offline'}&nbsp;
                             <button
-                                className="btn btn-sm btn-warning-outline"
+                                className={"btn btn-sm btn-" + buttonType}
                                 onClick={this.toggleRegistrationStatus}>
                                 {registrationButtonLabel}
                             </button>

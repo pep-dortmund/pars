@@ -16,6 +16,9 @@ db = SqliteDatabase(DBPATH)
 class Degree(Model):
     name = CharField()
 
+    def __repr__(self):
+        return self.name
+
     class Meta:
         database = db
 
@@ -23,28 +26,19 @@ class Degree(Model):
 class Participant(Model):
     firstname = CharField()
     lastname = CharField()
-    _email = CharField(unique=True)
+    email = CharField(unique=True)
     guests = IntegerField()
     degree = ForeignKeyField(Degree)
     token = CharField()
     title = CharField()
 
-    @property
-    def email(self):
-        return self._email.replace(ALLOWED_MAIL_SERVER, '')
-
-    @email.setter
-    def email(self, value):
-        self._email = value + ALLOWED_MAIL_SERVER
-
-    @email.deleter
-    def email(self):
-        del self._email
-
     def generate_token():
         import hashlib
         import random
         return hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()
+
+    def __repr__(self):
+        return self.email
 
     class Meta:
         database = db

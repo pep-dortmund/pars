@@ -14,8 +14,15 @@ import config
 
 import os
 
+from flask_admin import Admin, AdminIndexView
+from flask_admin.contrib.peewee import ModelView
+
 
 parsapp = Flask(__name__)
+
+admin = Admin(parsapp, name='PARS', template_mode='bootstrap3', index_view=AdminIndexView(name='Admin', template='admin.html'))
+admin.add_view(ModelView(Participant))
+admin.add_view(ModelView(Degree))
 
 parsapp.config.from_object('config.DevelopmentConfig')
 
