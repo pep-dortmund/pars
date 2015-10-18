@@ -12,6 +12,8 @@ import smtplib
 from functools import wraps
 import config
 
+import os
+
 
 parsapp = Flask(__name__)
 
@@ -63,6 +65,10 @@ def sendmail(participant, template='email.html'):
         raise
 
 
+def registration_active():
+    return not os.path.exists('./reg_inactive')
+
+
 @parsapp.route('/', methods=['GET'])
 @parsapp.route('/<int:participant_id>!<token>/', methods=['GET'])
 def index(participant_id=None, token=None):
@@ -102,10 +108,15 @@ def admin_api(function):
             200
         )
 
-    if function == 'deactivate':
+    if function == 'toggle_registration':
+        if registration_active():
+            open('./reg_inactive', 'a').close()
+        else:
+            os.remove('./reg_inactive')
         return make_response(
             jsonify({
-                'status': 'success'
+                'status': 'success',
+                'registration': registration_active()
             }),
             200
         )
@@ -117,6 +128,11 @@ def admin_api(function):
 @parsapp.route('/api/<function>/', methods=['GET', 'POST'])
 def api(function=None):
     if not function:
+        if not registration_active():
+            return make_response(
+                jsonify(errormessage='Registration disabled.'),
+                401
+            )
         try:
             participant = Participant(**request.get_json(force=True))
             participant.degree = Degree.get(
@@ -149,11 +165,17 @@ def api(function=None):
             configObj = {
                 'degrees': degrees,
                 'allowed_mail': parsapp.config['ALLOWED_MAIL_SERVER'],
-                'maximum_guests': parsapp.config['MAXIMUM_GUESTS']
+                'maximum_guests': parsapp.config['MAXIMUM_GUESTS'],
+                'registration_is_active': registration_active()
             }
             return jsonify(configObj)
 
         if function == 'participant':
+            if not registration_active():
+                return make_response(
+                    jsonify(errormessage='Registration disabled.'),
+                    401
+                )
             p = Participant.get(id=request.args.get('participant_id'))
             if p.token == request.args.get('token'):
                 pObj = {'firstname': p.firstname,

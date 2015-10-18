@@ -5,3 +5,5 @@ env/
 *.sqlite
 config.py
 config.py.bak
+
+reg_inactive

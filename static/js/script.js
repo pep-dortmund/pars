@@ -19,6 +19,15 @@ var AlertMessage = React.createClass({
                     Deine Daten wurden aktualisiert. Bis dann!
                 </div>
             ),
+            4: (
+                <div className="alert alert-warning">
+                    Die Anmeldung ist deaktiviert. Du kannst momentan
+                    keine Änderungen vornehmen oder dich registrieren.
+                    Falls es eine dringende, kurzfristige Änderung gibt,
+                    melde Dich per Mail bei uns:&nbsp;
+                    <a href="#">absolventenfeier@pep-dortmund.de</a>
+                </div>
+            ),
             10: (
                 <div className="alert alert-warning">
                     Diese Email wurde bereits eingetragen.
@@ -144,6 +153,7 @@ var NameInput = React.createClass({
                             ref="firstname"
                             onChange={this.handleChange}
                             value={this.state.firstname}
+                            readOnly={this.props.readOnly}
                             />
                     </div>
                     <div className="col-sm-6">
@@ -152,7 +162,9 @@ var NameInput = React.createClass({
                             placeholder="Mustermann"
                             ref="lastname"
                             value={this.state.lastname}
-                            onChange={this.handleChange}/>
+                            onChange={this.handleChange}
+                            readOnly={this.props.readOnly}
+                            />
                     </div>
                 </div>
                 {hint}
@@ -219,6 +231,7 @@ var EmailInput = React.createClass({
                         onChange={this.handleChange}
                         value={this.state.email}
                         disabled={disabled}
+                        readOnly={this.props.readOnly}
                         />
                     <div className="input-group-addon">@tu-dortmund.de</div>
                 </div>
@@ -264,6 +277,7 @@ var DegreeSelect = React.createClass({
                         onChange={this.handleChange}
                         value={degree.id}
                         checked={checked}
+                        readOnly={this.props.readOnly}
                         />
                     {degree.name}
                 </label>
@@ -402,6 +416,7 @@ var TitleInput = React.createClass({
                     className="form-control"
                     value={this.state.title}
                     onChange={this.handleChange}
+                    readOnly={this.props.readOnly}
                      />
                 {hint}
                 <p className="text-center"
@@ -463,6 +478,7 @@ var GuestInput = React.createClass({
                     className="form-control"
                     onChange={this.handleChange}
                     value={this.state.guests}
+                    readOnly={this.props.readOnly}
                      />
                 {hint}
             </fieldset>
@@ -474,7 +490,8 @@ var ParticipantForm = React.createClass({
     getInitialState: function(){
         this.participant = {};
         return {
-            participant: {}
+            participant: {},
+            registrationIsActive: false
         };
     },
     pushMessage: function(id, callback){
@@ -489,6 +506,10 @@ var ParticipantForm = React.createClass({
             this.refs.title.setState({degrees: data.degrees});
             this.refs.email.setState({mailExtension: data.allowed_mail});
             this.refs.guests.setState({maxGuests: data.maximum_guests});
+            this.setState({registrationIsActive: data.registration_is_active});
+            if(!data.registration_is_active){
+                this.pushMessage(4);
+            }
         }.bind(this))
         .fail(function(){
             console.log("Error while downloading degrees.");
@@ -599,7 +620,9 @@ var ParticipantForm = React.createClass({
                 <button
                     type="submit"
                     className="btn btn-primary"
-                    key={buttons.length + 1}>
+                    key={buttons.length + 1}
+                    disabled={!this.state.registrationIsActive}
+                    >
                     Eintragen
                 </button>
                 );
@@ -608,6 +631,7 @@ var ParticipantForm = React.createClass({
                 <button
                     type="submit"
                     className="btn btn-primary"
+                    disabled={!this.state.registrationIsActive}
                     key={buttons.length + 1}>
                     Aktualisieren
                 </button>
@@ -616,6 +640,7 @@ var ParticipantForm = React.createClass({
             buttons.push(
                 <a href="/"
                     className="btn btn-secondary"
+                    disabled={!this.state.registrationIsActive}
                     key={buttons.length + 1}>
                     Neu
                 </a>
@@ -626,24 +651,29 @@ var ParticipantForm = React.createClass({
                 <NameInput
                     ref="name"
                     onUserInput={this.handleUserInput}
+                    readOnly={!this.state.registrationIsActive}
                     />
                 <EmailInput
                     ref="email"
                     onUserInput={this.handleUserInput}
                     value={this.participant.email}
+                    readOnly={!this.state.registrationIsActive}
                     />
                 <DegreeSelect
                     ref="degrees"
                     source="/api/degrees/"
                     onUserInput={this.handleDegreeInput}
+                    readOnly={!this.state.registrationIsActive}
                     />
                 <TitleInput
                     ref="title"
                     onUserInput={this.handleUserInput}
+                    readOnly={!this.state.registrationIsActive}
                     />
                 <GuestInput
                     ref="guests"
                     onUserInput={this.handleUserInput}
+                    readOnly={!this.state.registrationIsActive}
                     />
                 {buttons}
             </form>
@@ -657,7 +687,8 @@ var AdminPanel = React.createClass({
             participants: [],
             degrees: {},
             mailExtension: '',
-            stats: {}
+            stats: {},
+            registrationIsActive: false
         }
     },
     componentDidMount: function(){
@@ -684,6 +715,14 @@ var AdminPanel = React.createClass({
         .fail(function(){
             console.log('fail');
         });
+        $.getJSON('/api/config/', function(data){
+            this.setState({registrationIsActive: data.registration_is_active});
+        }.bind(this));
+    },
+    toggleRegistrationStatus: function(){
+        $.getJSON('/admin/api/toggle_registration/', function(data){
+            this.setState({registrationIsActive: data.registration});
+        }.bind(this));
     },
     render: function(){
         var degreeStats = []
@@ -734,13 +773,35 @@ var AdminPanel = React.createClass({
                 </tr>
             );
         }
+        var registrationButtonLabel = 'Anmeldung ' 
+            + (this.state.registrationIsActive ? 'deaktivieren' : 'aktivieren');
         return(
-            <table className="table table-sm table-hover table-striped">
-                {head}
-                <tbody>
-                {body}
-                </tbody>
-            </table>
+            <div>
+                <div className="row">
+                    <div className="col-xs-6 col-lg-6 col-lg-offset-1 col-xl-5 col-xl-offset-2">
+                        <h4>Adminpanel</h4>
+                    </div>
+                    <div className="col-xs-6 col-lg-4 col-xl-3 text-right">
+                        <span id="disable-registration">
+                            <button
+                                className="btn btn-sm btn-warning-outline"
+                                onClick={this.toggleRegistrationStatus}>
+                                {registrationButtonLabel}
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
+                        <table className="table table-sm table-hover table-striped">
+                            {head}
+                            <tbody>
+                            {body}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         )
     }
 });
