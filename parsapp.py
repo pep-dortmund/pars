@@ -14,15 +14,41 @@ import config
 
 import os
 
-from flask_admin import Admin, AdminIndexView
+from flask_admin import Admin, AdminIndexView, expose
+from flask_admin.base import MenuLink
 from flask_admin.contrib.peewee import ModelView
 
 
 parsapp = Flask(__name__)
 
-admin = Admin(parsapp, name='PARS', template_mode='bootstrap3', index_view=AdminIndexView(name='Admin', template='admin.html'))
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
+
+class AuthenticatedIndexView(AdminIndexView):
+    @requires_auth
+    @expose('/')
+    def index(self):
+        return super(AuthenticatedIndexView, self).index()
+
+    @expose('/logout/')
+    def logout(self):
+        return authenticate()
+
+
+admin = Admin(parsapp, name='PARS', template_mode='bootstrap3',
+              index_view=AuthenticatedIndexView(name='Admin',
+                                                template='admin.html'))
 admin.add_view(ModelView(Participant))
 admin.add_view(ModelView(Degree))
+admin.add_link(MenuLink(name='Logout', endpoint='logout'))
 
 parsapp.config.from_object('config.DevelopmentConfig')
 
@@ -43,19 +69,7 @@ def authenticate():
     )
 
 
-def requires_auth(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth = request.authorization
-        print(auth)
-        if not auth or not check_auth(auth.username, auth.password):
-            return authenticate()
-        return f(*args, **kwargs)
-    return decorated
-
-
 def sendmail(participant, template='email.html'):
-    print(sendmail)
     message = render_template(template, participant=participant)
     msg = MIMEText(message, 'html')
     msg['From'] = parsapp.config['MAIL_ADDRESS']
