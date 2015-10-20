@@ -54,11 +54,7 @@ var AlertMessage = React.createClass({
                 "Aktualisieren fehlgeschlagen."
             )
         };
-        return React.createElement(
-            "div",
-            { className: "col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2" },
-            messages[this.props.code]
-        );
+        return messages[this.props.code];
     }
 });
 
@@ -574,11 +570,9 @@ var ParticipantForm = React.createClass({
         this.participant = {};
         return {
             participant: {},
-            registrationIsActive: false
+            registrationIsActive: false,
+            alerts: []
         };
-    },
-    pushMessage: function pushMessage(id, callback) {
-        React.render(React.createElement(AlertMessage, { code: id, callback: callback }), document.getElementById('alert'));
     },
     componentDidMount: function componentDidMount() {
         $.getJSON('/api/config/', (function (data) {
@@ -588,7 +582,7 @@ var ParticipantForm = React.createClass({
             this.refs.guests.setState({ maxGuests: data.maximum_guests });
             this.setState({ registrationIsActive: data.registration_is_active });
             if (!data.registration_is_active) {
-                this.pushMessage(4);
+                this.setState({ alerts: [{ code: 4 }] });
             }
         }).bind(this)).fail(function () {
             console.log("Error while downloading degrees.");
@@ -620,7 +614,7 @@ var ParticipantForm = React.createClass({
                 });
                 this.id = id;
             }).bind(this)).fail((function () {
-                this.pushMessage(20);
+                this.setState({ alerts: [{ code: 20 }] });
             }).bind(this)).always(function () {
                 loader.setState({ display: false });
             });
@@ -629,9 +623,9 @@ var ParticipantForm = React.createClass({
     resendMail: function resendMail() {
         loader.setState({ display: true });
         $.get('/api/resend/?email=' + this.state.participant.email, (function () {
-            this.pushMessage(2);
+            this.setState({ alerts: [{ code: 2 }] });
         }).bind(this)).fail((function () {
-            this.pushMessage(20);
+            this.setState({ alerts: [{ code: 20 }] });
         }).bind(this)).always(function () {
             loader.setState({ display: false });
         });
@@ -656,17 +650,22 @@ var ParticipantForm = React.createClass({
                 url += this.state.participant.token;
                 loader.setState({ display: true });
                 $.post(url, JSON.stringify(this.state.participant), (function () {
-                    this.pushMessage(3);
+                    this.setState({ alerts: [{ code: 3 }] });
                 }).bind(this)).fail((function () {
-                    this.pushMessage(30);
+                    this.setState({ alerts: [{ code: 30 }] });
                 }).bind(this)).always(function (data) {
                     loader.setState({ display: false });
                 });
             } else {
                 $.post('/api/', JSON.stringify(this.state.participant), (function () {
-                    this.pushMessage(1);
+                    this.setState({ alerts: [{ code: 1 }] });
                 }).bind(this)).fail((function (data) {
-                    this.pushMessage(10, this.resendMail);
+                    if (data.status == 400) {
+                        this.setState({ alerts: [{ code: 10, callback: this.resendMail }] });
+                    };
+                    if (data.status == 500) {
+                        this.setState({ alerts: [{ code: 1 }, { code: 20 }] });
+                    };
                 }).bind(this)).always(function () {
                     loader.setState({ display: false });
                 });
@@ -684,6 +683,14 @@ var ParticipantForm = React.createClass({
         this.refs.title.setState({ degree: obj.degree });
     },
     render: function render() {
+        var alerts = [];
+        for (var key in this.state.alerts) {
+            alerts.push(React.createElement(AlertMessage, {
+                key: key,
+                code: this.state.alerts[key].code,
+                callback: this.state.alerts[key].callback
+            }));
+        }
         var buttons = [];
         if (!this.state.participant.token) {
             buttons.push(React.createElement(
@@ -721,36 +728,57 @@ var ParticipantForm = React.createClass({
             ));
         }
         return React.createElement(
-            "form",
-            { onSubmit: this.handleSubmit },
-            React.createElement(NameInput, {
-                ref: "name",
-                onUserInput: this.handleUserInput,
-                readOnly: !this.state.registrationIsActive
-            }),
-            React.createElement(EmailInput, {
-                ref: "email",
-                onUserInput: this.handleUserInput,
-                value: this.participant.email,
-                readOnly: !this.state.registrationIsActive
-            }),
-            React.createElement(DegreeSelect, {
-                ref: "degrees",
-                source: "/api/degrees/",
-                onUserInput: this.handleDegreeInput,
-                readOnly: !this.state.registrationIsActive
-            }),
-            React.createElement(TitleInput, {
-                ref: "title",
-                onUserInput: this.handleUserInput,
-                readOnly: !this.state.registrationIsActive
-            }),
-            React.createElement(GuestInput, {
-                ref: "guests",
-                onUserInput: this.handleUserInput,
-                readOnly: !this.state.registrationIsActive
-            }),
-            buttons
+            "div",
+            null,
+            React.createElement(
+                "div",
+                { className: "row" },
+                React.createElement(
+                    "div",
+                    { className: "col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2" },
+                    alerts
+                )
+            ),
+            React.createElement(
+                "div",
+                { className: "row" },
+                React.createElement(
+                    "div",
+                    { className: "col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2" },
+                    React.createElement(
+                        "form",
+                        { onSubmit: this.handleSubmit },
+                        React.createElement(NameInput, {
+                            ref: "name",
+                            onUserInput: this.handleUserInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(EmailInput, {
+                            ref: "email",
+                            onUserInput: this.handleUserInput,
+                            value: this.participant.email,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(DegreeSelect, {
+                            ref: "degrees",
+                            source: "/api/degrees/",
+                            onUserInput: this.handleDegreeInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(TitleInput, {
+                            ref: "title",
+                            onUserInput: this.handleUserInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(GuestInput, {
+                            ref: "guests",
+                            onUserInput: this.handleUserInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        buttons
+                    )
+                )
+            )
         );
     }
 });
