@@ -1,0 +1,12 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div id="loader"></div>
+<div id="admin-panel"></div>
+{% endblock %}
+
+{% block tail %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script>
+<script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
+<script src="/static/js/compiled/script.js"></script>
+{% endblock %}
