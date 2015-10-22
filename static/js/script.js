@@ -424,6 +424,57 @@ var TitleInput = React.createClass({
     }
 });
 
+var DateCheck = React.createClass({
+    getInitialState: function(){
+        return {
+            error: false,
+            checked: false
+        };
+    },
+    validate: function(){
+        var hasError = !this.state.checked;
+        this.setState({error: hasError});
+        return !hasError;
+    },
+    handleChange: function(e){
+        this.setState({checked: !this.state.checked}, function(){
+            if(this.state.error){
+                this.validate();
+            }
+            this.props.onUserInput({validDate: this.state.checked});
+        });
+    },
+    render: function(){
+        var classes = React.addons.classSet({
+            'form-group': true,
+            'has-error': this.state.error,
+            'disabled': false
+        });
+        var hint = this.state.error ? (
+            <span className="help-block"><small>
+                Falls Du Deine letzte Prüfung im Jahr 2016 hattest oder noch
+                haben wirst, bist Du herzlich zur Absolventenfeier 2016
+                eingeladen, die Anfang 2017 stattfinden wird.
+            </small></span>
+        ) : '';
+        return (
+            <fieldset className={classes} disabled={this.state.disabled}>
+                <div className="checkbox">
+                    <label>
+                        <input
+                            type="checkbox"
+                            onChange={this.handleChange}
+                            checked={this.state.checked}
+                        ></input>
+                        Meine letzte Prüfung ist beziehungsweise war im Jahr 2015.
+                    </label>
+                </div>
+                {hint}
+            </fieldset>
+        )
+    }
+})
+
 var GuestInput = React.createClass({
     getInitialState: function(){
         return {
@@ -531,6 +582,7 @@ var ParticipantForm = React.createClass({
                     title: data.title,
                     renderedTex: this.refs.title.toTex(data.title)
                 });
+                this.refs.date.setState({ checked: true, disabled: true });
                 this.id = id;
             }.bind(this))
             .fail(function(){
@@ -560,6 +612,7 @@ var ParticipantForm = React.createClass({
         valid = this.refs.degrees.validate() && valid;
         valid = this.refs.title.validate() && valid;
         valid = this.refs.guests.validate() && valid;
+        valid = this.refs.date.validate() && valid;
         return valid;
     },
     handleSubmit: function(e) {
@@ -689,6 +742,11 @@ var ParticipantForm = React.createClass({
                                 />
                             <GuestInput
                                 ref="guests"
+                                onUserInput={this.handleUserInput}
+                                readOnly={!this.state.registrationIsActive}
+                                />
+                            <DateCheck
+                                ref="date"
                                 onUserInput={this.handleUserInput}
                                 readOnly={!this.state.registrationIsActive}
                                 />
