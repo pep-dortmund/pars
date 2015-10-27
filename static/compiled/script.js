@@ -125,15 +125,15 @@ var NameInput = React.createClass({
         return !error;
     },
     render: function render() {
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
-        var firstnameClasses = React.addons.classSet({
+        var firstnameClasses = classNames({
             'form-control': true,
             'form-control-error': this.state.error && !this.state.firstname
         });
-        var lastnameClasses = React.addons.classSet({
+        var lastnameClasses = classNames({
             'form-control': true,
             'form-control-error': this.state.error && !this.state.lastname
         });
@@ -241,7 +241,7 @@ var EmailInput = React.createClass({
                 );
             }
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
@@ -318,7 +318,7 @@ var DegreeSelect = React.createClass({
                 degree.name
             ));
         }
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
@@ -452,7 +452,7 @@ var TitleInput = React.createClass({
         if (this.state.degree in this.state.degrees) {
             degreeText = this.state.degrees[this.state.degree].name + '-';
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
@@ -516,7 +516,7 @@ var DateCheck = React.createClass({
         });
     },
     render: function render() {
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error,
             'disabled': false
@@ -591,7 +591,7 @@ var GuestInput = React.createClass({
                 )
             );
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
