@@ -139,7 +139,7 @@ var NameInput = React.createClass({
                 So wirst du bei der Absolventenfeier aufgerufen.
             </small></span>);
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">Name</label>
                 <div className="row">
                     <div className="col-sm-6">
@@ -149,7 +149,6 @@ var NameInput = React.createClass({
                             ref="firstname"
                             onChange={this.handleChange}
                             value={this.state.firstname}
-                            readOnly={this.props.readOnly}
                             />
                     </div>
                     <div className="col-sm-6">
@@ -159,7 +158,6 @@ var NameInput = React.createClass({
                             ref="lastname"
                             value={this.state.lastname}
                             onChange={this.handleChange}
-                            readOnly={this.props.readOnly}
                             />
                     </div>
                 </div>
@@ -217,7 +215,7 @@ var EmailInput = React.createClass({
         });
         var disabled = this.state.disabled ? 'disabled' : '';
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">Unimail-Adresse</label>
                 <div className="input-group">
                     <input
@@ -226,8 +224,6 @@ var EmailInput = React.createClass({
                         ref="email"
                         onChange={this.handleChange}
                         value={this.state.email}
-                        disabled={disabled}
-                        readOnly={this.props.readOnly}
                         />
                     <div className="input-group-addon">@tu-dortmund.de</div>
                 </div>
@@ -273,7 +269,6 @@ var DegreeSelect = React.createClass({
                         onChange={this.handleChange}
                         value={degree.id}
                         checked={checked}
-                        readOnly={this.props.readOnly}
                         />
                     {degree.name}
                 </label>
@@ -289,7 +284,7 @@ var DegreeSelect = React.createClass({
                 </small></span>
             );
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">Abschluss</label>
                 <div className="input-group">
                     {degrees}
@@ -398,7 +393,7 @@ var TitleInput = React.createClass({
             'has-error': this.state.error
         });
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">
                     Titel der {degreeText}Arbeit&nbsp;
                     <small>
@@ -412,7 +407,6 @@ var TitleInput = React.createClass({
                     className="form-control"
                     value={this.state.title}
                     onChange={this.handleChange}
-                    readOnly={this.props.readOnly}
                      />
                 {hint}
                 <p className="text-center"
@@ -458,14 +452,14 @@ var DateCheck = React.createClass({
             </small></span>
         ) : '';
         return (
-            <fieldset className={classes} disabled={this.state.disabled}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <div className="checkbox">
                     <label>
                         <input
                             type="checkbox"
                             onChange={this.handleChange}
                             checked={this.state.checked}
-                        ></input>
+                        />
                         Meine letzte Prüfung ist beziehungsweise war im Jahr 2015.
                     </label>
                 </div>
@@ -485,7 +479,7 @@ var GuestInput = React.createClass({
     },
     validate: function(){
         var hasError = (!this.state.guests
-            || this.state.guests < 0
+            || this.state.guests < 1
             || this.state.guests > this.state.maxGuests);
         this.setState({error: hasError});
         return !hasError;
@@ -504,8 +498,8 @@ var GuestInput = React.createClass({
         if(this.state.error){
             hint = (
                 <span className="help-block"><small>
-                    Wie viele Gäste bringst du mit (ohne Dich mitzuzählen)?
-                    Momentan darfst du bis zu {this.state.maxGuests}&nbsp;
+                    Wie viele Gäste bringst du mit (inklusive Dir)?
+                    Momentan darfst du bis zu {this.state.maxGuests - 9}&nbsp;
                     Gäste mitbringen.
                 </small></span>
             )
@@ -515,9 +509,9 @@ var GuestInput = React.createClass({
             'has-error': this.state.error
         });
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">
-                    Anzahl der Gäste
+                    Anzahl der Gäste (inklusive Dir)
                 </label>
                 <input
                     type="number"
@@ -525,7 +519,8 @@ var GuestInput = React.createClass({
                     className="form-control"
                     onChange={this.handleChange}
                     value={this.state.guests}
-                    readOnly={this.props.readOnly}
+                    min={1}
+                    max={this.state.maxGuests}
                      />
                 {hint}
             </fieldset>

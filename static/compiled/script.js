@@ -148,7 +148,7 @@ var NameInput = React.createClass({
         );
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
@@ -165,8 +165,7 @@ var NameInput = React.createClass({
                         placeholder: "Max",
                         ref: "firstname",
                         onChange: this.handleChange,
-                        value: this.state.firstname,
-                        readOnly: this.props.readOnly
+                        value: this.state.firstname
                     })
                 ),
                 React.createElement(
@@ -177,8 +176,7 @@ var NameInput = React.createClass({
                         placeholder: "Mustermann",
                         ref: "lastname",
                         value: this.state.lastname,
-                        onChange: this.handleChange,
-                        readOnly: this.props.readOnly
+                        onChange: this.handleChange
                     })
                 )
             ),
@@ -250,7 +248,7 @@ var EmailInput = React.createClass({
         var disabled = this.state.disabled ? 'disabled' : '';
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
@@ -264,9 +262,7 @@ var EmailInput = React.createClass({
                     placeholder: "max.mustermann",
                     ref: "email",
                     onChange: this.handleChange,
-                    value: this.state.email,
-                    disabled: disabled,
-                    readOnly: this.props.readOnly
+                    value: this.state.email
                 }),
                 React.createElement(
                     "div",
@@ -317,8 +313,7 @@ var DegreeSelect = React.createClass({
                     type: "radio",
                     onChange: this.handleChange,
                     value: degree.id,
-                    checked: checked,
-                    readOnly: this.props.readOnly
+                    checked: checked
                 }),
                 degree.name
             ));
@@ -338,7 +333,7 @@ var DegreeSelect = React.createClass({
         );
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
@@ -463,7 +458,7 @@ var TitleInput = React.createClass({
         });
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
@@ -487,14 +482,72 @@ var TitleInput = React.createClass({
                 name: "title",
                 className: "form-control",
                 value: this.state.title,
-                onChange: this.handleChange,
-                readOnly: this.props.readOnly
+                onChange: this.handleChange
             }),
             hint,
             React.createElement("p", { className: "text-center",
                 dangerouslySetInnerHTML: {
                     __html: this.state.renderedTex
                 } })
+        );
+    }
+});
+
+var DateCheck = React.createClass({
+    displayName: "DateCheck",
+
+    getInitialState: function getInitialState() {
+        return {
+            error: false,
+            checked: false
+        };
+    },
+    validate: function validate() {
+        var hasError = !this.state.checked;
+        this.setState({ error: hasError });
+        return !hasError;
+    },
+    handleChange: function handleChange(e) {
+        this.setState({ checked: !this.state.checked }, function () {
+            if (this.state.error) {
+                this.validate();
+            }
+            this.props.onUserInput({ validDate: this.state.checked });
+        });
+    },
+    render: function render() {
+        var classes = React.addons.classSet({
+            'form-group': true,
+            'has-error': this.state.error,
+            'disabled': false
+        });
+        var hint = this.state.error ? React.createElement(
+            "span",
+            { className: "help-block" },
+            React.createElement(
+                "small",
+                null,
+                "Falls Du Deine letzte Prüfung im Jahr 2016 hattest oder noch haben wirst, bist Du herzlich zur Absolventenfeier 2016 eingeladen, die Anfang 2017 stattfinden wird."
+            )
+        ) : '';
+        return React.createElement(
+            "fieldset",
+            { className: classes, disabled: this.props.readOnly },
+            React.createElement(
+                "div",
+                { className: "checkbox" },
+                React.createElement(
+                    "label",
+                    null,
+                    React.createElement("input", {
+                        type: "checkbox",
+                        onChange: this.handleChange,
+                        checked: this.state.checked
+                    }),
+                    "Meine letzte Prüfung ist beziehungsweise war im Jahr 2015."
+                )
+            ),
+            hint
         );
     }
 });
@@ -510,7 +563,7 @@ var GuestInput = React.createClass({
         };
     },
     validate: function validate() {
-        var hasError = !this.state.guests || this.state.guests < 0 || this.state.guests > this.state.maxGuests;
+        var hasError = !this.state.guests || this.state.guests < 1 || this.state.guests > this.state.maxGuests;
         this.setState({ error: hasError });
         return !hasError;
     },
@@ -532,8 +585,8 @@ var GuestInput = React.createClass({
                 React.createElement(
                     "small",
                     null,
-                    "Wie viele Gäste bringst du mit (ohne Dich mitzuzählen)? Momentan darfst du bis zu ",
-                    this.state.maxGuests,
+                    "Wie viele Gäste bringst du mit (inklusive Dir)? Momentan darfst du bis zu ",
+                    this.state.maxGuests - 9,
                     "  Gäste mitbringen."
                 )
             );
@@ -544,11 +597,11 @@ var GuestInput = React.createClass({
         });
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
-                "Anzahl der Gäste"
+                "Anzahl der Gäste (inklusive Dir)"
             ),
             React.createElement("input", {
                 type: "number",
@@ -556,7 +609,8 @@ var GuestInput = React.createClass({
                 className: "form-control",
                 onChange: this.handleChange,
                 value: this.state.guests,
-                readOnly: this.props.readOnly
+                min: 1,
+                max: this.state.maxGuests
             }),
             hint
         );
@@ -612,6 +666,7 @@ var ParticipantForm = React.createClass({
                     title: data.title,
                     renderedTex: this.refs.title.toTex(data.title)
                 });
+                this.refs.date.setState({ checked: true, disabled: true });
                 this.id = id;
             }).bind(this)).fail((function () {
                 this.setState({ alerts: [{ code: 20 }] });
@@ -637,6 +692,7 @@ var ParticipantForm = React.createClass({
         valid = this.refs.degrees.validate() && valid;
         valid = this.refs.title.validate() && valid;
         valid = this.refs.guests.validate() && valid;
+        valid = this.refs.date.validate() && valid;
         return valid;
     },
     handleSubmit: function handleSubmit(e) {
@@ -772,6 +828,11 @@ var ParticipantForm = React.createClass({
                         }),
                         React.createElement(GuestInput, {
                             ref: "guests",
+                            onUserInput: this.handleUserInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(DateCheck, {
+                            ref: "date",
                             onUserInput: this.handleUserInput,
                             readOnly: !this.state.registrationIsActive
                         }),
