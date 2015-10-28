@@ -76,7 +76,9 @@ def sendmail(participant, template='email.html'):
     msg = MIMEText(message, 'html')
     msg['From'] = parsapp.config['MAIL_ADDRESS']
     msg['To'] = (parsapp.config['TEST_MAIL_ADDRESS']
-                 if parsapp.config['DEBUG'] else participant.email)
+                 if parsapp.config['DEBUG']
+                 else participant.email
+                 + parsapp.config['ALLOWED_MAIL_SERVER'])
     msg['Subject'] = 'Anmeldung zur Absolventenfeier'
     try:
         s = smtplib.SMTP(parsapp.config['MAIL_SERVER'],
