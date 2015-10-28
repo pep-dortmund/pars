@@ -3,6 +3,8 @@ from flask import (Flask,
                    render_template,
                    jsonify,
                    request,
+                   redirect,
+                   url_for,
                    make_response)
 from database import Participant, Degree
 from peewee import (IntegrityError,
@@ -73,7 +75,8 @@ def sendmail(participant, template='email.html'):
     message = render_template(template, participant=participant)
     msg = MIMEText(message, 'html')
     msg['From'] = parsapp.config['MAIL_ADDRESS']
-    msg['To'] = parsapp.config['TEST_MAIL_ADDRESS']  # participant._email
+    msg['To'] = (parsapp.config['TEST_MAIL_ADDRESS']
+                 if parsapp.config['DEBUG'] else participant.email)
     msg['Subject'] = 'Anmeldung zur Absolventenfeier'
     try:
         s = smtplib.SMTP(parsapp.config['MAIL_SERVER'],
@@ -94,6 +97,19 @@ def registration_active():
 @parsapp.route('/<int:participant_id>!<token>/', methods=['GET'])
 def index(participant_id=None, token=None):
     return render_template('index.html')
+
+
+@parsapp.route('/<int:participant_id>!<token>/verify/', methods=['GET'])
+def verify(participant_id, token):
+    participant = Participant.get(
+        Participant.id == participant_id,
+        Participant.token == token
+    )
+    participant.verified = True
+    participant.save()
+    return redirect(url_for('index',
+                    participant_id=participant_id,
+                    token=token).replace('%21', '!'))
 
 
 @parsapp.route('/admin/', methods=['GET', 'POST'])
@@ -243,8 +259,8 @@ def api(function=None):
             try:
                 p = Participant\
                     .select()\
-                    .where(Participant._email
-                           == request.args.get('email') + parsapp.config['ALLOWED_MAIL_SERVER'])\
+                    .where(Participant.email
+                           == request.args.get('email'))\
                     .get()
                 sendmail(p)
             except:
