@@ -30,6 +30,11 @@ var AlertMessage = React.createClass({
                     "absolventenfeier@pep-dortmund.de"
                 )
             ),
+            5: React.createElement(
+                "div",
+                { className: "alert alert-success" },
+                "Die Anmeldung wurde verifiziert, dankeschön!"
+            ),
             10: React.createElement(
                 "div",
                 { className: "alert alert-warning" },
@@ -54,11 +59,7 @@ var AlertMessage = React.createClass({
                 "Aktualisieren fehlgeschlagen."
             )
         };
-        return React.createElement(
-            "div",
-            { className: "col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2" },
-            messages[this.props.code]
-        );
+        return messages[this.props.code];
     }
 });
 
@@ -129,15 +130,15 @@ var NameInput = React.createClass({
         return !error;
     },
     render: function render() {
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
-        var firstnameClasses = React.addons.classSet({
+        var firstnameClasses = classNames({
             'form-control': true,
             'form-control-error': this.state.error && !this.state.firstname
         });
-        var lastnameClasses = React.addons.classSet({
+        var lastnameClasses = classNames({
             'form-control': true,
             'form-control-error': this.state.error && !this.state.lastname
         });
@@ -152,7 +153,7 @@ var NameInput = React.createClass({
         );
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
@@ -169,8 +170,7 @@ var NameInput = React.createClass({
                         placeholder: "Max",
                         ref: "firstname",
                         onChange: this.handleChange,
-                        value: this.state.firstname,
-                        readOnly: this.props.readOnly
+                        value: this.state.firstname
                     })
                 ),
                 React.createElement(
@@ -181,8 +181,7 @@ var NameInput = React.createClass({
                         placeholder: "Mustermann",
                         ref: "lastname",
                         value: this.state.lastname,
-                        onChange: this.handleChange,
-                        readOnly: this.props.readOnly
+                        onChange: this.handleChange
                     })
                 )
             ),
@@ -247,14 +246,14 @@ var EmailInput = React.createClass({
                 );
             }
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
         var disabled = this.state.disabled ? 'disabled' : '';
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
@@ -268,9 +267,7 @@ var EmailInput = React.createClass({
                     placeholder: "max.mustermann",
                     ref: "email",
                     onChange: this.handleChange,
-                    value: this.state.email,
-                    disabled: disabled,
-                    readOnly: this.props.readOnly
+                    value: this.state.email
                 }),
                 React.createElement(
                     "div",
@@ -321,13 +318,12 @@ var DegreeSelect = React.createClass({
                     type: "radio",
                     onChange: this.handleChange,
                     value: degree.id,
-                    checked: checked,
-                    readOnly: this.props.readOnly
+                    checked: checked
                 }),
                 degree.name
             ));
         }
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
@@ -342,7 +338,7 @@ var DegreeSelect = React.createClass({
         );
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
@@ -461,13 +457,13 @@ var TitleInput = React.createClass({
         if (this.state.degree in this.state.degrees) {
             degreeText = this.state.degrees[this.state.degree].name + '-';
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
@@ -491,14 +487,72 @@ var TitleInput = React.createClass({
                 name: "title",
                 className: "form-control",
                 value: this.state.title,
-                onChange: this.handleChange,
-                readOnly: this.props.readOnly
+                onChange: this.handleChange
             }),
             hint,
             React.createElement("p", { className: "text-center",
                 dangerouslySetInnerHTML: {
                     __html: this.state.renderedTex
                 } })
+        );
+    }
+});
+
+var DateCheck = React.createClass({
+    displayName: "DateCheck",
+
+    getInitialState: function getInitialState() {
+        return {
+            error: false,
+            checked: false
+        };
+    },
+    validate: function validate() {
+        var hasError = !this.state.checked;
+        this.setState({ error: hasError });
+        return !hasError;
+    },
+    handleChange: function handleChange(e) {
+        this.setState({ checked: !this.state.checked }, function () {
+            if (this.state.error) {
+                this.validate();
+            }
+            this.props.onUserInput({ validDate: this.state.checked });
+        });
+    },
+    render: function render() {
+        var classes = classNames({
+            'form-group': true,
+            'has-error': this.state.error,
+            'disabled': false
+        });
+        var hint = this.state.error ? React.createElement(
+            "span",
+            { className: "help-block" },
+            React.createElement(
+                "small",
+                null,
+                "Falls Du Deine letzte Prüfung im Jahr 2016 hattest oder noch haben wirst, bist Du herzlich zur Absolventenfeier 2016 eingeladen, die Anfang 2017 stattfinden wird."
+            )
+        ) : '';
+        return React.createElement(
+            "fieldset",
+            { className: classes, disabled: this.props.readOnly },
+            React.createElement(
+                "div",
+                { className: "checkbox" },
+                React.createElement(
+                    "label",
+                    null,
+                    React.createElement("input", {
+                        type: "checkbox",
+                        onChange: this.handleChange,
+                        checked: this.state.checked
+                    }),
+                    "Meine letzte Prüfung ist beziehungsweise war im Jahr 2015."
+                )
+            ),
+            hint
         );
     }
 });
@@ -514,7 +568,7 @@ var GuestInput = React.createClass({
         };
     },
     validate: function validate() {
-        var hasError = !this.state.guests || this.state.guests < 0 || this.state.guests > this.state.maxGuests;
+        var hasError = !this.state.guests || this.state.guests < 1 || this.state.guests > this.state.maxGuests;
         this.setState({ error: hasError });
         return !hasError;
     },
@@ -536,23 +590,23 @@ var GuestInput = React.createClass({
                 React.createElement(
                     "small",
                     null,
-                    "Wie viele Gäste bringst du mit (ohne Dich mitzuzählen)? Momentan darfst du bis zu ",
-                    this.state.maxGuests,
+                    "Wie viele Gäste bringst du mit (inklusive Dir)? Momentan darfst du bis zu ",
+                    this.state.maxGuests - 9,
                     "  Gäste mitbringen."
                 )
             );
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
         return React.createElement(
             "fieldset",
-            { className: classes },
+            { className: classes, disabled: this.props.readOnly },
             React.createElement(
                 "label",
                 { className: "control-label" },
-                "Anzahl der Gäste"
+                "Anzahl der Gäste (inklusive Dir)"
             ),
             React.createElement("input", {
                 type: "number",
@@ -560,7 +614,8 @@ var GuestInput = React.createClass({
                 className: "form-control",
                 onChange: this.handleChange,
                 value: this.state.guests,
-                readOnly: this.props.readOnly
+                min: 1,
+                max: this.state.maxGuests
             }),
             hint
         );
@@ -574,11 +629,9 @@ var ParticipantForm = React.createClass({
         this.participant = {};
         return {
             participant: {},
-            registrationIsActive: false
+            registrationIsActive: false,
+            alerts: []
         };
-    },
-    pushMessage: function pushMessage(id, callback) {
-        React.render(React.createElement(AlertMessage, { code: id, callback: callback }), document.getElementById('alert'));
     },
     componentDidMount: function componentDidMount() {
         $.getJSON('/api/config/', (function (data) {
@@ -588,19 +641,22 @@ var ParticipantForm = React.createClass({
             this.refs.guests.setState({ maxGuests: data.maximum_guests });
             this.setState({ registrationIsActive: data.registration_is_active });
             if (!data.registration_is_active) {
-                this.pushMessage(4);
+                this.setState({ alerts: [{ code: 4 }] });
             }
         }).bind(this)).fail(function () {
             console.log("Error while downloading degrees.");
         });
         // check for edit-page
         var url = window.location.href;
-        var params = url.match(/\d+!\w+\/$/);
+        var params = url.match(/(\d+)!(\w+)\/(verify)?(\/)?$/);
         if (params) {
+            console.log(params);
             loader.setState({ display: true });
-            params = params[0].substr(0, params[0].length - 1);
-            var id = params.split('!')[0];
-            var token = params.split('!')[1];
+            var id = params[1];
+            var token = params[2];
+            if (params[3] && params[3] == 'verify') {
+                this.setState({ alerts: [{ code: 5 }] });
+            };
             var requestUrl = '/api/participant/?participant_id=' + id + '&token=' + token;
             $.get(requestUrl, (function (data) {
                 this.setState({ participant: data });
@@ -618,9 +674,10 @@ var ParticipantForm = React.createClass({
                     title: data.title,
                     renderedTex: this.refs.title.toTex(data.title)
                 });
+                this.refs.date.setState({ checked: true, disabled: true });
                 this.id = id;
             }).bind(this)).fail((function () {
-                this.pushMessage(20);
+                this.setState({ alerts: [{ code: 20 }] });
             }).bind(this)).always(function () {
                 loader.setState({ display: false });
             });
@@ -629,9 +686,9 @@ var ParticipantForm = React.createClass({
     resendMail: function resendMail() {
         loader.setState({ display: true });
         $.get('/api/resend/?email=' + this.state.participant.email, (function () {
-            this.pushMessage(2);
+            this.setState({ alerts: [{ code: 2 }] });
         }).bind(this)).fail((function () {
-            this.pushMessage(20);
+            this.setState({ alerts: [{ code: 20 }] });
         }).bind(this)).always(function () {
             loader.setState({ display: false });
         });
@@ -643,6 +700,7 @@ var ParticipantForm = React.createClass({
         valid = this.refs.degrees.validate() && valid;
         valid = this.refs.title.validate() && valid;
         valid = this.refs.guests.validate() && valid;
+        valid = this.refs.date.validate() && valid;
         return valid;
     },
     handleSubmit: function handleSubmit(e) {
@@ -656,17 +714,22 @@ var ParticipantForm = React.createClass({
                 url += this.state.participant.token;
                 loader.setState({ display: true });
                 $.post(url, JSON.stringify(this.state.participant), (function () {
-                    this.pushMessage(3);
+                    this.setState({ alerts: [{ code: 3 }] });
                 }).bind(this)).fail((function () {
-                    this.pushMessage(30);
+                    this.setState({ alerts: [{ code: 30 }] });
                 }).bind(this)).always(function (data) {
                     loader.setState({ display: false });
                 });
             } else {
                 $.post('/api/', JSON.stringify(this.state.participant), (function () {
-                    this.pushMessage(1);
+                    this.setState({ alerts: [{ code: 1 }] });
                 }).bind(this)).fail((function (data) {
-                    this.pushMessage(10, this.resendMail);
+                    if (data.status == 400) {
+                        this.setState({ alerts: [{ code: 10, callback: this.resendMail }] });
+                    };
+                    if (data.status == 500) {
+                        this.setState({ alerts: [{ code: 1 }, { code: 20 }] });
+                    };
                 }).bind(this)).always(function () {
                     loader.setState({ display: false });
                 });
@@ -684,6 +747,14 @@ var ParticipantForm = React.createClass({
         this.refs.title.setState({ degree: obj.degree });
     },
     render: function render() {
+        var alerts = [];
+        for (var key in this.state.alerts) {
+            alerts.push(React.createElement(AlertMessage, {
+                key: key,
+                code: this.state.alerts[key].code,
+                callback: this.state.alerts[key].callback
+            }));
+        }
         var buttons = [];
         if (!this.state.participant.token) {
             buttons.push(React.createElement(
@@ -721,203 +792,6 @@ var ParticipantForm = React.createClass({
             ));
         }
         return React.createElement(
-            "form",
-            { onSubmit: this.handleSubmit },
-            React.createElement(NameInput, {
-                ref: "name",
-                onUserInput: this.handleUserInput,
-                readOnly: !this.state.registrationIsActive
-            }),
-            React.createElement(EmailInput, {
-                ref: "email",
-                onUserInput: this.handleUserInput,
-                value: this.participant.email,
-                readOnly: !this.state.registrationIsActive
-            }),
-            React.createElement(DegreeSelect, {
-                ref: "degrees",
-                source: "/api/degrees/",
-                onUserInput: this.handleDegreeInput,
-                readOnly: !this.state.registrationIsActive
-            }),
-            React.createElement(TitleInput, {
-                ref: "title",
-                onUserInput: this.handleUserInput,
-                readOnly: !this.state.registrationIsActive
-            }),
-            React.createElement(GuestInput, {
-                ref: "guests",
-                onUserInput: this.handleUserInput,
-                readOnly: !this.state.registrationIsActive
-            }),
-            buttons
-        );
-    }
-});
-
-var AdminPanel = React.createClass({
-    displayName: "AdminPanel",
-
-    getInitialState: function getInitialState() {
-        return {
-            participants: [],
-            degrees: {},
-            mailExtension: '',
-            stats: {},
-            registrationIsActive: false
-        };
-    },
-    componentDidMount: function componentDidMount() {
-        $.getJSON('/api/config/', (function (data) {
-            this.setState({
-                degrees: data.degrees,
-                mailExtension: data.allowed_mail
-            });
-        }).bind(this)).fail(function () {
-            console.log("Error while downloading degrees.");
-        });
-        $.getJSON('/api/stats/', (function (data) {
-            this.setState({
-                stats: data
-            });
-        }).bind(this)).fail(function () {
-            console.log("Error while downloading degrees.");
-        });
-        $.getJSON('/admin/api/participants/', (function (data) {
-            this.setState({ participants: data.participants });
-        }).bind(this)).fail(function () {
-            console.log('fail');
-        });
-        $.getJSON('/api/config/', (function (data) {
-            this.setState({ registrationIsActive: data.registration_is_active });
-        }).bind(this));
-    },
-    toggleRegistrationStatus: function toggleRegistrationStatus() {
-        $.getJSON('/admin/api/toggle_registration/', (function (data) {
-            this.setState({ registrationIsActive: data.registration });
-        }).bind(this));
-    },
-    render: function render() {
-        var degreeStats = [];
-        for (var key in this.state.stats.degree_counts) {
-            if (key in this.state.degrees) {
-                degreeStats.push(React.createElement(
-                    "span",
-                    { key: key },
-                    React.createElement(
-                        "small",
-                        null,
-                        this.state.degrees[key].name,
-                        ": "
-                    ),
-                    this.state.stats.degree_counts[key],
-                    " "
-                ));
-            }
-        }
-        var head = React.createElement(
-            "thead",
-            null,
-            React.createElement(
-                "tr",
-                null,
-                React.createElement(
-                    "th",
-                    null,
-                    "ID"
-                ),
-                React.createElement(
-                    "th",
-                    null,
-                    "Name"
-                ),
-                React.createElement(
-                    "th",
-                    null,
-                    "Email ",
-                    React.createElement(
-                        "small",
-                        null,
-                        this.state.mailExtension
-                    )
-                ),
-                React.createElement(
-                    "th",
-                    null,
-                    "Abschluss"
-                ),
-                React.createElement(
-                    "th",
-                    null,
-                    "Gäste"
-                )
-            )
-        );
-        var body = [];
-        body.push(React.createElement(
-            "tr",
-            null,
-            React.createElement(
-                "td",
-                { colSpan: "2" },
-                "Total: ",
-                this.state.stats.participant_count
-            ),
-            React.createElement(
-                "td",
-                { colSpan: "2" },
-                degreeStats
-            ),
-            React.createElement(
-                "td",
-                null,
-                "Total: ",
-                this.state.stats.guest_count
-            )
-        ));
-        for (var key in this.state.participants) {
-            var p = this.state.participants[key];
-            var degree = p.degree in this.state.degrees ? this.state.degrees[p.degree].name : '...';
-            body.push(React.createElement(
-                "tr",
-                { key: key },
-                React.createElement(
-                    "td",
-                    null,
-                    "#",
-                    p.id
-                ),
-                React.createElement(
-                    "td",
-                    null,
-                    p.firstname,
-                    " ",
-                    p.lastname
-                ),
-                React.createElement(
-                    "td",
-                    null,
-                    React.createElement(
-                        "a",
-                        { href: 'mailto:' + p.email + this.state.mailExtension },
-                        p.email
-                    )
-                ),
-                React.createElement(
-                    "td",
-                    null,
-                    degree
-                ),
-                React.createElement(
-                    "td",
-                    null,
-                    p.guests
-                )
-            ));
-        }
-        var registrationButtonLabel = this.state.registrationIsActive ? 'deaktivieren' : 'aktivieren';
-        var buttonType = this.state.registrationIsActive ? 'warning' : 'success';
-        return React.createElement(
             "div",
             null,
             React.createElement(
@@ -925,30 +799,8 @@ var AdminPanel = React.createClass({
                 { className: "row" },
                 React.createElement(
                     "div",
-                    { className: "col-xs-6 col-lg-6 col-lg-offset-1 col-xl-5 col-xl-offset-2" },
-                    React.createElement(
-                        "h4",
-                        null,
-                        "Adminpanel"
-                    )
-                ),
-                React.createElement(
-                    "div",
-                    { className: "col-xs-6 col-lg-4 col-xl-3 text-right" },
-                    React.createElement(
-                        "span",
-                        { id: "disable-registration" },
-                        "Anmeldung ",
-                        this.state.registrationIsActive ? 'online' : 'offline',
-                        " ",
-                        React.createElement(
-                            "button",
-                            {
-                                className: "btn btn-sm btn-" + buttonType,
-                                onClick: this.toggleRegistrationStatus },
-                            registrationButtonLabel
-                        )
-                    )
+                    { className: "col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2" },
+                    alerts
                 )
             ),
             React.createElement(
@@ -958,14 +810,41 @@ var AdminPanel = React.createClass({
                     "div",
                     { className: "col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2" },
                     React.createElement(
-                        "table",
-                        { className: "table table-sm table-hover table-striped" },
-                        head,
-                        React.createElement(
-                            "tbody",
-                            null,
-                            body
-                        )
+                        "form",
+                        { onSubmit: this.handleSubmit },
+                        React.createElement(NameInput, {
+                            ref: "name",
+                            onUserInput: this.handleUserInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(EmailInput, {
+                            ref: "email",
+                            onUserInput: this.handleUserInput,
+                            value: this.participant.email,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(DegreeSelect, {
+                            ref: "degrees",
+                            source: "/api/degrees/",
+                            onUserInput: this.handleDegreeInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(TitleInput, {
+                            ref: "title",
+                            onUserInput: this.handleUserInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(GuestInput, {
+                            ref: "guests",
+                            onUserInput: this.handleUserInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        React.createElement(DateCheck, {
+                            ref: "date",
+                            onUserInput: this.handleUserInput,
+                            readOnly: !this.state.registrationIsActive
+                        }),
+                        buttons
                     )
                 )
             )
@@ -973,9 +852,4 @@ var AdminPanel = React.createClass({
     }
 });
 
-var admin = window.location.href.match(/\/admin\/$/);
-if (admin) {
-    React.render(React.createElement(AdminPanel, null), document.getElementById('admin-panel'));
-} else {
-    React.render(React.createElement(ParticipantForm, null), document.getElementById('main'));
-}
+React.render(React.createElement(ParticipantForm, null), document.getElementById('main'));

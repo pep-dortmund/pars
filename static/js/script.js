@@ -28,6 +28,11 @@ var AlertMessage = React.createClass({
                     <a href="#">absolventenfeier@pep-dortmund.de</a>
                 </div>
             ),
+            5: (
+                <div className="alert alert-success">
+                    Die Anmeldung wurde verifiziert, dankeschön!
+                </div>
+            ),
             10: (
                 <div className="alert alert-warning">
                     Diese Email wurde bereits eingetragen.
@@ -52,11 +57,7 @@ var AlertMessage = React.createClass({
                 </div>
             )
         }
-        return (
-            <div className="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
-                {messages[this.props.code]}
-            </div>
-        );
+        return messages[this.props.code];
     }
 });
 
@@ -125,15 +126,15 @@ var NameInput = React.createClass({
         return !error;
     },
     render: function(){
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
-        var firstnameClasses = React.addons.classSet({
+        var firstnameClasses = classNames({
             'form-control': true,
             'form-control-error': this.state.error && !this.state.firstname
         });
-        var lastnameClasses = React.addons.classSet({
+        var lastnameClasses = classNames({
             'form-control': true,
             'form-control-error': this.state.error && !this.state.lastname,
         });
@@ -143,7 +144,7 @@ var NameInput = React.createClass({
                 So wirst du bei der Absolventenfeier aufgerufen.
             </small></span>);
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">Name</label>
                 <div className="row">
                     <div className="col-sm-6">
@@ -153,7 +154,6 @@ var NameInput = React.createClass({
                             ref="firstname"
                             onChange={this.handleChange}
                             value={this.state.firstname}
-                            readOnly={this.props.readOnly}
                             />
                     </div>
                     <div className="col-sm-6">
@@ -163,7 +163,6 @@ var NameInput = React.createClass({
                             ref="lastname"
                             value={this.state.lastname}
                             onChange={this.handleChange}
-                            readOnly={this.props.readOnly}
                             />
                     </div>
                 </div>
@@ -215,13 +214,13 @@ var EmailInput = React.createClass({
                 );
             }
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error,
         });
         var disabled = this.state.disabled ? 'disabled' : '';
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">Unimail-Adresse</label>
                 <div className="input-group">
                     <input
@@ -230,8 +229,6 @@ var EmailInput = React.createClass({
                         ref="email"
                         onChange={this.handleChange}
                         value={this.state.email}
-                        disabled={disabled}
-                        readOnly={this.props.readOnly}
                         />
                     <div className="input-group-addon">@tu-dortmund.de</div>
                 </div>
@@ -277,13 +274,12 @@ var DegreeSelect = React.createClass({
                         onChange={this.handleChange}
                         value={degree.id}
                         checked={checked}
-                        readOnly={this.props.readOnly}
                         />
                     {degree.name}
                 </label>
             )
         }
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
@@ -293,7 +289,7 @@ var DegreeSelect = React.createClass({
                 </small></span>
             );
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">Abschluss</label>
                 <div className="input-group">
                     {degrees}
@@ -397,12 +393,12 @@ var TitleInput = React.createClass({
         if(this.state.degree in this.state.degrees){
             degreeText = this.state.degrees[this.state.degree].name + '-';
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">
                     Titel der {degreeText}Arbeit&nbsp;
                     <small>
@@ -416,7 +412,6 @@ var TitleInput = React.createClass({
                     className="form-control"
                     value={this.state.title}
                     onChange={this.handleChange}
-                    readOnly={this.props.readOnly}
                      />
                 {hint}
                 <p className="text-center"
@@ -428,6 +423,57 @@ var TitleInput = React.createClass({
     }
 });
 
+var DateCheck = React.createClass({
+    getInitialState: function(){
+        return {
+            error: false,
+            checked: false
+        };
+    },
+    validate: function(){
+        var hasError = !this.state.checked;
+        this.setState({error: hasError});
+        return !hasError;
+    },
+    handleChange: function(e){
+        this.setState({checked: !this.state.checked}, function(){
+            if(this.state.error){
+                this.validate();
+            }
+            this.props.onUserInput({validDate: this.state.checked});
+        });
+    },
+    render: function(){
+        var classes = classNames({
+            'form-group': true,
+            'has-error': this.state.error,
+            'disabled': false
+        });
+        var hint = this.state.error ? (
+            <span className="help-block"><small>
+                Falls Du Deine letzte Prüfung im Jahr 2016 hattest oder noch
+                haben wirst, bist Du herzlich zur Absolventenfeier 2016
+                eingeladen, die Anfang 2017 stattfinden wird.
+            </small></span>
+        ) : '';
+        return (
+            <fieldset className={classes} disabled={this.props.readOnly}>
+                <div className="checkbox">
+                    <label>
+                        <input
+                            type="checkbox"
+                            onChange={this.handleChange}
+                            checked={this.state.checked}
+                        />
+                        Meine letzte Prüfung ist beziehungsweise war im Jahr 2015.
+                    </label>
+                </div>
+                {hint}
+            </fieldset>
+        )
+    }
+})
+
 var GuestInput = React.createClass({
     getInitialState: function(){
         return {
@@ -438,7 +484,7 @@ var GuestInput = React.createClass({
     },
     validate: function(){
         var hasError = (!this.state.guests
-            || this.state.guests < 0
+            || this.state.guests < 1
             || this.state.guests > this.state.maxGuests);
         this.setState({error: hasError});
         return !hasError;
@@ -457,20 +503,20 @@ var GuestInput = React.createClass({
         if(this.state.error){
             hint = (
                 <span className="help-block"><small>
-                    Wie viele Gäste bringst du mit (ohne Dich mitzuzählen)?
-                    Momentan darfst du bis zu {this.state.maxGuests}&nbsp;
+                    Wie viele Gäste bringst du mit (inklusive Dir)?
+                    Momentan darfst du bis zu {this.state.maxGuests - 9}&nbsp;
                     Gäste mitbringen.
                 </small></span>
             )
         };
-        var classes = React.addons.classSet({
+        var classes = classNames({
             'form-group': true,
             'has-error': this.state.error
         });
         return (
-            <fieldset className={classes}>
+            <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">
-                    Anzahl der Gäste
+                    Anzahl der Gäste (inklusive Dir)
                 </label>
                 <input
                     type="number"
@@ -478,7 +524,8 @@ var GuestInput = React.createClass({
                     className="form-control"
                     onChange={this.handleChange}
                     value={this.state.guests}
-                    readOnly={this.props.readOnly}
+                    min={1}
+                    max={this.state.maxGuests}
                      />
                 {hint}
             </fieldset>
@@ -491,14 +538,9 @@ var ParticipantForm = React.createClass({
         this.participant = {};
         return {
             participant: {},
-            registrationIsActive: false
+            registrationIsActive: false,
+            alerts: []
         };
-    },
-    pushMessage: function(id, callback){
-        React.render(
-            <AlertMessage code={id} callback={callback} />,
-            document.getElementById('alert')
-        );
     },
     componentDidMount: function(){
         $.getJSON('/api/config/', function(data){
@@ -508,7 +550,7 @@ var ParticipantForm = React.createClass({
             this.refs.guests.setState({maxGuests: data.maximum_guests});
             this.setState({registrationIsActive: data.registration_is_active});
             if(!data.registration_is_active){
-                this.pushMessage(4);
+                this.setState({alerts: [{code: 4}]});
             }
         }.bind(this))
         .fail(function(){
@@ -516,12 +558,15 @@ var ParticipantForm = React.createClass({
         });
         // check for edit-page
         var url = window.location.href;
-        var params = url.match(/\d+!\w+\/$/);
+        var params = url.match(/(\d+)!(\w+)\/(verify)?(\/)?$/);
         if(params){
+            console.log(params);
             loader.setState({display: true});
-            params = params[0].substr(0, params[0].length - 1);
-            var id = params.split('!')[0];
-            var token = params.split('!')[1];
+            var id = params[1];
+            var token = params[2];
+            if(params[3] && params[3] == 'verify'){
+                this.setState({alerts: [{code: 5}]});
+            };
             var requestUrl = '/api/participant/?participant_id='
                 + id + '&token=' + token;
             $.get(requestUrl, function(data){
@@ -540,10 +585,11 @@ var ParticipantForm = React.createClass({
                     title: data.title,
                     renderedTex: this.refs.title.toTex(data.title)
                 });
+                this.refs.date.setState({ checked: true, disabled: true });
                 this.id = id;
             }.bind(this))
             .fail(function(){
-                this.pushMessage(20);
+                this.setState({alerts: [{code: 20}]});
             }.bind(this))
             .always(function(){
                 loader.setState({display: false});
@@ -553,10 +599,10 @@ var ParticipantForm = React.createClass({
     resendMail: function(){
         loader.setState({display: true});
         $.get('/api/resend/?email='+this.state.participant.email, function(){
-            this.pushMessage(2);
+            this.setState({alerts: [{code: 2}]});
         }.bind(this))
         .fail(function(){
-            this.pushMessage(20);
+            this.setState({alerts: [{code: 20}]});
         }.bind(this))
         .always(function(){
             loader.setState({display: false});
@@ -569,6 +615,7 @@ var ParticipantForm = React.createClass({
         valid = this.refs.degrees.validate() && valid;
         valid = this.refs.title.validate() && valid;
         valid = this.refs.guests.validate() && valid;
+        valid = this.refs.date.validate() && valid;
         return valid;
     },
     handleSubmit: function(e) {
@@ -582,20 +629,28 @@ var ParticipantForm = React.createClass({
                 url += this.state.participant.token;
                 loader.setState({display: true});
                 $.post(url, JSON.stringify(this.state.participant), function(){
-                    this.pushMessage(3);
+                    this.setState({alerts: [{code: 3}]});
                 }.bind(this))
                 .fail(function(){
-                    this.pushMessage(30);
+                    this.setState({alerts: [{code: 30}]});
                 }.bind(this))
                 .always(function(data){
                     loader.setState({display: false});
                 });
             } else {
                 $.post('/api/', JSON.stringify(this.state.participant), function(){
-                    this.pushMessage(1);
+                    this.setState({alerts: [{code: 1}]});
                 }.bind(this))
                 .fail(function(data){
-                    this.pushMessage(10, this.resendMail);
+                    if(data.status == 400){
+                        this.setState({alerts: [{code: 10, callback: this.resendMail}]});
+                    };
+                    if(data.status == 500){
+                        this.setState({alerts: [
+                            {code: 1},
+                            {code: 20}
+                        ]});
+                    };
                 }.bind(this))
                 .always(function(){
                     loader.setState({display: false});
@@ -614,6 +669,16 @@ var ParticipantForm = React.createClass({
         this.refs.title.setState({degree: obj.degree});
     },
     render: function(){
+        var alerts = [];
+        for(var key in this.state.alerts){
+            alerts.push(
+                <AlertMessage
+                    key={key}
+                    code={this.state.alerts[key].code}
+                    callback={this.state.alerts[key].callback}
+                />
+            )
+        }
         var buttons = [];
         if(!this.state.participant.token){
             buttons.push(
@@ -647,170 +712,54 @@ var ParticipantForm = React.createClass({
             );
         }
         return (
-            <form onSubmit={this.handleSubmit}>
-                <NameInput
-                    ref="name"
-                    onUserInput={this.handleUserInput}
-                    readOnly={!this.state.registrationIsActive}
-                    />
-                <EmailInput
-                    ref="email"
-                    onUserInput={this.handleUserInput}
-                    value={this.participant.email}
-                    readOnly={!this.state.registrationIsActive}
-                    />
-                <DegreeSelect
-                    ref="degrees"
-                    source="/api/degrees/"
-                    onUserInput={this.handleDegreeInput}
-                    readOnly={!this.state.registrationIsActive}
-                    />
-                <TitleInput
-                    ref="title"
-                    onUserInput={this.handleUserInput}
-                    readOnly={!this.state.registrationIsActive}
-                    />
-                <GuestInput
-                    ref="guests"
-                    onUserInput={this.handleUserInput}
-                    readOnly={!this.state.registrationIsActive}
-                    />
-                {buttons}
-            </form>
-        );
-    }
-});
-
-var AdminPanel = React.createClass({
-    getInitialState: function(){
-        return {
-            participants: [],
-            degrees: {},
-            mailExtension: '',
-            stats: {},
-            registrationIsActive: false
-        }
-    },
-    componentDidMount: function(){
-        $.getJSON('/api/config/', function(data){
-            this.setState({
-                degrees: data.degrees,
-                mailExtension: data.allowed_mail
-            });
-        }.bind(this))
-        .fail(function(){
-            console.log("Error while downloading degrees.");
-        });
-        $.getJSON('/api/stats/', function(data){
-            this.setState({
-                stats: data
-            });
-        }.bind(this))
-        .fail(function(){
-            console.log("Error while downloading degrees.");
-        });
-        $.getJSON('/admin/api/participants/', function(data){
-            this.setState({participants: data.participants});
-        }.bind(this))
-        .fail(function(){
-            console.log('fail');
-        });
-        $.getJSON('/api/config/', function(data){
-            this.setState({registrationIsActive: data.registration_is_active});
-        }.bind(this));
-    },
-    toggleRegistrationStatus: function(){
-        $.getJSON('/admin/api/toggle_registration/', function(data){
-            this.setState({registrationIsActive: data.registration});
-        }.bind(this));
-    },
-    render: function(){
-        var degreeStats = []
-        for(var key in this.state.stats.degree_counts){
-            if(key in this.state.degrees){
-                degreeStats.push(
-                    <span key={key}>
-                        <small>{this.state.degrees[key].name}: </small>
-                        {this.state.stats.degree_counts[key]}&nbsp;
-                    </span>
-                );
-            }
-        }
-        var head = (
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email <small>{this.state.mailExtension}</small></th>
-                    <th>Abschluss</th>
-                    <th>Gäste</th>
-                </tr>
-            </thead>
-        );
-        var body = [];
-        body.push(
-            <tr>
-                <td colSpan="2">Total: {this.state.stats.participant_count}</td>
-                <td colSpan="2">{degreeStats}</td>
-                <td>Total: {this.state.stats.guest_count}</td>
-            </tr>
-        )
-        for(var key in this.state.participants){
-            var p = this.state.participants[key];
-            var degree = p.degree in this.state.degrees ?
-                this.state.degrees[p.degree].name :
-                '...';
-            body.push(
-                <tr key={key}>
-                    <td>#{p.id}</td>
-                    <td>{p.firstname} {p.lastname}</td>
-                    <td>
-                        <a href={'mailto:' + p.email + this.state.mailExtension}>
-                        {p.email}</a>
-                    </td>
-                    <td>{degree}</td>
-                    <td>{p.guests}</td>
-                </tr>
-            );
-        }
-        var registrationButtonLabel = this.state.registrationIsActive
-            ? 'deaktivieren' : 'aktivieren';
-        var buttonType = this.state.registrationIsActive ? 'warning' : 'success';
-        return(
             <div>
                 <div className="row">
-                    <div className="col-xs-6 col-lg-6 col-lg-offset-1 col-xl-5 col-xl-offset-2">
-                        <h4>Adminpanel</h4>
-                    </div>
-                    <div className="col-xs-6 col-lg-4 col-xl-3 text-right">
-                        <span id="disable-registration">
-                            Anmeldung {this.state.registrationIsActive ? 'online' : 'offline'}&nbsp;
-                            <button
-                                className={"btn btn-sm btn-" + buttonType}
-                                onClick={this.toggleRegistrationStatus}>
-                                {registrationButtonLabel}
-                            </button>
-                        </span>
+                    <div className="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
+                        {alerts}
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
-                        <table className="table table-sm table-hover table-striped">
-                            {head}
-                            <tbody>
-                            {body}
-                            </tbody>
-                        </table>
+                        <form onSubmit={this.handleSubmit}>
+                            <NameInput
+                                ref="name"
+                                onUserInput={this.handleUserInput}
+                                readOnly={!this.state.registrationIsActive}
+                                />
+                            <EmailInput
+                                ref="email"
+                                onUserInput={this.handleUserInput}
+                                value={this.participant.email}
+                                readOnly={!this.state.registrationIsActive}
+                                />
+                            <DegreeSelect
+                                ref="degrees"
+                                source="/api/degrees/"
+                                onUserInput={this.handleDegreeInput}
+                                readOnly={!this.state.registrationIsActive}
+                                />
+                            <TitleInput
+                                ref="title"
+                                onUserInput={this.handleUserInput}
+                                readOnly={!this.state.registrationIsActive}
+                                />
+                            <GuestInput
+                                ref="guests"
+                                onUserInput={this.handleUserInput}
+                                readOnly={!this.state.registrationIsActive}
+                                />
+                            <DateCheck
+                                ref="date"
+                                onUserInput={this.handleUserInput}
+                                readOnly={!this.state.registrationIsActive}
+                                />
+                            {buttons}
+                        </form>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 });
 
-var admin = window.location.href.match(/\/admin\/$/);
-if(admin){
-    React.render(<AdminPanel />, document.getElementById('admin-panel'));
-} else {
-    React.render(<ParticipantForm />, document.getElementById('main'));
-}
+React.render(<ParticipantForm />, document.getElementById('main'));

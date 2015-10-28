@@ -2,6 +2,7 @@ from peewee import (SqliteDatabase,
                     Model,
                     CharField,
                     IntegerField,
+                    BooleanField,
                     ForeignKeyField)
 import os
 from config import DevelopmentConfig
@@ -31,6 +32,7 @@ class Participant(Model):
     degree = ForeignKeyField(Degree)
     token = CharField()
     title = CharField()
+    verified = BooleanField(default=False)
 
     def generate_token():
         import hashlib
