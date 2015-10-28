@@ -142,6 +142,27 @@ def admin_api(function):
             200
         )
 
+    if function == 'stats':
+        degrees = Degree.select()
+        degree_counts = {}
+        for d in degrees:
+            degree_counts.update(
+                {
+                    d.id: (Participant.select().join(Degree)
+                           .where(Degree.id == d.id).count())
+                }
+            )
+        stats = {
+            'degree_counts': degree_counts,
+            'participant_count': Participant.select().count(),
+            'guest_count': (Participant
+                            .select(fn.SUM(Participant.guests))
+                            .scalar())
+        }
+        return make_response(
+            jsonify(stats)
+        )
+
     return ''
 
 
@@ -246,27 +267,6 @@ def api(function=None):
                     jsonify(errormessage='No access!'),
                     401
                 )
-
-        if function == 'stats':
-            degrees = Degree.select()
-            degree_counts = {}
-            for d in degrees:
-                degree_counts.update(
-                    {
-                        d.id: (Participant.select().join(Degree)
-                               .where(Degree.id == d.id).count())
-                    }
-                )
-            stats = {
-                'degree_counts': degree_counts,
-                'participant_count': Participant.select().count(),
-                'guest_count': (Participant
-                                .select(fn.SUM(Participant.guests))
-                                .scalar())
-            }
-            return make_response(
-                jsonify(stats)
-            )
 
         return ''
 
