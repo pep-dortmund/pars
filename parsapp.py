@@ -107,9 +107,7 @@ def verify(participant_id, token):
     )
     participant.verified = True
     participant.save()
-    return redirect(url_for('index',
-                    participant_id=participant_id,
-                    token=token).replace('%21', '!'))
+    return render_template('index.html')
 
 
 @parsapp.route('/admin/', methods=['GET', 'POST'])

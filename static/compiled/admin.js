@@ -21,7 +21,7 @@ var AdminPanel = React.createClass({
         }).bind(this)).fail(function () {
             console.log("Error while downloading degrees.");
         });
-        $.getJSON('/api/stats/', (function (data) {
+        $.getJSON('/admin/api/stats/', (function (data) {
             this.setState({
                 stats: data
             });

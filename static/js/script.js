@@ -28,6 +28,11 @@ var AlertMessage = React.createClass({
                     <a href="#">absolventenfeier@pep-dortmund.de</a>
                 </div>
             ),
+            5: (
+                <div className="alert alert-success">
+                    Die Anmeldung wurde verifiziert, dankeschön!
+                </div>
+            ),
             10: (
                 <div className="alert alert-warning">
                     Diese Email wurde bereits eingetragen.
@@ -553,12 +558,15 @@ var ParticipantForm = React.createClass({
         });
         // check for edit-page
         var url = window.location.href;
-        var params = url.match(/\d+!\w+\/$/);
+        var params = url.match(/(\d+)!(\w+)\/(verify)?(\/)?$/);
         if(params){
+            console.log(params);
             loader.setState({display: true});
-            params = params[0].substr(0, params[0].length - 1);
-            var id = params.split('!')[0];
-            var token = params.split('!')[1];
+            var id = params[1];
+            var token = params[2];
+            if(params[3] && params[3] == 'verify'){
+                this.setState({alerts: [{code: 5}]});
+            };
             var requestUrl = '/api/participant/?participant_id='
                 + id + '&token=' + token;
             $.get(requestUrl, function(data){
