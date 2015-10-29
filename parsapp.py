@@ -303,4 +303,5 @@ def api(function=None):
 
 
 if __name__ == '__main__':
+    parsapp.secret_key = "eBGypMg[DSU@j$yHdnOI0}b!sKDl/m01"
     parsapp.run()
