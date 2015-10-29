@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 from peewee import SqliteDatabase
 import os
 
@@ -17,6 +19,6 @@ db.create_tables([Participant, Degree], safe=True)
 
 ba = Degree.create(name='Bachelor')
 ma = Degree.create(name='Master')
-phd = Degree.create(name='Promotion')
+phd = Degree.create(name='Doktor')
 
 db.close()

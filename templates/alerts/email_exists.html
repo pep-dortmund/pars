@@ -1,9 +1,0 @@
-{% extends 'alerts/alert.html' %}
-{% set type = 'warning' %}
-{% block message %}
-Diese Email wurde bereits eingetragen. 
-Du solltest eine Bestätigungsmail in Deinem 
-Postfach finden, in der ein Link zur Änderung 
-Deiner Daten aufgeführt ist. 
-<a href="{{ url_for('resend', participant_id=participant.id, token=participant.token) }}" class="alert-link">Email erneut versenden.</a>
-{% endblock %}

@@ -1,29 +1,12 @@
-{% extends 'index.html' %}
-{% block title %}<h3>PARS Admin-Panel</h3>{% endblock %}
-{% block content %}
-<table class="table table-hover">
-  <tr>
-    <th>Name</th>
-    <th>Email</th>
-    <th>Abschluss</th>
-    <th>Gäste</th>
-    <th></th>
-  </tr>
-  <tr>
-    <th>{{ parts.count() }}</th>
-    <th></th>
-    <th>{{ ba_count }}/{{ ma_count }}/{{ dr_count }}</th>
-    <th>{{ guest_count }}</th>
-    <th></th>
-  </tr>
-  {% for p in parts %}
-  <tr id="{{ p.id }}">
-    <td>{{ p.firstname }} {{ p.lastname }}</td>
-    <td>{{ p._email }}</td>
-    <td>{{ p.degree.name }}</td>
-    <td>{{ p.numberOfGuests }}</td>
-    <td><a class="btn btn-xs btn-default" href="{{ url_for('delete', pid=p.id) }}">⨉</a></td>
-  </tr>
-  {% endfor %}
-</table>
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div id="loader"></div>
+<div id="admin-panel"></div>
+{% endblock %}
+
+{% block tail %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script>
+<script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
+<script src="/static/compiled/admin.js"></script>
 {% endblock %}

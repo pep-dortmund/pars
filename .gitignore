@@ -4,3 +4,6 @@ env/
 *.swp
 *.sqlite
 config.py
+config.py.bak
+
+reg_inactive
