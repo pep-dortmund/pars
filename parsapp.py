@@ -59,7 +59,8 @@ def check_auth(username, password):
     """This function is called to check if a username /
     password combination is valid.
     """
-    return username == 'admin' and password == 'secret'
+    return (username == parsapp.config['ADMIN_USERNAME']
+            and password == parsapp.config['ADMIN_PASSWORD'])
 
 
 def authenticate():

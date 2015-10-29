@@ -5,15 +5,19 @@ class Config(object):
     MAIL_SERVER = ''
     MAIL_LOGIN = ''
     MAIL_PASSWORD = ''
+    ALLOWED_MAIL_SERVER = '@tu-dortmund.de'
     DEBUG = False
     TESTING = False
+    ADMIN_USERNAME = None
+    ADMIN_PASSWORD = None
 
 
 class DevelopmentConfig(Config):
-    ALLOWED_MAIL_SERVER = '@tu-dortmund.de'
     MAIL_ADDRESS = ''
     MAIL_SERVER = ''
     MAIL_LOGIN = ''
     MAIL_PASSWORD = ''
     TEST_MAIL_ADDRESS = ''
     DEBUG = True
+    ADMIN_USERNAME = 'admin'
+    ADMIN_PASSWORD = 'secret'
