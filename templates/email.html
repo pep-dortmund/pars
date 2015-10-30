@@ -1,50 +1,32 @@
-<p>Hallo {{ participant.firstname }} {{ participant.lastname }},</p>
+Hallo {{ participant.firstname }} {{ participant.lastname }},
 
-<p>Vielen Dank für Deine Anmeldung für die kommende Absolventenfeier!
+Vielen Dank für Deine Anmeldung für die kommende Absolventenfeier!
 Wir freuen uns auf Dich!
 {% if not participant.verified %}
-Bitte bestätige zunächst Deine Email-Adresse, indem du
-<a href="{{ url_for(
-             'verify',
-             _external=True,
-             participant_id=participant.id,
-             token=participant.token)
-             | replace('%21', '!')
-         }}">hier</a>
-klickst und
-{% else %}
-Bitte
-{% endif %}
-behalte diese Email als Reminder in deinem Postfach.
+Bestätige zunächst Deine Email-Adresse, indem du folgenden Link öffnest:
+{{ url_for( 'verify', _external=True, participant_id=participant.id,
+             token=participant.token) | replace('%21', '!') }}{% endif %}
+Bitte behalte diese Email als Reminder in deinem Postfach.
 
-<p>
-Die Absolventenfeier wird stattfinden<br />
-am <b>10.01.2015</b><br />
-Einlass ab <b>15:00 Uhr</b><br />
-im <b>Hörsaal des Seminarraumgebäudes</b><br />
-Friedrich-Wöhler-Weg 6<br />
-44227 Dortmund<br />
-</p>
+Die Absolventenfeier wird stattfinden
+am {{ date }}
+Einlass ab 15:00 Uhr
+im Hörsaal des Seminarraumgebäudes
+Friedrich-Wöhler-Weg 6
+44227 Dortmund
 
-<p>
 Hier sind noch einmal die von Dir eingetragenen Daten:
-Eingetragene Gäste: {{ participant.numberOfGuests }}<br />
+Eingetragene Gäste (einschließlich Dir): {{ participant.guests }}
 Abschluss: {{ participant.degree.name }}
-</p>
+Titel Deiner Abschlussarbeit: {{ participant.title }}
 
-<p>
-Falls Du deine Angaben verändern, oder Dich abmelden möchtest, benutze bitte
-den folgenden Link. Gib diesen Link am besten an keine Dritten weiter.
-<a href="{{ url_for(
-             'index',
-             _external=True,
-             participant_id=participant.id,
-             token=participant.token)
-             | replace('%21', '!')
-         }}">Anmeldung bearbeiten</a>
-</p>
+Falls Du deine Angaben verändern möchtest, benutze bitte den folgenden Link.
+Gib diesen Link am besten an keine Dritten weiter.
+{{ url_for( 'index', _external=True, participant_id=participant.id,
+             token=participant.token) | replace('%21', '!') }}
+Bei Fragen kannst Du uns einfach eine Mail an absolventenfeier@pep-dortmund.org senden.
 
-<p> Mit freundlichen Grüßen<br />
-Dein Alumniverein </p>
+Mit freundlichen Grüßen
+Dein Alumniverein
 
-<p> Pep et. Al. e.V.  </p>
+Pep et. Al. e.V.

@@ -88,21 +88,30 @@ def _db_close(exc):
 
 
 def sendmail(participant, template='email.html'):
-    message = render_template(template, participant=participant)
-    msg = MIMEText(message, 'html')
+    message = render_template(template,
+                              participant=participant,
+                              date=parsapp.config['DATE'])
+    msg = MIMEText(message)
     msg['From'] = parsapp.config['MAIL_ADDRESS']
     msg['To'] = (parsapp.config['TEST_MAIL_ADDRESS']
                  if parsapp.config['DEBUG']
                  else participant.email
                  + parsapp.config['ALLOWED_MAIL_SERVER'])
-    msg['Subject'] = 'Anmeldung zur Absolventenfeier'
+    msg['Subject'] = ('Anmeldung zur Absolventenfeier am '
+                      + parsapp.config['DATE'])
     try:
-        s = smtplib.SMTP(parsapp.config['MAIL_SERVER'],
-                         parsapp.config['MAIL_PORT'])
-        s.starttls()
-        s.login(parsapp.config['MAIL_LOGIN'], parsapp.config['MAIL_PASSWORD'])
-        s.sendmail(parsapp.config['MAIL_ADDRESS'], msg['To'], msg.as_string())
-        s.quit()
+        if parsapp.config['MAIL_DEBUG']:
+            print('Sending mail:\n'
+                  + msg.get_payload(decode=True).decode('utf-8'))
+        else:
+            s = smtplib.SMTP(parsapp.config['MAIL_SERVER'],
+                             parsapp.config['MAIL_PORT'])
+            s.starttls()
+            s.login(parsapp.config['MAIL_LOGIN'],
+                    parsapp.config['MAIL_PASSWORD'])
+            s.sendmail(parsapp.config['MAIL_ADDRESS'],
+                       msg['To'], msg.as_string())
+            s.quit()
     except:
         raise
 
