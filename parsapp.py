@@ -40,16 +40,24 @@ class AuthenticatedIndexView(AdminIndexView):
     def index(self):
         return super(AuthenticatedIndexView, self).index()
 
-    @expose('/logout/')
     def logout(self):
         return authenticate()
 
+    @requires_auth
+    def export():
+        participants = Participant.select()
+        csv = render_template('export.csv', participants=participants)
+        response = make_response(csv)
+        response.headers['Content-Disposition'] = \
+            'attachment; filename=export.csv'
+        return response
 
 admin = Admin(parsapp, name='PARS', template_mode='bootstrap3',
               index_view=AuthenticatedIndexView(name='Admin',
                                                 template='admin.html'))
 admin.add_view(ModelView(Participant))
 admin.add_view(ModelView(Degree))
+admin.add_link(MenuLink(name='Export CSV', endpoint='export'))
 admin.add_link(MenuLink(name='Logout', endpoint='logout'))
 
 parsapp.config.from_object('config.DevelopmentConfig')
@@ -205,6 +213,16 @@ def admin_api(function):
         )
 
     return ''
+
+
+@parsapp.route('/admin/export.csv', methods=['GET'])
+@requires_auth
+def export():
+    participants = Participant.select()
+    csv = render_template('export.csv', participants=participants)
+    response = make_response(csv)
+    response.headers['Content-Disposition'] = 'attachment; filename=export.csv'
+    return response
 
 
 @parsapp.route('/api/', methods=['POST'])
