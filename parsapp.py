@@ -224,6 +224,8 @@ def api(function=None):
                     400
                 )
             participant.email = participant.email.lower()
+            if participant.guests > parsapp.config['MAXIMUM_GUESTS']:
+                return make_response('Guests exceeding maximum.', 400)
             participant.save()
             response = make_response(
                 jsonify(message='Success', token=participant.token),
