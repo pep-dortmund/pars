@@ -1,0 +1,3 @@
+# Name, Email, Gäste, Abschluss, Titel
+{% for p in participants %}"{{p.firstname}} {{p.lastname}}", {{p.email}}, {{p.guests}}, {{p.degree}}, "{{p.title}}"
+{% endfor %}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/katex.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div id="top-row" class="row">
+        <div class="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
+          <h2>Anmeldung zur Absolventenfeier 2015</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div id="alert"></div>
+        <div id="loader"></div>
+      </div>
+      {% block main %}
+      <div id="main"></div>
+      {% endblock %}
+      <div class="row">
+        <div class="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
+          <ul class="list-inline">
+            <li><a href="mailto:kontakt@pep-dortmund.org">Kontakt</a>
+            <li><a href="http://pep-dortmund.org">pep-dortmund.org</a>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <script src="/static/compiled/jquery-2.1.4.js"></script>
+    <script src="/static/compiled/bootstrap.min.js"></script>
+    <script src="/static/compiled/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react-with-addons.js"></script>
+    <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
+    <script src="/static/compiled/classnames.js"></script>
+    <script src="/static/compiled/script.js"></script>
+  </body>
+</html>

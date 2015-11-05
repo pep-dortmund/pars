@@ -1,0 +1,32 @@
+Hallo {{ participant.firstname }} {{ participant.lastname }},
+
+Vielen Dank für Deine Anmeldung für die kommende Absolventenfeier!
+Wir freuen uns auf Dich!
+{% if not participant.verified %}
+Bestätige zunächst Deine Email-Adresse, indem du folgenden Link öffnest:
+{{ url_for( 'verify', _external=True, participant_id=participant.id,
+             token=participant.token) | replace('%21', '!') }}{% endif %}
+Bitte behalte diese Email als Reminder in deinem Postfach.
+
+Die Absolventenfeier wird stattfinden
+am {{ date }}
+Einlass ab 15:00 Uhr
+im Hörsaal des Seminarraumgebäudes
+Friedrich-Wöhler-Weg 6
+44227 Dortmund
+
+Hier sind noch einmal die von Dir eingetragenen Daten:
+Eingetragene Gäste (einschließlich Dir): {{ participant.guests }}
+Abschluss: {{ participant.degree.name }}
+Titel Deiner Abschlussarbeit: {{ participant.title }}
+
+Falls Du deine Angaben verändern möchtest, benutze bitte den folgenden Link.
+Gib diesen Link am besten an keine Dritten weiter.
+{{ url_for( 'index', _external=True, participant_id=participant.id,
+             token=participant.token) | replace('%21', '!') }}
+Bei Fragen kannst Du uns einfach eine Mail an absolventenfeier@pep-dortmund.org senden.
+
+Mit freundlichen Grüßen
+Dein Alumniverein
+
+Pep et. Al. e.V.
