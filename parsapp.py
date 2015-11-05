@@ -227,6 +227,7 @@ def api(function=None):
                 Degree.id == request.get_json(force=True).get('degree')
             )
             participant.token = Participant.generate_token()
+            participant.email = participant.email.lower()
             participant.save()
             response = make_response(
                 jsonify(message='Success', token=participant.token),
