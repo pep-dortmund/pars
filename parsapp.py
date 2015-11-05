@@ -145,7 +145,7 @@ def participant_or_404(pid, token):
 @parsapp.route('/', methods=['GET'])
 @parsapp.route('/<int:participant_id>!<token>/', methods=['GET'])
 def index(participant_id=None, token=None):
-    if not participant_or_404(participant_id, token):
+    if token and not participant_or_404(participant_id, token):
         return abort(404)
     else:
         return render_template('index.html')
@@ -153,7 +153,7 @@ def index(participant_id=None, token=None):
 
 @parsapp.route('/<int:participant_id>!<token>/verify/', methods=['GET'])
 def verify(participant_id, token):
-    if not participant_or_404(participant_id, token):
+    if token and not participant_or_404(participant_id, token):
         return abort(404)
     else:
         participant = Participant.get(
