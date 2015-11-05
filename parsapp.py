@@ -247,7 +247,7 @@ def api(function=None):
                     400
                 )
             participant.email = participant.email.lower()
-            if participant.guests > parsapp.config['MAXIMUM_GUESTS']:
+            if int(participant.guests) > parsapp.config['MAXIMUM_GUESTS']:
                 return make_response('Guests exceeding maximum.', 400)
             participant.save()
             response = make_response(
@@ -257,10 +257,13 @@ def api(function=None):
             try:
                 sendmail(participant)
             except:
-                response = make_response(
-                    jsonify(errormessage='Error while mailing.'),
-                    500
-                )
+                if not parsapp.config['DEBUG']:
+                    response = make_response(
+                        jsonify(errormessage='Error while mailing.'),
+                        500
+                    )
+                else:
+                    raise
         except IntegrityError:
             response = make_response(
                 jsonify(errormessage='User already in Database.'),
@@ -311,7 +314,10 @@ def api(function=None):
                     .get()
                 sendmail(p)
             except:
-                return(jsonify(errormessage='Fail'), 500)
+                if not parsapp.config['DEBUG']:
+                    return(jsonify(errormessage='Fail'), 500)
+                else:
+                    raise
             return(jsonify(message='Success'), 200)
 
         if function == 'update':
