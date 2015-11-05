@@ -4,6 +4,7 @@ from flask import (Flask,
                    jsonify,
                    request,
                    redirect,
+                   abort,
                    url_for,
                    make_response)
 from database import Participant, Degree, db
@@ -133,21 +134,35 @@ def registration_active():
     return not os.path.exists('./reg_inactive')
 
 
+def participant_or_404(pid, token):
+    try:
+        Participant.get(Participant.id == pid, Participant.token == token)
+        return True
+    except:
+        return False
+
+
 @parsapp.route('/', methods=['GET'])
 @parsapp.route('/<int:participant_id>!<token>/', methods=['GET'])
 def index(participant_id=None, token=None):
-    return render_template('index.html')
+    if not participant_or_404(participant_id, token):
+        return abort(404)
+    else:
+        return render_template('index.html')
 
 
 @parsapp.route('/<int:participant_id>!<token>/verify/', methods=['GET'])
 def verify(participant_id, token):
-    participant = Participant.get(
-        Participant.id == participant_id,
-        Participant.token == token
-    )
-    participant.verified = True
-    participant.save()
-    return render_template('index.html')
+    if not participant_or_404(participant_id, token):
+        return abort(404)
+    else:
+        participant = Participant.get(
+            Participant.id == participant_id,
+            Participant.token == token
+        )
+        participant.verified = True
+        participant.save()
+        return render_template('index.html')
 
 
 @parsapp.route('/admin/', methods=['GET', 'POST'])
