@@ -52,10 +52,15 @@ class AuthenticatedIndexView(AdminIndexView):
             'attachment; filename=export.csv'
         return response
 
+
+class ParticipantAdminView(ModelView):
+    column_exclude_list = ['token']
+
+
 admin = Admin(parsapp, name='PARS', template_mode='bootstrap3',
               index_view=AuthenticatedIndexView(name='Admin',
                                                 template='admin.html'))
-admin.add_view(ModelView(Participant))
+admin.add_view(ParticipantAdminView(Participant))
 admin.add_view(ModelView(Degree))
 admin.add_link(MenuLink(name='Export CSV', endpoint='export'))
 admin.add_link(MenuLink(name='Logout', endpoint='logout'))
