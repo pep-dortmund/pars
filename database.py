@@ -25,19 +25,19 @@ class Degree(Model):
 
 
 class Participant(Model):
-    firstname = CharField()
-    lastname = CharField()
-    email = CharField(unique=True)
-    guests = IntegerField()
-    degree = ForeignKeyField(Degree)
-    token = CharField()
-    title = CharField()
-    verified = BooleanField(default=False)
-
     def generate_token():
         import hashlib
         import random
         return hashlib.sha1(str(random.random()).encode('utf-8')).hexdigest()
+
+    firstname = CharField()
+    lastname = CharField()
+    email = CharField(unique=True)
+    guests = IntegerField(default=0)
+    degree = ForeignKeyField(Degree)
+    token = CharField(null=True, default=generate_token)
+    title = CharField()
+    verified = BooleanField(default=False)
 
     def __repr__(self):
         return self.email

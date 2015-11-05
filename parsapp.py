@@ -223,10 +223,6 @@ def api(function=None):
                     jsonify(errormessage='Error'),
                     400
                 )
-            participant.degree = Degree.get(
-                Degree.id == request.get_json(force=True).get('degree')
-            )
-            participant.token = Participant.generate_token()
             participant.email = participant.email.lower()
             participant.save()
             response = make_response(
