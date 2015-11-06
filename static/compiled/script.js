@@ -202,7 +202,7 @@ var EmailInput = React.createClass({
         };
     },
     validate: function validate() {
-        var error = !this.state.email || !this.state.email.match(/^\w+\.\w+$/i);
+        var error = !this.state.email || !this.state.email.match(/^[\w-]+\.[\w-]+$/i);
         this.setState({ error: error });
         return !error;
     },

@@ -183,7 +183,7 @@ var EmailInput = React.createClass({
     },
     validate: function(){
         var error = (!this.state.email
-                || !this.state.email.match(/^\w+\.\w+$/i));
+                || !this.state.email.match(/^[\w-]+\.[\w-]+$/i));
         this.setState({error: error});
         return !error;
     },
