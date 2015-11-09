@@ -5,7 +5,8 @@ var AdminPanel = React.createClass({
             degrees: {},
             mailExtension: '',
             stats: {},
-            registrationIsActive: false
+            registrationIsActive: false,
+            order: 'Name_0'
         }
     },
     componentDidMount: function(){
@@ -41,6 +42,86 @@ var AdminPanel = React.createClass({
             this.setState({registrationIsActive: data.registration});
         }.bind(this));
     },
+    orderBy: function(e){
+        var parts = [];
+        var order = this.state.order;
+        var newOrder = '';
+        switch(e.currentTarget.innerText){
+            case 'Name': {
+                parts = this.state.participants.sort(function(a, b){
+                    switch(order){
+                        case 'Name_0': {
+                            newOrder = 'Name_1';
+                            return a.firstname < b.firstname;
+                        }
+                        case 'Name_1': {
+                            newOrder = 'Name_2';
+                            return a.lastname > b.lastname;
+                        }
+                        case 'Name_2': {
+                            newOrder = 'Name_3';
+                            return a.lastname < b.lastname;
+                        }
+                        default: { // Name_3
+                            newOrder = 'Name_0';
+                            return a.firstname > b.firstname;
+                        }
+                    };
+                });
+                break;
+            }
+            case 'ID': {
+                parts = this.state.participants.sort(function(a, b){
+                    switch(order){
+                        case 'ID_0': {
+                            newOrder = 'ID_1';
+                            return a.id < b.id;
+                        }
+                        default: { // ID_1
+                            newOrder = 'ID_0';
+                            return a.id > b.id;
+                        }
+                    }
+                });
+                break;
+            }
+            case 'Abschluss': {
+                parts = this.state.participants.sort(function(a, b){
+                    switch(order){
+                        case 'degree_0': {
+                            newOrder = 'degree_1';
+                            return a.degree < b.degree;
+                        }
+                        default: { // degree_1
+                            newOrder = 'degree_0';
+                            return a.degree > b.degree;
+                        }
+                    }
+                });
+                break;
+            }
+            case 'Gäste': {
+                parts = this.state.participants.sort(function(a, b){
+                    switch(order){
+                        case 'guests_0': {
+                            newOrder = 'guests_1';
+                            return a.guests < b.guests;
+                        }
+                        default: { // guests_1
+                            newOrder = 'guests_0';
+                            return a.guests > b.guests;
+                        }
+                    }
+                });
+                break;
+            }
+            default: undefined;
+        };
+        this.setState({
+            participants: parts,
+            order: newOrder
+        });
+    },
     render: function(){
         var degreeStats = []
         for(var key in this.state.stats.degree_counts){
@@ -56,11 +137,12 @@ var AdminPanel = React.createClass({
         var head = (
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
+                    <th onClick={this.orderBy}>ID</th>
+                    <th onClick={this.orderBy}>Name</th>
+                    <th onClick={this.orderBy}>Abschluss</th>
                     <th>Email <small>{this.state.mailExtension}</small></th>
-                    <th>Abschluss</th>
-                    <th>Gäste</th>
+                    <th onClick={this.orderBy}>Gäste</th>
+                    <th onClick={this.orderBy}>Verifiziert</th>
                 </tr>
             </thead>
         );
@@ -70,6 +152,7 @@ var AdminPanel = React.createClass({
                 <td colSpan="2">Total: {this.state.stats.participant_count}</td>
                 <td colSpan="2">{degreeStats}</td>
                 <td>Total: {this.state.stats.guest_count}</td>
+                <td></td>
             </tr>
         )
         for(var key in this.state.participants){
@@ -81,12 +164,13 @@ var AdminPanel = React.createClass({
                 <tr key={key}>
                     <td>#{p.id}</td>
                     <td>{p.firstname} {p.lastname}</td>
+                    <td>{degree}</td>
                     <td>
                         <a href={'mailto:' + p.email + this.state.mailExtension}>
                         {p.email}</a>
                     </td>
-                    <td>{degree}</td>
                     <td>{p.guests}</td>
+                    <td>{p.verified}</td>
                 </tr>
             );
         }

@@ -9,7 +9,8 @@ var AdminPanel = React.createClass({
             degrees: {},
             mailExtension: '',
             stats: {},
-            registrationIsActive: false
+            registrationIsActive: false,
+            order: 'Name_0'
         };
     },
     componentDidMount: function componentDidMount() {
@@ -42,6 +43,105 @@ var AdminPanel = React.createClass({
             this.setState({ registrationIsActive: data.registration });
         }).bind(this));
     },
+    orderBy: function orderBy(e) {
+        var parts = [];
+        var order = this.state.order;
+        var newOrder = '';
+        switch (e.currentTarget.innerText) {
+            case 'Name':
+                {
+                    parts = this.state.participants.sort(function (a, b) {
+                        switch (order) {
+                            case 'Name_0':
+                                {
+                                    newOrder = 'Name_1';
+                                    return a.firstname < b.firstname;
+                                }
+                            case 'Name_1':
+                                {
+                                    newOrder = 'Name_2';
+                                    return a.lastname > b.lastname;
+                                }
+                            case 'Name_2':
+                                {
+                                    newOrder = 'Name_3';
+                                    return a.lastname < b.lastname;
+                                }
+                            default:
+                                {
+                                    // Name_3
+                                    newOrder = 'Name_0';
+                                    return a.firstname > b.firstname;
+                                }
+                        };
+                    });
+                    break;
+                }
+            case 'ID':
+                {
+                    parts = this.state.participants.sort(function (a, b) {
+                        switch (order) {
+                            case 'ID_0':
+                                {
+                                    newOrder = 'ID_1';
+                                    return a.id < b.id;
+                                }
+                            default:
+                                {
+                                    // ID_1
+                                    newOrder = 'ID_0';
+                                    return a.id > b.id;
+                                }
+                        }
+                    });
+                    break;
+                }
+            case 'Abschluss':
+                {
+                    parts = this.state.participants.sort(function (a, b) {
+                        switch (order) {
+                            case 'degree_0':
+                                {
+                                    newOrder = 'degree_1';
+                                    return a.degree < b.degree;
+                                }
+                            default:
+                                {
+                                    // degree_1
+                                    newOrder = 'degree_0';
+                                    return a.degree > b.degree;
+                                }
+                        }
+                    });
+                    break;
+                }
+            case 'Gäste':
+                {
+                    parts = this.state.participants.sort(function (a, b) {
+                        switch (order) {
+                            case 'guests_0':
+                                {
+                                    newOrder = 'guests_1';
+                                    return a.guests < b.guests;
+                                }
+                            default:
+                                {
+                                    // guests_1
+                                    newOrder = 'guests_0';
+                                    return a.guests > b.guests;
+                                }
+                        }
+                    });
+                    break;
+                }
+            default:
+                undefined;
+        };
+        this.setState({
+            participants: parts,
+            order: newOrder
+        });
+    },
     render: function render() {
         var degreeStats = [];
         for (var key in this.state.stats.degree_counts) {
@@ -68,13 +168,18 @@ var AdminPanel = React.createClass({
                 null,
                 React.createElement(
                     'th',
-                    null,
+                    { onClick: this.orderBy },
                     'ID'
                 ),
                 React.createElement(
                     'th',
-                    null,
+                    { onClick: this.orderBy },
                     'Name'
+                ),
+                React.createElement(
+                    'th',
+                    { onClick: this.orderBy },
+                    'Abschluss'
                 ),
                 React.createElement(
                     'th',
@@ -88,13 +193,13 @@ var AdminPanel = React.createClass({
                 ),
                 React.createElement(
                     'th',
-                    null,
-                    'Abschluss'
+                    { onClick: this.orderBy },
+                    'Gäste'
                 ),
                 React.createElement(
                     'th',
-                    null,
-                    'Gäste'
+                    { onClick: this.orderBy },
+                    'Verifiziert'
                 )
             )
         );
@@ -118,7 +223,8 @@ var AdminPanel = React.createClass({
                 null,
                 'Total: ',
                 this.state.stats.guest_count
-            )
+            ),
+            React.createElement('td', null)
         ));
         for (var key in this.state.participants) {
             var p = this.state.participants[key];
@@ -142,6 +248,11 @@ var AdminPanel = React.createClass({
                 React.createElement(
                     'td',
                     null,
+                    degree
+                ),
+                React.createElement(
+                    'td',
+                    null,
                     React.createElement(
                         'a',
                         { href: 'mailto:' + p.email + this.state.mailExtension },
@@ -151,12 +262,12 @@ var AdminPanel = React.createClass({
                 React.createElement(
                     'td',
                     null,
-                    degree
+                    p.guests
                 ),
                 React.createElement(
                     'td',
                     null,
-                    p.guests
+                    p.verified
                 )
             ));
         }
