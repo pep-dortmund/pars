@@ -3,9 +3,7 @@ from flask import (Flask,
                    render_template,
                    jsonify,
                    request,
-                   redirect,
                    abort,
-                   url_for,
                    make_response)
 from database import Participant, Degree, db
 from peewee import (IntegrityError,
@@ -189,7 +187,8 @@ def admin_api(function):
                 'email': p.email,
                 'title': p.title,
                 'degree': p.degree.id,
-                'id': p.id
+                'id': p.id,
+                'verified': p.verified,
             })
         return make_response(
             jsonify({
