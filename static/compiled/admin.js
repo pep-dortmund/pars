@@ -44,13 +44,13 @@ var AdminPanel = React.createClass({
         }).bind(this));
     },
     orderBy: function orderBy(e) {
-        var parts = [];
+        var parts = this.state.participants;
         var order = this.state.order;
         var newOrder = '';
         switch (e.currentTarget.innerText) {
             case 'Name':
                 {
-                    parts = this.state.participants.sort(function (a, b) {
+                    parts = parts.sort(function (a, b) {
                         switch (order) {
                             case 'Name_0':
                                 {
@@ -79,7 +79,7 @@ var AdminPanel = React.createClass({
                 }
             case 'ID':
                 {
-                    parts = this.state.participants.sort(function (a, b) {
+                    parts = parts.sort(function (a, b) {
                         switch (order) {
                             case 'ID_0':
                                 {
@@ -98,7 +98,7 @@ var AdminPanel = React.createClass({
                 }
             case 'Abschluss':
                 {
-                    parts = this.state.participants.sort(function (a, b) {
+                    parts = parts.sort(function (a, b) {
                         switch (order) {
                             case 'degree_0':
                                 {
@@ -117,7 +117,7 @@ var AdminPanel = React.createClass({
                 }
             case 'Gäste':
                 {
-                    parts = this.state.participants.sort(function (a, b) {
+                    parts = parts.sort(function (a, b) {
                         switch (order) {
                             case 'guests_0':
                                 {
@@ -129,6 +129,25 @@ var AdminPanel = React.createClass({
                                     // guests_1
                                     newOrder = 'guests_0';
                                     return a.guests > b.guests;
+                                }
+                        }
+                    });
+                    break;
+                }
+            case 'Verifiziert':
+                {
+                    parts = parts.sort(function (a, b) {
+                        switch (order) {
+                            case 'verified_0':
+                                {
+                                    newOrder = 'verified_1';
+                                    return a.verified < b.verified;
+                                }
+                            default:
+                                {
+                                    // verified_1
+                                    newOrder = 'verified_0';
+                                    return a.verified > b.verified;
                                 }
                         }
                     });
@@ -229,6 +248,14 @@ var AdminPanel = React.createClass({
         for (var key in this.state.participants) {
             var p = this.state.participants[key];
             var degree = p.degree in this.state.degrees ? this.state.degrees[p.degree].name : '...';
+            var spanClasses = classNames({
+                'glyphicon': true,
+                'glyphicon-minus-sign': !p.verified,
+                'icon-minus-sign': !p.verified,
+                'glyphicon-ok-circle': p.verified,
+                'icon-ok-circle': p.verified
+            });
+            var verified = React.createElement('span', { className: spanClasses });
             body.push(React.createElement(
                 'tr',
                 { key: key },
@@ -267,7 +294,7 @@ var AdminPanel = React.createClass({
                 React.createElement(
                     'td',
                     null,
-                    p.verified
+                    verified
                 )
             ));
         }
