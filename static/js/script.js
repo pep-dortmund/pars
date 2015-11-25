@@ -720,7 +720,7 @@ var ParticipantForm = React.createClass({
                 </div>
                 <div className="row">
                     <div className="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
-                        <form onSubmit={this.handleSubmit}>
+                        <form onSubmit={this.handleSubmit} noValidate>
                             <NameInput
                                 ref="name"
                                 onUserInput={this.handleUserInput}

@@ -811,7 +811,7 @@ var ParticipantForm = React.createClass({
                     { className: "col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2" },
                     React.createElement(
                         "form",
-                        { onSubmit: this.handleSubmit },
+                        { onSubmit: this.handleSubmit, noValidate: true },
                         React.createElement(NameInput, {
                             ref: "name",
                             onUserInput: this.handleUserInput,
