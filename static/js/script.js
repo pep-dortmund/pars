@@ -3,7 +3,7 @@ var AlertMessage = React.createClass({
         var messages = {
             1: (
                 <div className="alert alert-success">
-                    Du hast Dich erfolgreich zur Absolventenfeier angemeldet.
+                    Du hast dich erfolgreich zur Absolventenfeier angemeldet.
                     Überprüfe dein Postfach für weitere Informationen.
                     Bis bald!
                 </div>
@@ -11,7 +11,7 @@ var AlertMessage = React.createClass({
             2: (
                 <div className="alert alert-success">
                     Die Email wurde noch einmal versandt und sollte in ein
-                    paar Minuten in Deinem Postfach sein.
+                    paar Minuten in deinem Postfach sein.
                 </div>
             ),
             3: (
@@ -24,7 +24,7 @@ var AlertMessage = React.createClass({
                     Die Anmeldung ist deaktiviert. Du kannst momentan
                     keine Änderungen vornehmen oder dich registrieren.
                     Falls es eine dringende, kurzfristige Änderung gibt,
-                    melde Dich per Mail bei uns:&nbsp;
+                    melde dich per Mail bei uns:&nbsp;
                     <a href="#">absolventenfeier@pep-dortmund.de</a>
                 </div>
             ),
@@ -36,9 +36,9 @@ var AlertMessage = React.createClass({
             10: (
                 <div className="alert alert-warning">
                     Diese Email wurde bereits eingetragen.
-                    Du solltest eine Bestätigungsmail in Deinem
+                    Du solltest eine Bestätigungsmail in deinem
                     Postfach finden, in der ein Link zur Änderung
-                    Deiner Daten aufgeführt ist.  <a
+                    deiner Daten aufgeführt ist.  <a
                         href="#"
                         className="alert-link"
                         onClick={this.props.callback}>
@@ -202,7 +202,7 @@ var EmailInput = React.createClass({
             if(!this.state.email){
                 hint = (
                     <span className="help-block"><small>
-                        Bitte trage Deine Emailadresse ein.
+                        Bitte trage deine Emailadresse ein.
                     </small></span>);
             } else {
                 hint = (
@@ -370,7 +370,7 @@ var TitleInput = React.createClass({
             if(!this.state.title){
                 hint = (
                     <span className="help-block"><small>
-                        Bitte gib hier den Titel Deiner Abschlussarbeit ein.
+                        Bitte gib hier den Titel deiner Abschlussarbeit ein.
                     </small></span>
                 )
             } else {
@@ -378,7 +378,7 @@ var TitleInput = React.createClass({
                     <span className="help-block"><small>
                         Anscheinend konnte dein <code>LaTeX</code>-nicht
                         richtig interpretiert werden. Versuche es bitte erneut
-                        oder schaue Dir&nbsp;
+                        oder schaue dir&nbsp;
                         <a href={'https://github.com/Khan/KaTeX/wiki/'
                             + 'Function-Support-in-KaTeX'}
                             target='_blank'>
@@ -451,8 +451,8 @@ var DateCheck = React.createClass({
         });
         var hint = this.state.error ? (
             <span className="help-block"><small>
-                Falls Du Deine letzte Prüfung im Jahr 2016 hattest oder noch
-                haben wirst, bist Du herzlich zur Absolventenfeier 2016
+                Falls du deine letzte Prüfung im Jahr 2016 hattest oder noch
+                haben wirst, bist du herzlich zur Absolventenfeier 2016
                 eingeladen, die Anfang 2017 stattfinden wird.
             </small></span>
         ) : '';
@@ -503,9 +503,9 @@ var GuestInput = React.createClass({
         if(this.state.error){
             hint = (
                 <span className="help-block"><small>
-                    Wie viele Gäste bringst du mit (inklusive Dir)?
-                    Momentan darfst du bis zu {this.state.maxGuests - 9}&nbsp;
-                    Gäste mitbringen.
+                    Mit wie vielen Personen wirst du erscheinen (inklusive
+                    dir)?  Momentan darfst du bis zu {this.state.maxGuests - 1}
+                    &nbsp;andere Gäste mitbringen.
                 </small></span>
             )
         };
@@ -516,7 +516,7 @@ var GuestInput = React.createClass({
         return (
             <fieldset className={classes} disabled={this.props.readOnly}>
                 <label className="control-label">
-                    Anzahl der Gäste (inklusive Dir)
+                    Anzahl der Gäste (inklusive dir)
                 </label>
                 <input
                     type="number"
@@ -688,7 +688,7 @@ var ParticipantForm = React.createClass({
                     key={buttons.length + 1}
                     disabled={!this.state.registrationIsActive}
                     >
-                    Eintragen
+                    Anmelden
                 </button>
                 );
         } else {
@@ -698,7 +698,7 @@ var ParticipantForm = React.createClass({
                     className="btn btn-primary"
                     disabled={!this.state.registrationIsActive}
                     key={buttons.length + 1}>
-                    Aktualisieren
+                    Daten speichern
                 </button>
             );
             buttons.push(<span> </span>);
@@ -707,7 +707,7 @@ var ParticipantForm = React.createClass({
                     className="btn btn-secondary"
                     disabled={!this.state.registrationIsActive}
                     key={buttons.length + 1}>
-                    Neu
+                    Neue Anmeldung
                 </a>
             );
         }

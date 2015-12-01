@@ -8,12 +8,12 @@ var AlertMessage = React.createClass({
             1: React.createElement(
                 "div",
                 { className: "alert alert-success" },
-                "Du hast Dich erfolgreich zur Absolventenfeier angemeldet. Überprüfe dein Postfach für weitere Informationen. Bis bald!"
+                "Du hast dich erfolgreich zur Absolventenfeier angemeldet. Überprüfe dein Postfach für weitere Informationen. Bis bald!"
             ),
             2: React.createElement(
                 "div",
                 { className: "alert alert-success" },
-                "Die Email wurde noch einmal versandt und sollte in ein paar Minuten in Deinem Postfach sein."
+                "Die Email wurde noch einmal versandt und sollte in ein paar Minuten in deinem Postfach sein."
             ),
             3: React.createElement(
                 "div",
@@ -23,7 +23,7 @@ var AlertMessage = React.createClass({
             4: React.createElement(
                 "div",
                 { className: "alert alert-warning" },
-                "Die Anmeldung ist deaktiviert. Du kannst momentan keine Änderungen vornehmen oder dich registrieren. Falls es eine dringende, kurzfristige Änderung gibt, melde Dich per Mail bei uns: ",
+                "Die Anmeldung ist deaktiviert. Du kannst momentan keine Änderungen vornehmen oder dich registrieren. Falls es eine dringende, kurzfristige Änderung gibt, melde dich per Mail bei uns: ",
                 React.createElement(
                     "a",
                     { href: "#" },
@@ -38,7 +38,7 @@ var AlertMessage = React.createClass({
             10: React.createElement(
                 "div",
                 { className: "alert alert-warning" },
-                "Diese Email wurde bereits eingetragen. Du solltest eine Bestätigungsmail in Deinem Postfach finden, in der ein Link zur Änderung Deiner Daten aufgeführt ist.  ",
+                "Diese Email wurde bereits eingetragen. Du solltest eine Bestätigungsmail in deinem Postfach finden, in der ein Link zur Änderung deiner Daten aufgeführt ist.  ",
                 React.createElement(
                     "a",
                     {
@@ -225,7 +225,7 @@ var EmailInput = React.createClass({
                     React.createElement(
                         "small",
                         null,
-                        "Bitte trage Deine Emailadresse ein."
+                        "Bitte trage deine Emailadresse ein."
                     )
                 );
             } else {
@@ -425,7 +425,7 @@ var TitleInput = React.createClass({
                     React.createElement(
                         "small",
                         null,
-                        "Bitte gib hier den Titel Deiner Abschlussarbeit ein."
+                        "Bitte gib hier den Titel deiner Abschlussarbeit ein."
                     )
                 );
             } else {
@@ -441,7 +441,7 @@ var TitleInput = React.createClass({
                             null,
                             "LaTeX"
                         ),
-                        "-nicht richtig interpretiert werden. Versuche es bitte erneut oder schaue Dir ",
+                        "-nicht richtig interpretiert werden. Versuche es bitte erneut oder schaue dir ",
                         React.createElement(
                             "a",
                             { href: 'https://github.com/Khan/KaTeX/wiki/' + 'Function-Support-in-KaTeX',
@@ -532,7 +532,7 @@ var DateCheck = React.createClass({
             React.createElement(
                 "small",
                 null,
-                "Falls Du Deine letzte Prüfung im Jahr 2016 hattest oder noch haben wirst, bist Du herzlich zur Absolventenfeier 2016 eingeladen, die Anfang 2017 stattfinden wird."
+                "Falls du deine letzte Prüfung im Jahr 2016 hattest oder noch haben wirst, bist du herzlich zur Absolventenfeier 2016 eingeladen, die Anfang 2017 stattfinden wird."
             )
         ) : '';
         return React.createElement(
@@ -590,9 +590,9 @@ var GuestInput = React.createClass({
                 React.createElement(
                     "small",
                     null,
-                    "Wie viele Gäste bringst du mit (inklusive Dir)? Momentan darfst du bis zu ",
-                    this.state.maxGuests - 9,
-                    "  Gäste mitbringen."
+                    "Mit wie vielen Personen wirst du erscheinen (inklusive dir)?  Momentan darfst du bis zu ",
+                    this.state.maxGuests - 1,
+                    " andere Gäste mitbringen."
                 )
             );
         };
@@ -606,7 +606,7 @@ var GuestInput = React.createClass({
             React.createElement(
                 "label",
                 { className: "control-label" },
-                "Anzahl der Gäste (inklusive Dir)"
+                "Anzahl der Gäste (inklusive dir)"
             ),
             React.createElement("input", {
                 type: "number",
@@ -765,7 +765,7 @@ var ParticipantForm = React.createClass({
                     key: buttons.length + 1,
                     disabled: !this.state.registrationIsActive
                 },
-                "Eintragen"
+                "Anmelden"
             ));
         } else {
             buttons.push(React.createElement(
@@ -775,7 +775,7 @@ var ParticipantForm = React.createClass({
                     className: "btn btn-primary",
                     disabled: !this.state.registrationIsActive,
                     key: buttons.length + 1 },
-                "Aktualisieren"
+                "Daten speichern"
             ));
             buttons.push(React.createElement(
                 "span",
@@ -788,7 +788,7 @@ var ParticipantForm = React.createClass({
                     className: "btn btn-secondary",
                     disabled: !this.state.registrationIsActive,
                     key: buttons.length + 1 },
-                "Neu"
+                "Neue Anmeldung"
             ));
         }
         return React.createElement(
