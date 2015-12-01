@@ -28,3 +28,7 @@ div.loader-rect {
     border-radius: 5px;
     margin-left: 5px;
 }
+
+#links {
+    margin-top: 1em;
+}
