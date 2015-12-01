@@ -130,6 +130,21 @@ var AdminPanel = React.createClass({
                 });
                 break;
             }
+            case 'Zeitstempel': {
+                parts = parts.sort(function(a, b){
+                    switch(order){
+                        case 'date_0': {
+                            newOrder = 'date_1';
+                            return a.registration_date < b.registration_date;
+                        }
+                        default: { // date_1
+                            newOrder = 'date_0';
+                            return a.registration_date > b.registration_date;
+                        }
+                    }
+                });
+                break;
+            }
             default: undefined;
         };
         this.setState({
@@ -158,6 +173,7 @@ var AdminPanel = React.createClass({
                     <th>Email <small>{this.state.mailExtension}</small></th>
                     <th onClick={this.orderBy}>Gäste</th>
                     <th onClick={this.orderBy}>Verifiziert</th>
+                    <th onClick={this.orderBy}>Zeitstempel</th>
                 </tr>
             </thead>
         );
@@ -167,6 +183,7 @@ var AdminPanel = React.createClass({
                 <td colSpan="2">Total: {this.state.stats.participant_count}</td>
                 <td colSpan="2">{degreeStats}</td>
                 <td>Total: {this.state.stats.guest_count}</td>
+                <td></td>
                 <td></td>
             </tr>
         )
@@ -184,7 +201,8 @@ var AdminPanel = React.createClass({
             });
             var verified = (
                 <span className={spanClasses}></span>
-            )
+            );
+            var d = new Date(Date.parse(p.registration_date));
             body.push(
                 <tr key={key}>
                     <td>#{p.id}</td>
@@ -196,6 +214,7 @@ var AdminPanel = React.createClass({
                     </td>
                     <td>{p.guests}</td>
                     <td>{verified}</td>
+                    <td>{d.getFullYear()}-{d.getMonth()}-{d.getDate()} {d.getHours()}:{d.getMinutes()}</td>
                 </tr>
             );
         }

@@ -3,9 +3,11 @@ from peewee import (SqliteDatabase,
                     CharField,
                     IntegerField,
                     BooleanField,
+                    DateTimeField,
                     ForeignKeyField)
 import os
 from config import DevelopmentConfig
+from datetime import datetime
 
 ALLOWED_MAIL_SERVER = DevelopmentConfig.ALLOWED_MAIL_SERVER
 
@@ -38,6 +40,7 @@ class Participant(Model):
     token = CharField(null=True, default=generate_token)
     title = CharField()
     verified = BooleanField(default=False)
+    registration_date = DateTimeField(default=datetime.utcnow)
 
     def __repr__(self):
         return self.email

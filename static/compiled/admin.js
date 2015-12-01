@@ -153,6 +153,25 @@ var AdminPanel = React.createClass({
                     });
                     break;
                 }
+            case 'Zeitstempel':
+                {
+                    parts = parts.sort(function (a, b) {
+                        switch (order) {
+                            case 'date_0':
+                                {
+                                    newOrder = 'date_1';
+                                    return a.registration_date < b.registration_date;
+                                }
+                            default:
+                                {
+                                    // date_1
+                                    newOrder = 'date_0';
+                                    return a.registration_date > b.registration_date;
+                                }
+                        }
+                    });
+                    break;
+                }
             default:
                 undefined;
         };
@@ -219,6 +238,11 @@ var AdminPanel = React.createClass({
                     'th',
                     { onClick: this.orderBy },
                     'Verifiziert'
+                ),
+                React.createElement(
+                    'th',
+                    { onClick: this.orderBy },
+                    'Zeitstempel'
                 )
             )
         );
@@ -243,6 +267,7 @@ var AdminPanel = React.createClass({
                 'Total: ',
                 this.state.stats.guest_count
             ),
+            React.createElement('td', null),
             React.createElement('td', null)
         ));
         for (var key in this.state.participants) {
@@ -256,6 +281,7 @@ var AdminPanel = React.createClass({
                 'icon-ok-circle': p.verified
             });
             var verified = React.createElement('span', { className: spanClasses });
+            var d = new Date(Date.parse(p.registration_date));
             body.push(React.createElement(
                 'tr',
                 { key: key },
@@ -295,6 +321,19 @@ var AdminPanel = React.createClass({
                     'td',
                     null,
                     verified
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    d.getFullYear(),
+                    '-',
+                    d.getMonth(),
+                    '-',
+                    d.getDate(),
+                    ' ',
+                    d.getHours(),
+                    ':',
+                    d.getMinutes()
                 )
             ));
         }

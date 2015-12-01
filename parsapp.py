@@ -189,6 +189,7 @@ def admin_api(function):
                 'degree': p.degree.id,
                 'id': p.id,
                 'verified': p.verified,
+                'registration_date': p.registration_date,
             })
         return make_response(
             jsonify({
