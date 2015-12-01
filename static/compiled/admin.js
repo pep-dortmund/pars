@@ -10,7 +10,8 @@ var AdminPanel = React.createClass({
             mailExtension: '',
             stats: {},
             registrationIsActive: false,
-            order: 'Name_0'
+            order: 'Name_0',
+            orderLabel: 'ID ↑'
         };
     },
     componentDidMount: function componentDidMount() {
@@ -47,6 +48,7 @@ var AdminPanel = React.createClass({
         var parts = this.state.participants;
         var order = this.state.order;
         var newOrder = '';
+        var orderLabel = '';
         switch (e.currentTarget.innerText) {
             case 'Name':
                 {
@@ -55,22 +57,26 @@ var AdminPanel = React.createClass({
                             case 'Name_0':
                                 {
                                     newOrder = 'Name_1';
+                                    orderLabel = 'Vorname ↓';
                                     return a.firstname < b.firstname;
                                 }
                             case 'Name_1':
                                 {
                                     newOrder = 'Name_2';
+                                    orderLabel = 'Nachname ↑';
                                     return a.lastname > b.lastname;
                                 }
                             case 'Name_2':
                                 {
                                     newOrder = 'Name_3';
+                                    orderLabel = 'Nachname ↓';
                                     return a.lastname < b.lastname;
                                 }
                             default:
                                 {
                                     // Name_3
                                     newOrder = 'Name_0';
+                                    orderLabel = 'Vorname ↑';
                                     return a.firstname > b.firstname;
                                 }
                         };
@@ -84,12 +90,14 @@ var AdminPanel = React.createClass({
                             case 'ID_0':
                                 {
                                     newOrder = 'ID_1';
+                                    orderLabel = 'ID ↓';
                                     return a.id < b.id;
                                 }
                             default:
                                 {
                                     // ID_1
                                     newOrder = 'ID_0';
+                                    orderLabel = 'ID ↑';
                                     return a.id > b.id;
                                 }
                         }
@@ -103,12 +111,14 @@ var AdminPanel = React.createClass({
                             case 'degree_0':
                                 {
                                     newOrder = 'degree_1';
+                                    orderLabel = 'Abschluss ↓';
                                     return a.degree < b.degree;
                                 }
                             default:
                                 {
                                     // degree_1
                                     newOrder = 'degree_0';
+                                    orderLabel = 'Abschluss ↑';
                                     return a.degree > b.degree;
                                 }
                         }
@@ -122,12 +132,14 @@ var AdminPanel = React.createClass({
                             case 'guests_0':
                                 {
                                     newOrder = 'guests_1';
+                                    orderLabel = 'Gäste ↓';
                                     return a.guests < b.guests;
                                 }
                             default:
                                 {
                                     // guests_1
                                     newOrder = 'guests_0';
+                                    orderLabel = 'Gäste ↑';
                                     return a.guests > b.guests;
                                 }
                         }
@@ -141,12 +153,14 @@ var AdminPanel = React.createClass({
                             case 'verified_0':
                                 {
                                     newOrder = 'verified_1';
+                                    orderLabel = 'Verifiziert ↓';
                                     return a.verified < b.verified;
                                 }
                             default:
                                 {
                                     // verified_1
                                     newOrder = 'verified_0';
+                                    orderLabel = 'Verifiziert ↑';
                                     return a.verified > b.verified;
                                 }
                         }
@@ -160,12 +174,14 @@ var AdminPanel = React.createClass({
                             case 'date_0':
                                 {
                                     newOrder = 'date_1';
+                                    orderLabel = 'Datum ↓';
                                     return a.registration_date < b.registration_date;
                                 }
                             default:
                                 {
                                     // date_1
                                     newOrder = 'date_0';
+                                    orderLabel = 'Datum ↑';
                                     return a.registration_date > b.registration_date;
                                 }
                         }
@@ -177,7 +193,8 @@ var AdminPanel = React.createClass({
         };
         this.setState({
             participants: parts,
-            order: newOrder
+            order: newOrder,
+            orderLabel: orderLabel
         });
     },
     render: function render() {
@@ -206,18 +223,30 @@ var AdminPanel = React.createClass({
                 null,
                 React.createElement(
                     'th',
-                    { onClick: this.orderBy },
-                    'ID'
+                    null,
+                    React.createElement(
+                        'a',
+                        { href: '#', onClick: this.orderBy },
+                        'ID'
+                    )
                 ),
                 React.createElement(
                     'th',
-                    { onClick: this.orderBy },
-                    'Name'
+                    null,
+                    React.createElement(
+                        'a',
+                        { href: '#', onClick: this.orderBy },
+                        'Name'
+                    )
                 ),
                 React.createElement(
                     'th',
-                    { onClick: this.orderBy },
-                    'Abschluss'
+                    null,
+                    React.createElement(
+                        'a',
+                        { href: '#', onClick: this.orderBy },
+                        'Abschluss'
+                    )
                 ),
                 React.createElement(
                     'th',
@@ -231,18 +260,30 @@ var AdminPanel = React.createClass({
                 ),
                 React.createElement(
                     'th',
-                    { onClick: this.orderBy },
-                    'Gäste'
+                    null,
+                    React.createElement(
+                        'a',
+                        { href: '#', onClick: this.orderBy },
+                        'Gäste'
+                    )
                 ),
                 React.createElement(
                     'th',
-                    { onClick: this.orderBy },
-                    'Verifiziert'
+                    null,
+                    React.createElement(
+                        'a',
+                        { href: '#', onClick: this.orderBy },
+                        'Verifiziert'
+                    )
                 ),
                 React.createElement(
                     'th',
-                    { onClick: this.orderBy },
-                    'Zeitstempel'
+                    null,
+                    React.createElement(
+                        'a',
+                        { href: '#', onClick: this.orderBy },
+                        'Zeitstempel'
+                    )
                 )
             )
         );
@@ -351,7 +392,12 @@ var AdminPanel = React.createClass({
                     React.createElement(
                         'h4',
                         null,
-                        'Adminpanel'
+                        'Adminpanel ',
+                        React.createElement(
+                            'small',
+                            null,
+                            this.state.orderLabel
+                        )
                     )
                 ),
                 React.createElement(

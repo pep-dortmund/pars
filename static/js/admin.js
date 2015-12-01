@@ -6,7 +6,8 @@ var AdminPanel = React.createClass({
             mailExtension: '',
             stats: {},
             registrationIsActive: false,
-            order: 'Name_0'
+            order: 'Name_0',
+            orderLabel: 'ID ↑'
         }
     },
     componentDidMount: function(){
@@ -46,24 +47,29 @@ var AdminPanel = React.createClass({
         var parts = this.state.participants;
         var order = this.state.order;
         var newOrder = '';
+        var orderLabel = '';
         switch(e.currentTarget.innerText){
             case 'Name': {
                 parts = parts.sort(function(a, b){
                     switch(order){
                         case 'Name_0': {
                             newOrder = 'Name_1';
+                            orderLabel = 'Vorname ↓';
                             return a.firstname < b.firstname;
                         }
                         case 'Name_1': {
                             newOrder = 'Name_2';
+                            orderLabel = 'Nachname ↑';
                             return a.lastname > b.lastname;
                         }
                         case 'Name_2': {
                             newOrder = 'Name_3';
+                            orderLabel = 'Nachname ↓';
                             return a.lastname < b.lastname;
                         }
                         default: { // Name_3
                             newOrder = 'Name_0';
+                            orderLabel = 'Vorname ↑';
                             return a.firstname > b.firstname;
                         }
                     };
@@ -75,10 +81,12 @@ var AdminPanel = React.createClass({
                     switch(order){
                         case 'ID_0': {
                             newOrder = 'ID_1';
+                            orderLabel = 'ID ↓';
                             return a.id < b.id;
                         }
                         default: { // ID_1
                             newOrder = 'ID_0';
+                            orderLabel = 'ID ↑';
                             return a.id > b.id;
                         }
                     }
@@ -90,10 +98,12 @@ var AdminPanel = React.createClass({
                     switch(order){
                         case 'degree_0': {
                             newOrder = 'degree_1';
+                            orderLabel = 'Abschluss ↓';
                             return a.degree < b.degree;
                         }
                         default: { // degree_1
                             newOrder = 'degree_0';
+                            orderLabel = 'Abschluss ↑';
                             return a.degree > b.degree;
                         }
                     }
@@ -105,10 +115,12 @@ var AdminPanel = React.createClass({
                     switch(order){
                         case 'guests_0': {
                             newOrder = 'guests_1';
+                            orderLabel = 'Gäste ↓';
                             return a.guests < b.guests;
                         }
                         default: { // guests_1
                             newOrder = 'guests_0';
+                            orderLabel = 'Gäste ↑';
                             return a.guests > b.guests;
                         }
                     }
@@ -120,10 +132,12 @@ var AdminPanel = React.createClass({
                     switch(order){
                         case 'verified_0': {
                             newOrder = 'verified_1';
+                            orderLabel = 'Verifiziert ↓';
                             return a.verified < b.verified;
                         }
                         default: { // verified_1
                             newOrder = 'verified_0';
+                            orderLabel = 'Verifiziert ↑';
                             return a.verified > b.verified;
                         }
                     }
@@ -135,10 +149,12 @@ var AdminPanel = React.createClass({
                     switch(order){
                         case 'date_0': {
                             newOrder = 'date_1';
+                            orderLabel = 'Datum ↓';
                             return a.registration_date < b.registration_date;
                         }
                         default: { // date_1
                             newOrder = 'date_0';
+                            orderLabel = 'Datum ↑';
                             return a.registration_date > b.registration_date;
                         }
                     }
@@ -149,7 +165,8 @@ var AdminPanel = React.createClass({
         };
         this.setState({
             participants: parts,
-            order: newOrder
+            order: newOrder,
+            orderLabel: orderLabel
         });
     },
     render: function(){
@@ -167,13 +184,13 @@ var AdminPanel = React.createClass({
         var head = (
             <thead>
                 <tr>
-                    <th onClick={this.orderBy}>ID</th>
-                    <th onClick={this.orderBy}>Name</th>
-                    <th onClick={this.orderBy}>Abschluss</th>
+                    <th><a href="#" onClick={this.orderBy}>ID</a></th>
+                    <th><a href="#" onClick={this.orderBy}>Name</a></th>
+                    <th><a href="#" onClick={this.orderBy}>Abschluss</a></th>
                     <th>Email <small>{this.state.mailExtension}</small></th>
-                    <th onClick={this.orderBy}>Gäste</th>
-                    <th onClick={this.orderBy}>Verifiziert</th>
-                    <th onClick={this.orderBy}>Zeitstempel</th>
+                    <th><a href="#" onClick={this.orderBy}>Gäste</a></th>
+                    <th><a href="#" onClick={this.orderBy}>Verifiziert</a></th>
+                    <th><a href="#" onClick={this.orderBy}>Zeitstempel</a></th>
                 </tr>
             </thead>
         );
@@ -225,7 +242,7 @@ var AdminPanel = React.createClass({
             <div>
                 <div className="row">
                     <div className="col-xs-6 col-lg-6 col-lg-offset-1 col-xl-5 col-xl-offset-2">
-                        <h4>Adminpanel</h4>
+                        <h4>Adminpanel <small>{this.state.orderLabel}</small></h4>
                     </div>
                     <div className="col-xs-6 col-lg-4 col-xl-3 text-right">
                         <span id="disable-registration">
