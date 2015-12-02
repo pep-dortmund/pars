@@ -220,6 +220,10 @@ var AdminPanel = React.createClass({
                 <span className={spanClasses}></span>
             );
             var d = new Date(Date.parse(p.registration_date));
+            var month = ("0" + d.getMonth()).slice(-2);
+            var date = ("0" + d.getDate()).slice(-2);
+            var h = ("0" + d.getHours()).slice(-2);
+            var m = ("0" + d.getMinutes()).slice(-2);
             body.push(
                 <tr key={key}>
                     <td>#{p.id}</td>
@@ -231,7 +235,7 @@ var AdminPanel = React.createClass({
                     </td>
                     <td>{p.guests}</td>
                     <td>{verified}</td>
-                    <td>{d.getFullYear()}-{d.getMonth()}-{d.getDate()} {d.getHours()}:{d.getMinutes()}</td>
+                    <td>{d.getFullYear()}-{month}-{date} {h}:{m}</td>
                 </tr>
             );
         }

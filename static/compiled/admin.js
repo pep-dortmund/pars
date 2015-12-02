@@ -323,6 +323,10 @@ var AdminPanel = React.createClass({
             });
             var verified = React.createElement('span', { className: spanClasses });
             var d = new Date(Date.parse(p.registration_date));
+            var month = ("0" + d.getMonth()).slice(-2);
+            var date = ("0" + d.getDate()).slice(-2);
+            var h = ("0" + d.getHours()).slice(-2);
+            var m = ("0" + d.getMinutes()).slice(-2);
             body.push(React.createElement(
                 'tr',
                 { key: key },
@@ -368,13 +372,13 @@ var AdminPanel = React.createClass({
                     null,
                     d.getFullYear(),
                     '-',
-                    d.getMonth(),
+                    month,
                     '-',
-                    d.getDate(),
+                    date,
                     ' ',
-                    d.getHours(),
+                    h,
                     ':',
-                    d.getMinutes()
+                    m
                 )
             ));
         }
