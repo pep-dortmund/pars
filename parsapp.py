@@ -325,7 +325,7 @@ def api(function=None):
                 p = Participant\
                     .select()\
                     .where(Participant.email
-                           == request.args.get('email'))\
+                           == request.args.get('email').lower())\
                     .get()
                 sendmail(p)
             except:
