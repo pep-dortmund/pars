@@ -133,14 +133,14 @@ var AdminPanel = React.createClass({
                                 {
                                     newOrder = 'guests_1';
                                     orderLabel = 'Gäste ↓';
-                                    return a.guests < b.guests;
+                                    return b.guests - a.guests;
                                 }
                             default:
                                 {
                                     // guests_1
                                     newOrder = 'guests_0';
                                     orderLabel = 'Gäste ↑';
-                                    return a.guests > b.guests;
+                                    return a.guests - b.guests;
                                 }
                         }
                     });
