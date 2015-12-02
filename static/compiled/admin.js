@@ -49,7 +49,7 @@ var AdminPanel = React.createClass({
         var order = this.state.order;
         var newOrder = '';
         var orderLabel = '';
-        switch (e.currentTarget.innerText) {
+        switch (e.currentTarget.innerHTML) {
             case 'Name':
                 {
                     parts = parts.sort(function (a, b) {
@@ -58,26 +58,26 @@ var AdminPanel = React.createClass({
                                 {
                                     newOrder = 'Name_1';
                                     orderLabel = 'Vorname ↓';
-                                    return a.firstname < b.firstname;
+                                    return b.firstname.localeCompare(a.firstname);
                                 }
                             case 'Name_1':
                                 {
                                     newOrder = 'Name_2';
                                     orderLabel = 'Nachname ↑';
-                                    return a.lastname > b.lastname;
+                                    return a.lastname.localeCompare(b.lastname);
                                 }
                             case 'Name_2':
                                 {
                                     newOrder = 'Name_3';
                                     orderLabel = 'Nachname ↓';
-                                    return a.lastname < b.lastname;
+                                    return b.lastname.localeCompare(a.lastname);
                                 }
                             default:
                                 {
                                     // Name_3
                                     newOrder = 'Name_0';
                                     orderLabel = 'Vorname ↑';
-                                    return a.firstname > b.firstname;
+                                    return a.firstname.localeCompare(b.firstname);
                                 }
                         };
                     });
@@ -91,14 +91,14 @@ var AdminPanel = React.createClass({
                                 {
                                     newOrder = 'ID_1';
                                     orderLabel = 'ID ↓';
-                                    return a.id < b.id;
+                                    return b.id - a.id;
                                 }
                             default:
                                 {
                                     // ID_1
                                     newOrder = 'ID_0';
                                     orderLabel = 'ID ↑';
-                                    return a.id > b.id;
+                                    return a.id - b.id;
                                 }
                         }
                     });
@@ -112,14 +112,14 @@ var AdminPanel = React.createClass({
                                 {
                                     newOrder = 'degree_1';
                                     orderLabel = 'Abschluss ↓';
-                                    return a.degree < b.degree;
+                                    return b.degree - a.degree;
                                 }
                             default:
                                 {
                                     // degree_1
                                     newOrder = 'degree_0';
                                     orderLabel = 'Abschluss ↑';
-                                    return a.degree > b.degree;
+                                    return a.degree - b.degree;
                                 }
                         }
                     });
@@ -154,14 +154,14 @@ var AdminPanel = React.createClass({
                                 {
                                     newOrder = 'verified_1';
                                     orderLabel = 'Verifiziert ↓';
-                                    return a.verified < b.verified;
+                                    return b.verified - a.verified;
                                 }
                             default:
                                 {
                                     // verified_1
                                     newOrder = 'verified_0';
                                     orderLabel = 'Verifiziert ↑';
-                                    return a.verified > b.verified;
+                                    return a.verified - b.verified;
                                 }
                         }
                     });
@@ -170,19 +170,21 @@ var AdminPanel = React.createClass({
             case 'Zeitstempel':
                 {
                     parts = parts.sort(function (a, b) {
+                        var date_a = new Date(Date.parse(a.registration_date));
+                        var date_b = new Date(Date.parse(b.registration_date));
                         switch (order) {
                             case 'date_0':
                                 {
                                     newOrder = 'date_1';
                                     orderLabel = 'Datum ↓';
-                                    return a.registration_date < b.registration_date;
+                                    return date_b - date_a;
                                 }
                             default:
                                 {
                                     // date_1
                                     newOrder = 'date_0';
                                     orderLabel = 'Datum ↑';
-                                    return a.registration_date > b.registration_date;
+                                    return date_a - date_b;
                                 }
                         }
                     });
