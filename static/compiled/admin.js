@@ -1,9 +1,7 @@
-'use strict';
-
 var AdminPanel = React.createClass({
     displayName: 'AdminPanel',
 
-    getInitialState: function getInitialState() {
+    getInitialState: function () {
         return {
             participants: [],
             degrees: {},
@@ -14,37 +12,37 @@ var AdminPanel = React.createClass({
             orderLabel: 'ID ↑'
         };
     },
-    componentDidMount: function componentDidMount() {
-        $.getJSON('/api/config/', (function (data) {
+    componentDidMount: function () {
+        $.getJSON('/api/config/', function (data) {
             this.setState({
                 degrees: data.degrees,
                 mailExtension: data.allowed_mail
             });
-        }).bind(this)).fail(function () {
+        }.bind(this)).fail(function () {
             console.log("Error while downloading degrees.");
         });
-        $.getJSON('/admin/api/stats/', (function (data) {
+        $.getJSON('/admin/api/stats/', function (data) {
             this.setState({
                 stats: data
             });
-        }).bind(this)).fail(function () {
+        }.bind(this)).fail(function () {
             console.log("Error while downloading degrees.");
         });
-        $.getJSON('/admin/api/participants/', (function (data) {
+        $.getJSON('/admin/api/participants/', function (data) {
             this.setState({ participants: data.participants });
-        }).bind(this)).fail(function () {
+        }.bind(this)).fail(function () {
             console.log('fail');
         });
-        $.getJSON('/api/config/', (function (data) {
+        $.getJSON('/api/config/', function (data) {
             this.setState({ registrationIsActive: data.registration_is_active });
-        }).bind(this));
+        }.bind(this));
     },
-    toggleRegistrationStatus: function toggleRegistrationStatus() {
-        $.getJSON('/admin/api/toggle_registration/', (function (data) {
+    toggleRegistrationStatus: function () {
+        $.getJSON('/admin/api/toggle_registration/', function (data) {
             this.setState({ registrationIsActive: data.registration });
-        }).bind(this));
+        }.bind(this));
     },
-    orderBy: function orderBy(e) {
+    orderBy: function (e) {
         var parts = this.state.participants;
         var order = this.state.order;
         var newOrder = '';
@@ -199,7 +197,7 @@ var AdminPanel = React.createClass({
             orderLabel: orderLabel
         });
     },
-    render: function render() {
+    render: function () {
         var degreeStats = [];
         for (var key in this.state.stats.degree_counts) {
             if (key in this.state.degrees) {
@@ -325,7 +323,7 @@ var AdminPanel = React.createClass({
             });
             var verified = React.createElement('span', { className: spanClasses });
             var d = new Date(Date.parse(p.registration_date));
-            var month = ("0" + d.getMonth()).slice(-2);
+            var month = ("0" + (d.getMonth() + 1)).slice(-2);
             var date = ("0" + d.getDate()).slice(-2);
             var h = ("0" + d.getHours()).slice(-2);
             var m = ("0" + d.getMinutes()).slice(-2);

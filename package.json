@@ -1,0 +1,23 @@
+{
+  "name": "pars",
+  "version": "1.0.0",
+  "description": "PEP/Physik Absolventenfeier Registrierungs System",
+  "main": "static/script.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-preset-react": "^6.3.13"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pep-dortmund/pars.git"
+  },
+  "author": "Kevin Heinicke <kevin.heinicke@tu-dortmund.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pep-dortmund/pars/issues"
+  },
+  "homepage": "https://github.com/pep-dortmund/pars#readme"
+}
