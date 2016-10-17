@@ -8,3 +8,4 @@ config.py.bak
 node_modules/
 
 reg_inactive
+static/compiled/

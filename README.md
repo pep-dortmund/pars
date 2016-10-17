@@ -25,10 +25,19 @@ installiert, die Datenbank mit
 
     $(emv) ./setup_db.py
 
-initialisiert und anschließend die App mit
+initialisiert. Jetzt werden noch alle JavaScript Abhängigkeiten benötigt:
+
+    $(env) npm install
+
+Die JS Dateien können dann im hintergrund (`tmux` oder andere Shell) kompiliert
+werden mittels
+
+    $(env) npm start
+
+Anschließend die App mit
 
     $(env) ./parsapp.py
 
-ausgeführt werden. Der Server ist dann lokal unter `http://localhost:5000`
+starten. Der Server ist dann lokal unter `http://localhost:5000`
 erreichbar. Für funktionierenden Email-Versand muss die datei `config.py`
 angepasst/erstellt werden (s.o.).

@@ -1,3 +1,7 @@
+var React = require('react');
+var ReactDOM = require('react-dom');
+var classNames = require('classnames');
+
 var AdminPanel = React.createClass({
     getInitialState: function(){
         return {
@@ -276,4 +280,4 @@ var AdminPanel = React.createClass({
     }
 });
 
-React.render(<AdminPanel />, document.getElementById('admin-panel'));
+ReactDOM.render(<AdminPanel />, document.getElementById('admin-panel'));

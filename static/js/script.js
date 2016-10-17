@@ -1,3 +1,8 @@
+var React = require('react');
+var ReactDOM = require('react-dom');
+var katex = require('katex');
+var classNames = require('classnames');
+
 var AlertMessage = React.createClass({
     render: function(){
         var messages = {
@@ -96,7 +101,7 @@ var Loader = React.createClass({
     }
 });
 
-var loader = React.render(<Loader />, document.getElementById('loader'));
+var loader = ReactDOM.render(<Loader />, document.getElementById('loader'));
 
 var NameInput = React.createClass({
     getInitialState: function(){
@@ -762,4 +767,4 @@ var ParticipantForm = React.createClass({
     }
 });
 
-React.render(<ParticipantForm />, document.getElementById('main'));
+ReactDOM.render(<ParticipantForm />, document.getElementById('main'));
