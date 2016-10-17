@@ -213,16 +213,17 @@ def admin_api(function):
 
     if function == 'stats':
         degrees = Degree.select()
-        degree_counts = {}
-        for d in degrees:
-            degree_counts.update(
-                {
-                    d.id: (Participant.select().join(Degree)
-                           .where(Degree.id == d.id).count())
-                }
-            )
+        degree_counts = {
+            d.name: d.count for d in Degree.select().annotate(Participant)
+        }
+        degree_guests = {
+            d.name: d.guests for d in Degree.select()
+                .annotate(Participant, fn.Sum(Participant.guests)
+                .alias('guests'))
+        }
         stats = {
             'degree_counts': degree_counts,
+            'degree_guests': degree_guests,
             'participant_count': Participant.select().count(),
             'guest_count': (Participant
                             .select(fn.SUM(Participant.guests))

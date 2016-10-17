@@ -176,16 +176,21 @@ var AdminPanel = React.createClass({
         });
     },
     render: function(){
-        var degreeStats = []
+        var degreeStats = [];
+        var guestsPerDegree = [];
         for(var key in this.state.stats.degree_counts){
-            if(key in this.state.degrees){
-                degreeStats.push(
-                    <span key={key}>
-                        <small>{this.state.degrees[key].name}: </small>
-                        {this.state.stats.degree_counts[key]}&nbsp;
-                    </span>
-                );
-            }
+            degreeStats.push(
+                <span key={key}>
+                    {key}: {this.state.stats.degree_counts[key]}&nbsp;
+                </span>
+            );
+        }
+        for(var key in this.state.stats.degree_guests){
+            guestsPerDegree.push(
+                <span key={key}>
+                    {key}: {this.state.stats.degree_guests[key]}&nbsp;
+                </span>
+            );
         }
         var head = (
             <thead>
@@ -203,11 +208,14 @@ var AdminPanel = React.createClass({
         var body = [];
         body.push(
             <tr key={-1}>
-                <td colSpan="2">Total: {this.state.stats.participant_count}</td>
-                <td colSpan="2">{degreeStats}</td>
-                <td>Total: {this.state.stats.guest_count}</td>
-                <td></td>
-                <td></td>
+                <td colSpan="4">
+                  Total: {this.state.stats.participant_count}&nbsp;
+                  <small>{degreeStats}</small>
+                  </td>
+                <td colSpan="3">
+                  Total: {this.state.stats.guest_count}&nbsp;
+                  <small>{guestsPerDegree}</small>
+                  </td>
             </tr>
         )
         for(var key in this.state.participants){
