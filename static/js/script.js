@@ -456,9 +456,9 @@ var DateCheck = React.createClass({
         });
         var hint = this.state.error ? (
             <span className="help-block"><small>
-                Falls du deine letzte Prüfung im Jahr 2016 hattest oder noch
-                haben wirst, bist du herzlich zur Absolventenfeier 2016
-                eingeladen, die Anfang 2017 stattfinden wird.
+                Falls du deine letzte Prüfung im Jahr 2017 hattest oder noch
+                haben wirst, bist du herzlich zur Absolventenfeier 2017
+                eingeladen, die Anfang 2018 stattfinden wird.
             </small></span>
         ) : '';
         return (
@@ -470,7 +470,7 @@ var DateCheck = React.createClass({
                             onChange={this.handleChange}
                             checked={this.state.checked}
                         />
-                        Meine letzte Prüfung ist beziehungsweise war im Jahr 2015.
+                        Meine letzte Prüfung ist beziehungsweise war im Jahr 2016.
                     </label>
                 </div>
                 {hint}
