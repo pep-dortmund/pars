@@ -41,3 +41,13 @@ Anschließend die App mit
 starten. Der Server ist dann lokal unter `http://localhost:5000`
 erreichbar. Für funktionierenden Email-Versand muss die datei `config.py`
 angepasst/erstellt werden (s.o.).
+
+### Ausliefern
+
+Vor dem deployment sollte unbedingt etwas wie
+
+    webpack --progress --colors --optimize-occurrence-order --optimize-minimize
+
+ausgeführt werden, um die scripte zu verkleinern. Falls `webpack` nicht
+installiert ist, kann auch `./node_modules/webpack/bin/webpack.js` direkt
+gerufen werden.
