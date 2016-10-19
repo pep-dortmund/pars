@@ -5,7 +5,7 @@ from flask import (Flask,
                    request,
                    abort,
                    make_response)
-from database import Participant, Degree, db
+from database import Participant, Degree, Chair, db
 from peewee import (IntegrityError,
                     fn)
 from email.mime.text import MIMEText
@@ -61,6 +61,7 @@ admin = Admin(parsapp, name='PARS', template_mode='bootstrap3',
                                                 template='admin.html'))
 admin.add_view(ParticipantAdminView(Participant))
 admin.add_view(ModelView(Degree))
+admin.add_view(ModelView(Chair))
 admin.add_link(MenuLink(name='Export CSV', endpoint='export'))
 admin.add_link(MenuLink(name='Logout', endpoint='logout'))
 
@@ -187,6 +188,7 @@ def admin_api(function):
                 'email': p.email,
                 'title': p.title,
                 'degree': p.degree.id,
+                'chair': p.chair.id,
                 'id': p.id,
                 'verified': p.verified,
                 'registration_date': p.registration_date,
@@ -291,8 +293,10 @@ def api(function=None):
             degrees = {}
             for d in Degree.select():
                 degrees[str(d.id)] = {'id': d.id, 'name': d.name}
+            chairs = [{'id': c.id, 'name': c.name} for c in Chair.select()]
             configObj = {
                 'degrees': degrees,
+                'chairs': chairs,
                 'allowed_mail': parsapp.config['ALLOWED_MAIL_SERVER'],
                 'maximum_guests': parsapp.config['MAXIMUM_GUESTS'],
                 'registration_is_active': registration_active()
@@ -313,7 +317,8 @@ def api(function=None):
                         'degree': p.degree.id,
                         'email': p.email,
                         'title': p.title,
-                        'token': p.token}
+                        'token': p.token,
+                        'chair': p.chair.id}
                 return jsonify(pObj)
             else:
                 return make_response(
@@ -343,6 +348,7 @@ def api(function=None):
                 p.firstname = data['firstname']
                 p.lastname = data['lastname']
                 p.degree = data['degree']
+                p.chair = data['chair']
                 p.title = data['title']
                 p.guests = data['guests']
                 p.save()

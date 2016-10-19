@@ -113,16 +113,16 @@ var NameInput = React.createClass({
     },
     handleChange: function() {
         this.setState({
-            firstname: this.refs.firstname.getDOMNode().value,
-            lastname: this.refs.lastname.getDOMNode().value
+            firstname: this.refs.firstname.value,
+            lastname: this.refs.lastname.value
         }, function(){
             if(this.state.error){
                 this.validate();
             }
         });
         this.props.onUserInput({
-            firstname: this.refs.firstname.getDOMNode().value,
-            lastname: this.refs.lastname.getDOMNode().value
+            firstname: this.refs.firstname.value,
+            lastname: this.refs.lastname.value
         });
     },
     validate: function() {
@@ -301,6 +301,60 @@ var DegreeSelect = React.createClass({
                 </div>
                 {hint}
             </fieldset>
+        );
+    }
+})
+
+var ChairSelect = React.createClass({
+    getInitialState: function(){
+        return {
+            chair: 0,
+            chairs: [],
+            error: false,
+        };
+    },
+    handleChange: function(e){
+        var val = e.currentTarget.value;
+        this.setState({chair: val}, function(){
+            if(this.state.error){
+                this.validate();
+            }
+        });
+        this.props.onUserInput({chair: val});
+    },
+    validate: function(){
+        var error = !this.state.chair;
+        this.setState({error: error});
+        return !error;
+    },
+    render: function(){
+        var chairs = [];
+        for(var key in this.state.chairs){
+            var chair = this.state.chairs[key];
+            chairs.push(
+                    <option value={chair.id} key={key}>
+                        {chair.name}
+                    </option>
+            )
+        }
+        var classes = classNames({
+            'form-group': true,
+            'has-error': this.state.error
+        });
+        var hint = !this.state.error ? '' : (
+                <span className="help-block"><small>
+                    Triff bitte eine Auswahl.
+                </small></span>
+            );
+        return (
+            <div className={classes} disabled={this.props.readOnly}>
+                <label className="control-label">Lehrstuhl</label>
+                <select name="chair" ref="chair" className="form-control"
+                    onChange={this.handleChange} value={this.state.chair} >
+                    {chairs}
+                </select>
+                {hint}
+            </div>
         );
     }
 })
@@ -550,6 +604,7 @@ var ParticipantForm = React.createClass({
     componentDidMount: function(){
         $.getJSON('/api/config/', function(data){
             this.refs.degrees.setState({degrees: data.degrees});
+            this.refs.chairs.setState({chairs: data.chairs});
             this.refs.title.setState({degrees: data.degrees});
             this.refs.email.setState({mailExtension: data.allowed_mail});
             this.refs.guests.setState({maxGuests: data.maximum_guests});
@@ -585,6 +640,7 @@ var ParticipantForm = React.createClass({
                     disabled: true
                 });
                 this.refs.degrees.setState({ degree: data.degree });
+                this.refs.chairs.setState({ chair: data.chair });
                 this.refs.guests.setState({ guests: data.guests });
                 this.refs.title.setState({
                     title: data.title,
@@ -618,6 +674,7 @@ var ParticipantForm = React.createClass({
         valid = this.refs.name.validate() && valid;
         valid = this.refs.email.validate() && valid;
         valid = this.refs.degrees.validate() && valid;
+        valid = this.refs.chairs.validate() && valid;
         valid = this.refs.title.validate() && valid;
         valid = this.refs.guests.validate() && valid;
         valid = this.refs.date.validate() && valid;
@@ -741,6 +798,12 @@ var ParticipantForm = React.createClass({
                                 ref="degrees"
                                 source="/api/degrees/"
                                 onUserInput={this.handleDegreeInput}
+                                readOnly={!this.state.registrationIsActive}
+                                />
+                            <ChairSelect
+                                ref="chairs"
+                                source="/api/chairs/"
+                                onUserInput={this.handleUserInput}
                                 readOnly={!this.state.registrationIsActive}
                                 />
                             <TitleInput
