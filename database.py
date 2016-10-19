@@ -16,17 +16,27 @@ DBPATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
 db = SqliteDatabase(DBPATH)
 
 
-class Degree(Model):
-    name = CharField()
-
-    def __repr__(self):
-        return self.name
+class BaseModel(Model):
 
     class Meta:
         database = db
 
 
-class Participant(Model):
+class Degree(BaseModel):
+    name = CharField()
+
+    def __repr__(self):
+        return self.name
+
+
+class Chair(BaseModel):
+    name = CharField()
+
+    def __repr__(self):
+        return self.name
+
+
+class Participant(BaseModel):
     def generate_token():
         import hashlib
         import random
@@ -37,6 +47,7 @@ class Participant(Model):
     email = CharField(unique=True)
     guests = IntegerField(default=0)
     degree = ForeignKeyField(Degree)
+    chair = ForeignKeyField(Chair)
     token = CharField(null=True, default=generate_token)
     title = CharField()
     verified = BooleanField(default=False)
@@ -44,8 +55,5 @@ class Participant(Model):
 
     def __repr__(self):
         return self.email
-
-    class Meta:
-        database = db
 
 db.connect()
