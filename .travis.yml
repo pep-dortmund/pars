@@ -1,9 +1,19 @@
 language: node_js
+
 node_js:
     - "node"
+
+addons:
+    ssh_known_hosts: kehei.de
+    apt:
+        packages:
+            - sshpass
 
 install:
     - npm install
 
 script:
     - npm run build
+
+after_success:
+    - sshpass -p THISISNOTMYPASSWORD rsync parsapp.py pars@kehei.de
