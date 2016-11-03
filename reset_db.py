@@ -2,6 +2,9 @@
 
 from peewee import SqliteDatabase
 import os
+import shutil
+from datetime import date
+import sys
 
 
 DBPATH = os.path.join(
@@ -10,7 +13,15 @@ DBPATH = os.path.join(
 )
 
 if os.path.isfile(DBPATH):
-    os.remove(DBPATH)
+    if input('Do you want to create a backup? [y]/N: ') in ['y', '']:
+        shutil.copyfile(DBPATH,
+                        os.path.splitext(DBPATH)[0] + '-backup-'
+                        + str(date.today()) + '.sqlite')
+    if input('File already existing, '
+             'do you want to overwrite it? [y]/N: ') in ['y', '']:
+        os.remove(DBPATH)
+    else:
+        sys.exit(0)
 
 db = SqliteDatabase(DBPATH)
 db.connect()
@@ -22,7 +33,7 @@ for d in ['Bachelor', 'Master', 'Doktor']:
     Degree.create(name=d)
 
 for c in ['E1', 'E2', 'E3', 'E4', 'E5', 'T1', 'T2', 'T3', 'T4',
-          'Beschleunigerphysik', 'Medizinphysik', 'Isas']:
+          'Beschleunigerphysik', 'Medizinphysik', 'Externe']:
     Chair.create(name=c)
 
 db.close()
