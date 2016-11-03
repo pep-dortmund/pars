@@ -7,6 +7,7 @@ var AdminPanel = React.createClass({
         return {
             participants: [],
             degrees: {},
+            chairs: {},
             mailExtension: '',
             stats: {},
             registrationIsActive: false,
@@ -18,11 +19,12 @@ var AdminPanel = React.createClass({
         $.getJSON('/api/config/', function(data){
             this.setState({
                 degrees: data.degrees,
+                chairs: data.chairs,
                 mailExtension: data.allowed_mail
             });
         }.bind(this))
         .fail(function(){
-            console.log("Error while downloading degrees.");
+            console.log("Error while downloading config.");
         });
         $.getJSON('/admin/api/stats/', function(data){
             this.setState({
@@ -30,7 +32,7 @@ var AdminPanel = React.createClass({
             });
         }.bind(this))
         .fail(function(){
-            console.log("Error while downloading degrees.");
+            console.log("Error while downloading stats.");
         });
         $.getJSON('/admin/api/participants/', function(data){
             this.setState({participants: data.participants});
@@ -109,6 +111,23 @@ var AdminPanel = React.createClass({
                             newOrder = 'degree_0';
                             orderLabel = 'Abschluss ↑';
                             return a.degree - b.degree;
+                        }
+                    }
+                });
+                break;
+            }
+            case 'Lehrstuhl': {
+                parts = parts.sort(function(a, b){
+                    switch(order){
+                        case 'chair_0': {
+                            newOrder = 'chair_1';
+                            orderLabel = 'Lehrstuhl ↓';
+                            return b.chair - a.chair;
+                        }
+                        default: { // chair_1
+                            newOrder = 'chair_0';
+                            orderLabel = 'Lehrstuhl ↑';
+                            return a.chair - b.chair;
                         }
                     }
                 });
@@ -198,6 +217,7 @@ var AdminPanel = React.createClass({
                     <th><a href="#" onClick={this.orderBy}>ID</a></th>
                     <th><a href="#" onClick={this.orderBy}>Name</a></th>
                     <th><a href="#" onClick={this.orderBy}>Abschluss</a></th>
+                    <th><a href="#" onClick={this.orderBy}>Lehrstuhl</a></th>
                     <th>Email <small>{this.state.mailExtension}</small></th>
                     <th><a href="#" onClick={this.orderBy}>Gäste</a></th>
                     <th><a href="#" onClick={this.orderBy}>Verifiziert</a></th>
@@ -217,12 +237,15 @@ var AdminPanel = React.createClass({
                   <small>{guestsPerDegree}</small>
                   </td>
             </tr>
-        )
-        for(var key in this.state.participants){
-            var p = this.state.participants[key];
+        );
+        var body = this.state.participants.map(function(p, key){
+            console.log(p.degree in this.state.degrees);
             var degree = p.degree in this.state.degrees ?
-                this.state.degrees[p.degree].name :
-                '...';
+                this.state.degrees[p.degree].name : 'ERR';
+            console.log(degree);
+            var chair = p.chair in this.state.chairs ?
+                this.state.chairs[p.chair].name : 'ERR';
+            console.log(chair);
             var spanClasses = classNames({
                 'glyphicon': true,
                 'glyphicon-minus-sign': !p.verified,
@@ -238,11 +261,12 @@ var AdminPanel = React.createClass({
             var date = ("0" + d.getDate()).slice(-2);
             var h = ("0" + d.getHours()).slice(-2);
             var m = ("0" + d.getMinutes()).slice(-2);
-            body.push(
+            return (
                 <tr key={key}>
                     <td>#{p.id}</td>
                     <td>{p.firstname} {p.lastname}</td>
                     <td>{degree}</td>
+                    <td>{chair}</td>
                     <td>
                         <a href={'mailto:' + p.email + this.state.mailExtension}>
                         {p.email}</a>
@@ -252,7 +276,7 @@ var AdminPanel = React.createClass({
                     <td>{d.getFullYear()}-{month}-{date} {h}:{m}</td>
                 </tr>
             );
-        }
+        }.bind(this));
         var registrationButtonLabel = this.state.registrationIsActive
             ? 'deaktivieren' : 'aktivieren';
         var buttonType = this.state.registrationIsActive ? 'warning' : 'success';
@@ -274,7 +298,7 @@ var AdminPanel = React.createClass({
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
+                    <div className="col-xs-12">
                         <table className="table table-sm table-hover table-striped">
                             {head}
                             <tbody>

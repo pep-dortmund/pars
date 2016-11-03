@@ -290,10 +290,10 @@ def api(function=None):
         return response
     else:
         if function == 'config':
-            degrees = {}
-            for d in Degree.select():
-                degrees[str(d.id)] = {'id': d.id, 'name': d.name}
-            chairs = [{'id': c.id, 'name': c.name} for c in Chair.select()]
+            degrees = {str(d.id): {'id': d.id, 'name': d.name}
+                       for d in Degree.select()}
+            chairs = {str(c.id): {'id': c.id, 'name': c.name}
+                      for c in Chair.select()}
             configObj = {
                 'degrees': degrees,
                 'chairs': chairs,
