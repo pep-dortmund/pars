@@ -9,3 +9,4 @@ node_modules/
 
 reg_inactive
 static/compiled/
+build/

@@ -17,6 +17,7 @@ install:
 
 script:
   - npm run build
+  - mkdir build && cp -r static templates parsapp.py database.py build
 
 after_success:
-  - 'rsync -rqe "ssh -o StrictHostKeyChecking=no" parsapp.py database.py static/ templates/ $DEPLOY_USER@$DEPLOY_HOST:'
+  - 'rsync -rqe "ssh -o StrictHostKeyChecking=no" build/ $DEPLOY_USER@$DEPLOY_HOST:'
