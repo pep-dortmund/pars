@@ -20,4 +20,4 @@ script:
   - mkdir build && cp -r static templates parsapp.py database.py build
 
 after_success:
-  - 'rsync -rqe "ssh -o StrictHostKeyChecking=no" build/ $DEPLOY_USER@$DEPLOY_HOST:'
+  - '[ "${TRAVIS_BRANCH}" = "master" ] && rsync -rqe "ssh -o StrictHostKeyChecking=no" build/ $DEPLOY_USER@$DEPLOY_HOST:'
