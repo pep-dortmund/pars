@@ -1,16 +1,22 @@
 language: node_js
 
 node_js:
-    - "node"
+  - node
 
 addons:
-    ssh_known_hosts: kehei.de
+  ssh_known_hosts: $DEPLOY_HOST
+
+before_install:
+  - openssl aes-256-cbc -K $encrypted_1017bbc80658_key -iv $encrypted_1017bbc80658_iv -in deploy_key.enc -out deploy_key -d
+  - eval "$(ssh-agent -s)" #start the ssh agent
+  - chmod 600 deploy_key # this key should have push access
+  - ssh-add deploy_key
 
 install:
-    - npm install
+  - npm install
 
 script:
-    - npm run build
+  - npm run build
 
 after_success:
-    - rsync parsapp.py pars@kehei.de
+  - "rsync parsapp.py $DEPLOY_USER@$DEPLOY_HOST:"
