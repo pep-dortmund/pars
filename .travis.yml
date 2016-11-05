@@ -19,6 +19,4 @@ script:
   - npm run build
 
 after_success:
-  provider: script
-  skip_cleanup: true
-  script: "rsync -r --quiet parsapp.py $DEPLOY_USER@$DEPLOY_HOST:"
+  - "rsync -r --quiet parsapp.py $DEPLOY_USER@$DEPLOY_HOST:"
