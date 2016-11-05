@@ -1,4 +1,5 @@
 ## PEP/Physik Absolventenfeier Registrierungs System (PARS)
+[![Build Status](https://travis-ci.org/pep-dortmund/pars.svg?branch=master)](https://travis-ci.org/pep-dortmund/pars)
 
 ### Lokale Konfiguration
 
