@@ -192,6 +192,7 @@ def admin_api(function):
                 'id': p.id,
                 'verified': p.verified,
                 'registration_date': p.registration_date,
+                'allow_email_contact': p.allow_email_contact,
             })
         return make_response(
             jsonify({
@@ -259,6 +260,7 @@ def api(function=None):
             )
         try:
             participant = Participant(**request.get_json(force=True))
+            print(request.get_json(force=True))
             if not request.get_json(force=True).get('validDate'):
                 return make_response(
                     jsonify(errormessage='Error'),
@@ -318,7 +320,8 @@ def api(function=None):
                         'email': p.email,
                         'title': p.title,
                         'token': p.token,
-                        'chair': p.chair.id}
+                        'chair': p.chair.id,
+                        'allow_email_contact': p.allow_email_contact,}
                 return jsonify(pObj)
             else:
                 return make_response(
@@ -351,6 +354,7 @@ def api(function=None):
                 p.chair = data['chair']
                 p.title = data['title']
                 p.guests = data['guests']
+                p.allow_email_contact = data['allow_email_contact']
                 p.save()
                 return make_response(jsonify(message='Success'), 200)
             else:

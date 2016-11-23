@@ -45,6 +45,7 @@ class Participant(BaseModel):
     firstname = CharField()
     lastname = CharField()
     email = CharField(unique=True)
+    allow_email_contact = BooleanField(default=False)
     guests = IntegerField(default=0)
     degree = ForeignKeyField(Degree)
     chair = ForeignKeyField(Chair)
