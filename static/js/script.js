@@ -335,7 +335,7 @@ var ChairSelect = React.createClass({
     return !error;
   },
   render: function(){
-    var chairs = [];
+    var chairs = [<option key='NONE'>---</option>];
     for(var key in this.state.chairs){
       var chair = this.state.chairs[key];
       chairs.push(
