@@ -566,7 +566,7 @@ var EmailCheck = React.createClass({
     });
     var hint =  (
       <span className="help-block"><small>
-        Zu diesem Zweck wird deine Email-Adresse von einigen PeP-Mitgliedern
+        Zu diesem Zweck wird deine Email-Adresse von einigen Mitgliedern des PeP-Vorstandes
         einsehbar sein. Die Adresse wird an keine Dritten weitergegeben.
       </small></span>
     );
@@ -580,7 +580,7 @@ var EmailCheck = React.createClass({
           checked={this.state.checked}
         />
           Ich bin über die Absolventenfeier hinaus damit einverstanden, per
-          Email von PeP et al. e.V.  kontaktiert zu werden.<br />
+          Email von PeP et al. e.V.  auf dem Laufenden gehalten zu werden.<br />
           {hint}
         </label>
       </div>
