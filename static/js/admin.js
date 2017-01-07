@@ -283,10 +283,10 @@ var AdminPanel = React.createClass({
         return(
             <div>
                 <div className="row">
-                    <div className="col-xs-6 col-lg-6 col-lg-offset-1 col-xl-5 col-xl-offset-2">
+                    <div className="col-xs-6">
                         <h4>Adminpanel <small>{this.state.orderLabel}</small></h4>
                     </div>
-                    <div className="col-xs-6 col-lg-4 col-xl-3 text-right">
+                    <div className="col-xs-6 text-right">
                         <span id="disable-registration">
                             Anmeldung {this.state.registrationIsActive ? 'online' : 'offline'}&nbsp;
                             <button
