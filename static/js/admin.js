@@ -228,7 +228,7 @@ var AdminPanel = React.createClass({
         var body = [];
         body.push(
             <tr key={-1}>
-                <td colSpan="4">
+                <td colSpan="5">
                   Total: {this.state.stats.participant_count}&nbsp;
                   <small>{degreeStats}</small>
                   </td>
@@ -238,7 +238,7 @@ var AdminPanel = React.createClass({
                   </td>
             </tr>
         );
-        var body = this.state.participants.map(function(p, key){
+        body.push(this.state.participants.map(function(p, key){
             console.log(p.degree in this.state.degrees);
             var degree = p.degree in this.state.degrees ?
                 this.state.degrees[p.degree].name : 'ERR';
@@ -276,7 +276,7 @@ var AdminPanel = React.createClass({
                     <td>{d.getFullYear()}-{month}-{date} {h}:{m}</td>
                 </tr>
             );
-        }.bind(this));
+        }.bind(this)));
         var registrationButtonLabel = this.state.registrationIsActive
             ? 'deaktivieren' : 'aktivieren';
         var buttonType = this.state.registrationIsActive ? 'warning' : 'success';
