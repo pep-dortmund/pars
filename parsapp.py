@@ -179,27 +179,17 @@ def logout():
 @requires_auth
 def admin_api(function):
     if function == 'participants':
-        parts = []
-        for p in Participant.select():
-            parts.append({
-                'firstname': p.firstname,
-                'lastname': p.lastname,
-                'guests': p.guests,
-                'email': p.email,
-                'title': p.title,
-                'degree': p.degree.id,
-                'chair': p.chair.id,
-                'id': p.id,
-                'verified': p.verified,
-                'registration_date': p.registration_date,
-                'allow_email_contact': p.allow_email_contact,
-            })
+        parts = list(Participant.select().dicts())
         return make_response(
-            jsonify({
-                'participants': parts
-            }),
-            200
-        )
+            jsonify({'participants': parts}), 200)
+
+    if function == 'degrees':
+        degrees = list(Degree.select().dicts())
+        return make_response(jsonify({'degrees': degrees}, 200))
+
+    if function == 'chairs':
+        chairs = list(Chair.select().dicts())
+        return make_response(jsonify({'chairs': chairs}, 200))
 
     if function == 'toggle_registration':
         if registration_active():
