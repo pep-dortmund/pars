@@ -180,8 +180,7 @@ def logout():
 def admin_api(function):
     if function == 'participants':
         parts = list(Participant.select().dicts())
-        return make_response(
-            jsonify({'participants': parts}), 200)
+        return make_response(jsonify({'participants': parts}), 200)
 
     if function == 'degrees':
         degrees = list(Degree.select().dicts())
