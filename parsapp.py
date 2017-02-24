@@ -225,7 +225,7 @@ def admin_api(function):
             jsonify(stats)
         )
 
-    return ''
+    abort(404)
 
 
 @parsapp.route('/admin/export.csv', methods=['GET'])
@@ -352,7 +352,7 @@ def api(function=None):
                     401
                 )
 
-        return ''
+        abort(404)
 
 
 if __name__ == '__main__':
