@@ -184,11 +184,11 @@ def admin_api(function):
 
     if function == 'degrees':
         degrees = list(Degree.select().dicts())
-        return make_response(jsonify({'degrees': degrees}, 200))
+        return make_response(jsonify({'degrees': degrees}), 200)
 
     if function == 'chairs':
         chairs = list(Chair.select().dicts())
-        return make_response(jsonify({'chairs': chairs}, 200))
+        return make_response(jsonify({'chairs': chairs}), 200)
 
     if function == 'toggle_registration':
         if registration_active():
