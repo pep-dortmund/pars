@@ -4,7 +4,7 @@ Vielen Dank für Deine Anmeldung für die kommende Absolventenfeier!
 Wir freuen uns auf Dich!
 {% if not participant.verified %}
 Bestätige zunächst Deine Email-Adresse, indem du folgenden Link öffnest:
-{{ prefix }}{{ url_for( 'verify', _external=True, participant_id=participant.id,
+{{ prefix }}{{ url_for( 'verify', participant_id=participant.id,
              token=participant.token) | replace('%21', '!') }}{% endif %}
 Bitte behalte diese Email als Reminder in deinem Postfach.
 
@@ -22,7 +22,7 @@ Titel Deiner Abschlussarbeit: {{ participant.title }}
 
 Falls Du deine Angaben verändern möchtest, benutze bitte den folgenden Link.
 Gib diesen Link am besten an keine Dritten weiter.
-{{ prefix }}{{ url_for( 'index', _external=True, participant_id=participant.id,
+{{ prefix }}{{ url_for( 'index', participant_id=participant.id,
              token=participant.token) | replace('%21', '!') }}
 Bei Fragen kannst Du uns einfach eine Mail an absolventenfeier@pep-dortmund.org senden.
 
