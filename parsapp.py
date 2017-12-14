@@ -42,15 +42,6 @@ class AuthenticatedIndexView(AdminIndexView):
     def logout(self):
         return authenticate()
 
-    @requires_auth
-    def export():
-        participants = Participant.select()
-        csv = render_template('export.csv', participants=participants)
-        response = make_response(csv)
-        response.headers['Content-Disposition'] = \
-            'attachment; filename=export.csv'
-        return response
-
 
 class ParticipantAdminView(ModelView):
     column_exclude_list = ['token']
@@ -232,7 +223,8 @@ def admin_api(function):
 @requires_auth
 def export():
     participants = Participant.select()
-    csv = render_template('export.csv', participants=participants)
+    csv = render_template('export.csv', participants=participants,
+            mail_suffix=parsapp.config['ALLOWED_MAIL_SERVER'])
     response = make_response(csv)
     response.headers['Content-Disposition'] = 'attachment; filename=export.csv'
     response.mimetype = 'text/csv'
