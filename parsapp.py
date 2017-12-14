@@ -235,6 +235,7 @@ def export():
     csv = render_template('export.csv', participants=participants)
     response = make_response(csv)
     response.headers['Content-Disposition'] = 'attachment; filename=export.csv'
+    response.mimetype = 'text/csv'
     return response
 
 
