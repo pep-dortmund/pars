@@ -246,7 +246,6 @@ def api(function=None):
             )
         try:
             participant = Participant(**request.get_json(force=True))
-            print(request.get_json(force=True))
             if not request.get_json(force=True).get('validDate'):
                 return make_response(
                     jsonify(errormessage='Error'),
