@@ -19,7 +19,7 @@ install:
 
 script:
   - npm run build
-  - mkdir build && cp -r static templates parsapp.py database.py build
+  - mkdir build && cp -r static templates parsapp.py database.py reset_db.py build
 
 after_success:
   - '[ "${TRAVIS_BRANCH}" = "master" ] && rsync -rq build/ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH'
