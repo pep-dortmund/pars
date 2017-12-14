@@ -56,5 +56,3 @@ class Participant(BaseModel):
 
     def __repr__(self):
         return self.email
-
-db.connect()
