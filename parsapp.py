@@ -14,6 +14,7 @@ from functools import wraps
 import config
 
 import os
+from datetime import date
 
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.base import MenuLink
@@ -138,7 +139,7 @@ def index(participant_id=None, token=None):
     if token and not participant_or_404(participant_id, token):
         return abort(404)
     else:
-        return render_template('index.html')
+        return render_template('index.html', date=date)
 
 
 @parsapp.route('/<int:participant_id>!<token>/verify/', methods=['GET'])

@@ -22,14 +22,16 @@
           Vorbereitung der Absolventenfeier verwendet.
           </p>
           <p class="lead">
-          Für Anmeldungen nach dem XX.XX.18 können wir nicht garantieren, dass
+          Für Anmeldungen nach dem 03.02.18 können wir nicht garantieren, dass
           das Abschlusszeugnis rechtzeitig zur Feier fertiggestellt ist. Das
           Zeugnis kann dann nachträglich im Dekanat abgeholt werden.
           </p>
-          <!-- <p class="text-warning">
+          {% if date.today() > date(2018, 1, 20) %}
+          <p class="text-warning">
           Die Anmeldung ist lediglich bis zum 24.02.17 möglich.
           </p>
-          <p class="lead text-danger">
+          {% endif %}
+          <!-- <p class="lead text-danger">
           Der offizielle Anmeldeschluss war der 15.01.16. Für Anmeldungen nach
           diesem Datum können wir nicht garantieren, dass das Abschlusszeugnis
           rechtzeitig zur Absolventenfeier fertiggestellt ist.
