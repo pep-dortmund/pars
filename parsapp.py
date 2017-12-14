@@ -153,7 +153,7 @@ def verify(participant_id, token):
         )
         participant.verified = True
         participant.save()
-        return render_template('index.html')
+        return render_template('index.html', date=date)
 
 
 @parsapp.route('/admin/', methods=['GET', 'POST'])
