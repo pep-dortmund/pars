@@ -22,4 +22,4 @@ script:
   - mkdir build && cp -r static templates parsapp.py database.py build
 
 after_success:
-  - '[ "${TRAVIS_BRANCH}" = "development" ] && rsync -rq build/ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH'
+  - '[ "${TRAVIS_BRANCH}" = "master" ] && rsync -rq build/ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH'
