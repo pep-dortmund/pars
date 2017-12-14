@@ -93,9 +93,12 @@ def _db_close(exc):
 
 
 def sendmail(participant, template='email.html'):
+    # the manual prefix is needed behind a (uberspace) proxy, otherwise
+    # `url_for` cannot resolve the proper hostname
     message = render_template(template,
                               participant=participant,
-                              date=parsapp.config['DATE'])
+                              date=parsapp.config['DATE'],
+                              prefix=parsapp.config['MAIL_URL_PREFIX'])
     msg = MIMEText(message)
     msg['From'] = parsapp.config['MAIL_ADDRESS']
     msg['To'] = (parsapp.config['TEST_MAIL_ADDRESS']
