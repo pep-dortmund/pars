@@ -635,7 +635,7 @@ var GuestInput = React.createClass({
           key={i}
           type="button"
           className={classes}
-          style={{padding: "6px 8px"}}
+          style={{padding: "6px 8px", width: "10%"}}
           value={i + 1}
           onClick={this.handleChange}>
           {i + 1}
@@ -651,7 +651,7 @@ var GuestInput = React.createClass({
           Anzahl der Gäste (inklusive dir){number}
         </label>
         <div className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-          <div className="btn-group" role="group" aria-label="First group">
+          <div className="btn-group" role="group" aria-label="First group" style={{width: "100%"}}>
             {buttons}
           </div>
         </div>

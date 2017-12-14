@@ -10,7 +10,7 @@ class Config(object):
     TESTING = False
     ADMIN_USERNAME = None
     ADMIN_PASSWORD = None
-    DATE = '06.02.2016'
+    DATE = 'XX.XX.2018'
     MAIL_DEBUG = False
 
 
