@@ -7,7 +7,8 @@ from flask import (Flask,
                    make_response)
 from database import Participant, Degree, Chair, db
 from peewee import (IntegrityError,
-                    fn)
+                    fn,
+                    JOIN,)
 from email.mime.text import MIMEText
 import smtplib
 from functools import wraps
@@ -201,12 +202,14 @@ def admin_api(function):
     if function == 'stats':
         degrees = Degree.select()
         degree_counts = {
-            d.name: d.count for d in Degree.select().annotate(Participant)
+            d.name: d.count for d in Degree.select(
+                Degree, fn.Count(Participant.id).alias('count')
+            ).join(Participant).group_by(Degree)
         }
         degree_guests = {
-            d.name: d.guests for d in Degree.select()
-                .annotate(Participant, fn.Sum(Participant.guests)
-                .alias('guests'))
+            d.name: d.guests for d in Degree.select(
+                Degree, fn.Count(Participant.guests).alias('guests')
+            ).join(Participant).group_by(Degree)
         }
         stats = {
             'degree_counts': degree_counts,
