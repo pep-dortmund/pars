@@ -58,7 +58,7 @@ admin.add_view(ModelView(Chair))
 admin.add_link(MenuLink(name='Export CSV', endpoint='export'))
 admin.add_link(MenuLink(name='Logout', endpoint='logout'))
 
-parsapp.config.from_object('config.DevelopmentConfig')
+parsapp.config.from_object('config.' + os.environ.get('PARS_CONFIG', 'DevelopmentConfig'))
 
 
 def check_auth(username, password):

@@ -15,5 +15,5 @@ RUN chmod +x boot.sh
 
 ENV FLASK_APP parsapp.py
 
-EXPOSE 5000
+EXPOSE 80
 ENTRYPOINT ["./boot.sh"]
