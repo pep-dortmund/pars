@@ -363,7 +363,7 @@ var ChairSelect = React.createClass({
       ) : '';
     return (
       <div className={classes} disabled={this.props.readOnly}>
-        <label className="control-label">Lehrstuhl</label>
+        <label className="control-label">Lehrstuhl/Studiengang</label>
         <select name="chair" ref="chair" className="form-control"
           onChange={this.handleChange} value={this.state.chair} >
           {chairs}
