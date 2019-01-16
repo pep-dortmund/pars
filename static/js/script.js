@@ -353,6 +353,14 @@ var ChairSelect = React.createClass({
           Triff bitte eine Auswahl.
         </small></span>
       );
+    var hint_lehramt = this.state.chair && this.state.chairs[this.state.chair].name === 'Lehramt' ? (
+        <span className="help-block"><small>
+          Als Lehramtsstudierender können wir dir aus organisatorischen Gründen
+          dein Zeugnis nicht während der Absolventenfeier überreichen. Du wirst
+          dennoch eine leere Zeugnismappe mit dem Hinweis "Bitte lächeln und
+          winken" erhalten.
+        </small></span>
+      ) : '';
     return (
       <div className={classes} disabled={this.props.readOnly}>
         <label className="control-label">Lehrstuhl</label>
@@ -360,6 +368,7 @@ var ChairSelect = React.createClass({
           onChange={this.handleChange} value={this.state.chair} >
           {chairs}
         </select>
+        {hint_lehramt}
         {hint}
       </div>
     );
@@ -517,9 +526,9 @@ var DateCheck = React.createClass({
     });
     var hint = this.state.error ? (
       <span className="help-block"><small>
-        Falls du deine letzte Prüfung im Jahr 2018 hattest oder noch
-        haben wirst, bist du herzlich zur Absolventenfeier 2018
-        eingeladen, die Anfang 2019 stattfinden wird.
+        Falls du deine letzte Prüfung im Jahr 2019 hattest oder noch
+        haben wirst, bist du herzlich zur Absolventenfeier 2019
+        eingeladen, die Anfang 2020 stattfinden wird.
       </small></span>
     ) : '';
     return (
@@ -531,7 +540,7 @@ var DateCheck = React.createClass({
               onChange={this.handleChange}
               checked={this.state.checked}
             />
-            Meine letzte Prüfung ist beziehungsweise war im Jahr 2017.<br />
+            Meine letzte Prüfung war im Jahr 2018.<br />
             {hint}
           </label>
         </div>

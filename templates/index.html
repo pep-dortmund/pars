@@ -14,24 +14,27 @@
     <div class="container">
       <div id="top-row" class="row">
         <div class="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
-          <h2>Anmeldung zur Absolventenfeier 2017</h2>
+          <h2>Anmeldung zur Absolventenfeier 2018</h2>
           <p class="lead">
           Zur Teilnahme an der Absolventenfeier und für einen reibungslosen
           Ablauf dieser benötigen wir die hier erfragten Daten. Die Daten
           werden vertraulich behandelt und ausschließlich zur Planung und
           Vorbereitung der Absolventenfeier verwendet.
           </p>
+          {#
           <p class="lead">
-          Für Anmeldungen nach dem 03.02.18 können wir nicht garantieren, dass
+          Für Anmeldungen nach dem 02.02.18 können wir nicht garantieren, dass
           das Abschlusszeugnis rechtzeitig zur Feier fertiggestellt ist. Das
           Zeugnis kann dann nachträglich im Dekanat abgeholt werden.
           </p>
-          {% if date.today() > date(2018, 1, 20) %}
+          #}
+          {% if date.today() > date(2019, 2, 1) %}
           <p class="text-warning">
-          Die Anmeldung ist lediglich bis zum 24.02.17 möglich.
+          Die Anmeldung ist lediglich bis zum 22.02.18 möglich.
           </p>
           {% endif %}
-          <!-- <p class="lead text-danger">
+          {#
+          <p class="lead text-danger">
           Der offizielle Anmeldeschluss war der 15.01.16. Für Anmeldungen nach
           diesem Datum können wir nicht garantieren, dass das Abschlusszeugnis
           rechtzeitig zur Absolventenfeier fertiggestellt ist.
@@ -41,10 +44,11 @@
           Seite dennoch möglich. Das Zeugnis kann nachträglich im Dekanat
           abgeholt werden.
           </p>
+          #}
           <p class="lead text-danger">
           Die Anmeldung ist momentan im Testbetrieb. Alle eingetragenen Daten
           werden in Kürze gelöscht!
-          </p> -->
+          </p>
         </div>
       </div>
       <div class="row">
