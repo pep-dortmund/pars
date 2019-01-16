@@ -33,7 +33,7 @@ for d in ['Bachelor', 'Master', 'Doktor']:
     Degree.create(name=d)
 
 for c in ['E1', 'E2', 'E3', 'E4', 'E5', 'T1', 'T2', 'T3', 'T4',
-          'Beschleunigerphysik', 'Medizinphysik', 'Externe']:
+          'Beschleunigerphysik', 'Medizinphysik', 'Lehramt', 'Externe']:
     Chair.create(name=c)
 
 db.close()
