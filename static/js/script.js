@@ -15,7 +15,7 @@ var AlertMessage = React.createClass({
       ),
       2: (
         <div className="alert alert-success">
-          Die Email wurde noch einmal versandt und sollte in ein
+          Die E-Mail wurde noch einmal versandt und sollte in ein
           paar Minuten in deinem Postfach sein.
         </div>
       ),
@@ -40,20 +40,20 @@ var AlertMessage = React.createClass({
       ),
       10: (
         <div className="alert alert-warning">
-          Diese Email wurde bereits eingetragen.
+          Diese E-Mail wurde bereits eingetragen.
           Du solltest eine Bestätigungsmail in deinem
           Postfach finden, in der ein Link zur Änderung
           deiner Daten aufgeführt ist.  <a
             href="#"
             className="alert-link"
             onClick={this.props.callback}>
-            Email erneut versenden.
+            E-Mail erneut versenden.
           </a>
         </div>
       ),
       20: (
         <div className="alert alert-danger">
-          Der Versand der Email ist fehlgeschlagen.
+          Der Versand der E-Mail ist fehlgeschlagen.
         </div>
       ),
       30: (
@@ -207,7 +207,7 @@ var EmailInput = React.createClass({
       if(!this.state.email){
         hint = (
           <span className="help-block"><small>
-            Bitte trage deine Emailadresse ein.
+            Bitte trage deine E-Mail-Adresse ein.
           </small></span>);
       } else {
         hint = (
@@ -575,7 +575,7 @@ var EmailCheck = React.createClass({
     });
     var hint =  (
       <span className="help-block"><small>
-        Zu diesem Zweck wird deine Email-Adresse von einigen Mitgliedern des PeP-Vorstandes
+        Zu diesem Zweck wird deine E-Mail-Adresse von einigen Mitgliedern des PeP-Vorstandes
         einsehbar sein. Die Adresse wird an keine Dritten weitergegeben.
       </small></span>
     );
@@ -589,7 +589,7 @@ var EmailCheck = React.createClass({
           checked={this.state.checked}
         />
           Ich bin über die Absolventenfeier hinaus damit einverstanden, per
-          Email von PeP et al. e.V.  auf dem Laufenden gehalten zu werden.<br />
+          E-Mail von PeP et al. e.V.  auf dem Laufenden gehalten zu werden.<br />
           {hint}
         </label>
       </div>
