@@ -14,8 +14,10 @@ ALLOWED_MAIL_SERVER = DevelopmentConfig.ALLOWED_MAIL_SERVER
 DBPATH = os.environ.get(
     'PARS_DBPATH',
     os.path.join(
-        os.path.dirname(os.path.realpath(__file__)), 'database.sqlite')
+        os.path.dirname(os.path.realpath(__file__)),
+        'database.sqlite'
     )
+)
 db = SqliteDatabase(DBPATH)
 
 
@@ -39,6 +41,13 @@ class Chair(BaseModel):
         return self.name
 
 
+class Course(BaseModel):
+    name = CharField()
+
+    def __repr__(self):
+        return self.name
+
+
 class Participant(BaseModel):
     def generate_token():
         import hashlib
@@ -52,6 +61,7 @@ class Participant(BaseModel):
     guests = IntegerField(default=0)
     degree = ForeignKeyField(Degree)
     chair = ForeignKeyField(Chair)
+    course = ForeignKeyField(Course)
     token = CharField(null=True, default=generate_token)
     title = CharField()
     verified = BooleanField(default=False)
