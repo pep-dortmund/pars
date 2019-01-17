@@ -311,6 +311,68 @@ var DegreeSelect = React.createClass({
     );
   }
 })
+var CourseSelect = React.createClass({
+  getInitialState: function(){
+    return {
+      course: 0,
+      courses: [],
+      error: false,
+    };
+  },
+  handleChange: function(e){
+    var val = e.currentTarget.value;
+    this.setState({course: val}, function(){
+      if(this.state.error){
+        this.validate();
+      }
+    });
+    this.props.onUserInput({course: val});
+  },
+  validate: function(){
+    var error = !this.state.course;
+    this.setState({error: error});
+    return !error;
+  },
+  render: function(){
+    var courses = [<option key='NONE'>---</option>];
+    for(var key in this.state.courses){
+      var course = this.state.courses[key];
+      courses.push(
+          <option value={course.id} key={key}>
+            {course.name}
+          </option>
+      )
+    }
+    var classes = classNames({
+      'form-group': true,
+      'has-error': this.state.error
+    });
+    var hint = !this.state.error ? '' : (
+        <span className="help-block"><small>
+          Triff bitte eine Auswahl.
+        </small></span>
+      );
+    var hint_lehramt = this.state.course && this.state.courses[this.state.course].name === 'Lehramt' ? (
+        <span className="help-block"><small>
+          Als Lehramtsstudierender können wir dir aus organisatorischen Gründen
+          dein Zeugnis nicht während der Absolventenfeier überreichen. Du wirst
+          dennoch eine leere Zeugnismappe mit dem Hinweis "Bitte lächeln und
+          winken" erhalten.
+        </small></span>
+      ) : '';
+    return (
+      <div className={classes} disabled={this.props.readOnly}>
+        <label className="control-label">Studiengang</label>
+        <select name="course" ref="course" className="form-control"
+          onChange={this.handleChange} value={this.state.course} >
+          {courses}
+        </select>
+        {hint_lehramt}
+        {hint}
+      </div>
+    );
+  }
+})
 
 var ChairSelect = React.createClass({
   getInitialState: function(){
@@ -353,22 +415,13 @@ var ChairSelect = React.createClass({
           Triff bitte eine Auswahl.
         </small></span>
       );
-    var hint_lehramt = this.state.chair && this.state.chairs[this.state.chair].name === 'Lehramt' ? (
-        <span className="help-block"><small>
-          Als Lehramtsstudierender können wir dir aus organisatorischen Gründen
-          dein Zeugnis nicht während der Absolventenfeier überreichen. Du wirst
-          dennoch eine leere Zeugnismappe mit dem Hinweis "Bitte lächeln und
-          winken" erhalten.
-        </small></span>
-      ) : '';
     return (
       <div className={classes} disabled={this.props.readOnly}>
-        <label className="control-label">Lehrstuhl/Studiengang</label>
+        <label className="control-label">Lehrstuhl</label>
         <select name="chair" ref="chair" className="form-control"
           onChange={this.handleChange} value={this.state.chair} >
           {chairs}
         </select>
-        {hint_lehramt}
         {hint}
       </div>
     );
@@ -683,6 +736,7 @@ var ParticipantForm = React.createClass({
     $.getJSON('/api/config/', function(data){
       this.refs.degrees.setState({degrees: data.degrees});
       this.refs.chairs.setState({chairs: data.chairs});
+      this.refs.courses.setState({courses: data.courses});
       this.refs.title.setState({degrees: data.degrees});
       this.refs.email.setState({mailExtension: data.allowed_mail});
       this.refs.guests.setState({maxGuests: data.maximum_guests});
@@ -718,6 +772,7 @@ var ParticipantForm = React.createClass({
         });
         this.refs.degrees.setState({ degree: data.degree });
         this.refs.chairs.setState({ chair: data.chair });
+        this.refs.courses.setState({ course: data.course });
         this.refs.guests.setState({ guests: data.guests });
         this.refs.title.setState({
           title: data.title,
@@ -753,6 +808,7 @@ var ParticipantForm = React.createClass({
     valid = this.refs.email.validate() && valid;
     valid = this.refs.degrees.validate() && valid;
     valid = this.refs.chairs.validate() && valid;
+    valid = this.refs.courses.validate() && valid;
     valid = this.refs.title.validate() && valid;
     valid = this.refs.guests.validate() && valid;
     valid = this.refs.date.validate() && valid;
@@ -876,6 +932,11 @@ var ParticipantForm = React.createClass({
               <DegreeSelect
                 ref="degrees"
                 onUserInput={this.handleDegreeInput}
+                readOnly={!this.state.registrationIsActive}
+                />
+              <CourseSelect
+                ref="courses"
+                onUserInput={this.handleUserInput}
                 readOnly={!this.state.registrationIsActive}
                 />
               <ChairSelect

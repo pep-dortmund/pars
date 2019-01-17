@@ -5,10 +5,11 @@ from flask import (Flask,
                    request,
                    abort,
                    make_response)
-from database import Participant, Degree, Chair, db
-from peewee import (IntegrityError,
-                    fn,
-                    JOIN,)
+from database import Participant, Degree, Chair, Course, db
+from peewee import (
+    IntegrityError,
+    fn,
+)
 from email.mime.text import MIMEText
 import smtplib
 from functools import wraps
@@ -55,6 +56,7 @@ admin = Admin(parsapp, name='PARS', template_mode='bootstrap3',
 admin.add_view(ParticipantAdminView(Participant))
 admin.add_view(ModelView(Degree))
 admin.add_view(ModelView(Chair))
+admin.add_view(ModelView(Course))
 admin.add_link(MenuLink(name='Export CSV', endpoint='export'))
 admin.add_link(MenuLink(name='Logout', endpoint='logout'))
 
@@ -178,15 +180,19 @@ def admin_api(function):
         parts = list(Participant.select().dicts())
         return make_response(jsonify({'participants': parts}), 200)
 
-    if function == 'degrees':
+    elif function == 'degrees':
         degrees = list(Degree.select().dicts())
         return make_response(jsonify({'degrees': degrees}), 200)
 
-    if function == 'chairs':
+    elif function == 'chairs':
         chairs = list(Chair.select().dicts())
         return make_response(jsonify({'chairs': chairs}), 200)
 
-    if function == 'toggle_registration':
+    elif function == 'courses':
+        courses = list(Course.select().dicts())
+        return make_response(jsonify({'courses': courses}), 200)
+
+    elif function == 'toggle_registration':
         if registration_active():
             open('./reg_inactive', 'a').close()
         else:
@@ -199,7 +205,7 @@ def admin_api(function):
             200
         )
 
-    if function == 'stats':
+    elif function == 'stats':
         degrees = Degree.select()
         degree_counts = {
             d.name: d.count for d in Degree.select(
@@ -230,8 +236,11 @@ def admin_api(function):
 @requires_auth
 def export():
     participants = Participant.select()
-    csv = render_template('export.csv', participants=participants,
-            mail_suffix=parsapp.config['ALLOWED_MAIL_SERVER'])
+    csv = render_template(
+        'export.csv',
+        participants=participants,
+        mail_suffix=parsapp.config['ALLOWED_MAIL_SERVER']
+    )
     response = make_response(csv)
     response.headers['Content-Disposition'] = 'attachment; filename=export.csv'
     response.mimetype = 'text/csv'
@@ -284,9 +293,12 @@ def api(function=None):
                        for d in Degree.select()}
             chairs = {str(c.id): {'id': c.id, 'name': c.name}
                       for c in Chair.select()}
+            courses = {str(c.id): {'id': c.id, 'name': c.name}
+                      for c in Course.select()}
             configObj = {
                 'degrees': degrees,
                 'chairs': chairs,
+                'courses': courses,
                 'allowed_mail': parsapp.config['ALLOWED_MAIL_SERVER'],
                 'maximum_guests': parsapp.config['MAXIMUM_GUESTS'],
                 'registration_is_active': registration_active()
@@ -301,15 +313,18 @@ def api(function=None):
                 )
             p = Participant.get(id=request.args.get('participant_id'))
             if p.token == request.args.get('token'):
-                pObj = {'firstname': p.firstname,
-                        'lastname': p.lastname,
-                        'guests': p.guests,
-                        'degree': p.degree.id,
-                        'email': p.email,
-                        'title': p.title,
-                        'token': p.token,
-                        'chair': p.chair.id,
-                        'allow_email_contact': p.allow_email_contact,}
+                pObj = {
+                    'firstname': p.firstname,
+                    'lastname': p.lastname,
+                    'guests': p.guests,
+                    'degree': p.degree.id,
+                    'email': p.email,
+                    'title': p.title,
+                    'token': p.token,
+                    'chair': p.chair.id,
+                    'course': p.course.id,
+                    'allow_email_contact': p.allow_email_contact,
+                }
                 return jsonify(pObj)
             else:
                 return make_response(
@@ -319,11 +334,12 @@ def api(function=None):
 
         if function == 'resend':
             try:
-                p = Participant\
-                    .select()\
-                    .where(Participant.email
-                           == request.args.get('email').lower())\
+                p = (
+                    Participant
+                    .select()
+                    .where(Participant.email == request.args.get('email').lower())
                     .get()
+                )
                 sendmail(p)
             except:
                 if not parsapp.config['DEBUG']:
@@ -340,6 +356,7 @@ def api(function=None):
                 p.lastname = data['lastname']
                 p.degree = data['degree']
                 p.chair = data['chair']
+                p.course = data['course']
                 p.title = data['title']
                 p.guests = data['guests']
                 p.allow_email_contact = data['allow_email_contact']
