@@ -8,6 +8,7 @@ var AdminPanel = React.createClass({
             participants: [],
             degrees: {},
             chairs: {},
+            courses: {},
             mailExtension: '',
             stats: {},
             registrationIsActive: false,
@@ -20,6 +21,7 @@ var AdminPanel = React.createClass({
             this.setState({
                 degrees: data.degrees,
                 chairs: data.chairs,
+                courses: data.courses,
                 mailExtension: data.allowed_mail
             });
         }.bind(this))
@@ -133,6 +135,23 @@ var AdminPanel = React.createClass({
                 });
                 break;
             }
+            case 'Studiengang': {
+                parts = parts.sort(function(a, b){
+                    switch(order){
+                        case 'course_0': {
+                            newOrder = 'course_1';
+                            orderLabel = 'Studiengang ↓';
+                            return b.course - a.course;
+                        }
+                        default: { // chair_1
+                            newOrder = 'course_0';
+                            orderLabel = 'Studiengang ↑';
+                            return a.course - b.course;
+                        }
+                    }
+                });
+                break;
+            }
             case 'Gäste': {
                 parts = parts.sort(function(a, b){
                     switch(order){
@@ -218,6 +237,7 @@ var AdminPanel = React.createClass({
                     <th><a href="#" onClick={this.orderBy}>Name</a></th>
                     <th><a href="#" onClick={this.orderBy}>Abschluss</a></th>
                     <th><a href="#" onClick={this.orderBy}>Lehrstuhl</a></th>
+                    <th><a href="#" onClick={this.orderBy}>Studiengang</a></th>
                     <th>Email <small>{this.state.mailExtension}</small></th>
                     <th><a href="#" onClick={this.orderBy}>Gäste</a></th>
                     <th><a href="#" onClick={this.orderBy}>Verifiziert</a></th>
@@ -245,7 +265,9 @@ var AdminPanel = React.createClass({
             console.log(degree);
             var chair = p.chair in this.state.chairs ?
                 this.state.chairs[p.chair].name : 'ERR';
-            console.log(chair);
+            var course = p.course in this.state.courses ?
+                this.state.courses[p.course].name : 'ERR';
+            console.log(course);
             var spanClasses = classNames({
                 'glyphicon': true,
                 'glyphicon-minus-sign': !p.verified,
@@ -267,6 +289,7 @@ var AdminPanel = React.createClass({
                     <td>{p.firstname} {p.lastname}</td>
                     <td>{degree}</td>
                     <td>{chair}</td>
+                    <td>{course}</td>
                     <td>
                         <a href={'mailto:' + p.email + this.state.mailExtension}>
                         {p.email}</a>
