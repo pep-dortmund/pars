@@ -11,8 +11,11 @@ from datetime import datetime
 
 ALLOWED_MAIL_SERVER = DevelopmentConfig.ALLOWED_MAIL_SERVER
 
-DBPATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                      'database.sqlite')
+DBPATH = os.environ.get(
+    'PARS_DBPATH',
+    os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), 'database.sqlite')
+    )
 db = SqliteDatabase(DBPATH)
 
 
@@ -56,5 +59,3 @@ class Participant(BaseModel):
 
     def __repr__(self):
         return self.email
-
-db.connect()

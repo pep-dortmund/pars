@@ -10,17 +10,19 @@ class Config(object):
     TESTING = False
     ADMIN_USERNAME = None
     ADMIN_PASSWORD = None
-    DATE = '06.02.2016'
+    DATE = 'XX.XX.2018'
     MAIL_DEBUG = False
 
 
 class DevelopmentConfig(Config):
-    MAIL_ADDRESS = ''
-    MAIL_SERVER = ''
-    MAIL_LOGIN = ''
-    MAIL_PASSWORD = ''
+    MAIL_ADDRESS = 'absolventenfeier@pep-dortmund.org'
+    MAIL_SERVER = 'pepdo.elnath.uberspace.de'
+    MAIL_LOGIN = 'absolventenfeier@pepdo.elnath.uberspace.de'
+    MAIL_PASSWORD = 'bronx5-9fume-shoot-Loan-Beirut6-picky9-Cull0-tuff'
     TEST_MAIL_ADDRESS = ''
     DEBUG = True
     MAIL_DEBUG = True
     ADMIN_USERNAME = 'admin'
     ADMIN_PASSWORD = 'secret'
+    MAIL_URL_PREFIX = 'http://localhost:5000'
+    SECRET_KEY = 'foobar'

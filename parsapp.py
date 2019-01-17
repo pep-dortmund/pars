@@ -7,13 +7,15 @@ from flask import (Flask,
                    make_response)
 from database import Participant, Degree, Chair, db
 from peewee import (IntegrityError,
-                    fn)
+                    fn,
+                    JOIN,)
 from email.mime.text import MIMEText
 import smtplib
 from functools import wraps
 import config
 
 import os
+from datetime import date
 
 from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.base import MenuLink
@@ -42,15 +44,6 @@ class AuthenticatedIndexView(AdminIndexView):
     def logout(self):
         return authenticate()
 
-    @requires_auth
-    def export():
-        participants = Participant.select()
-        csv = render_template('export.csv', participants=participants)
-        response = make_response(csv)
-        response.headers['Content-Disposition'] = \
-            'attachment; filename=export.csv'
-        return response
-
 
 class ParticipantAdminView(ModelView):
     column_exclude_list = ['token']
@@ -65,7 +58,7 @@ admin.add_view(ModelView(Chair))
 admin.add_link(MenuLink(name='Export CSV', endpoint='export'))
 admin.add_link(MenuLink(name='Logout', endpoint='logout'))
 
-parsapp.config.from_object('config.DevelopmentConfig')
+parsapp.config.from_object('config.' + os.environ.get('PARS_CONFIG', 'DevelopmentConfig'))
 
 
 def check_auth(username, password):
@@ -101,9 +94,12 @@ def _db_close(exc):
 
 
 def sendmail(participant, template='email.html'):
+    # the manual prefix is needed behind a (uberspace) proxy, otherwise
+    # `url_for` cannot resolve the proper hostname
     message = render_template(template,
                               participant=participant,
-                              date=parsapp.config['DATE'])
+                              date=parsapp.config['DATE'],
+                              prefix=parsapp.config['MAIL_URL_PREFIX'])
     msg = MIMEText(message)
     msg['From'] = parsapp.config['MAIL_ADDRESS']
     msg['To'] = (parsapp.config['TEST_MAIL_ADDRESS']
@@ -147,7 +143,7 @@ def index(participant_id=None, token=None):
     if token and not participant_or_404(participant_id, token):
         return abort(404)
     else:
-        return render_template('index.html')
+        return render_template('index.html', date=date)
 
 
 @parsapp.route('/<int:participant_id>!<token>/verify/', methods=['GET'])
@@ -161,7 +157,7 @@ def verify(participant_id, token):
         )
         participant.verified = True
         participant.save()
-        return render_template('index.html')
+        return render_template('index.html', date=date)
 
 
 @parsapp.route('/admin/', methods=['GET', 'POST'])
@@ -206,12 +202,14 @@ def admin_api(function):
     if function == 'stats':
         degrees = Degree.select()
         degree_counts = {
-            d.name: d.count for d in Degree.select().annotate(Participant)
+            d.name: d.count for d in Degree.select(
+                Degree, fn.Count(Participant.id).alias('count')
+            ).join(Participant).group_by(Degree)
         }
         degree_guests = {
-            d.name: d.guests for d in Degree.select()
-                .annotate(Participant, fn.Sum(Participant.guests)
-                .alias('guests'))
+            d.name: d.guests for d in Degree.select(
+                Degree, fn.Count(Participant.guests).alias('guests')
+            ).join(Participant).group_by(Degree)
         }
         stats = {
             'degree_counts': degree_counts,
@@ -232,9 +230,11 @@ def admin_api(function):
 @requires_auth
 def export():
     participants = Participant.select()
-    csv = render_template('export.csv', participants=participants)
+    csv = render_template('export.csv', participants=participants,
+            mail_suffix=parsapp.config['ALLOWED_MAIL_SERVER'])
     response = make_response(csv)
     response.headers['Content-Disposition'] = 'attachment; filename=export.csv'
+    response.mimetype = 'text/csv'
     return response
 
 
@@ -249,7 +249,6 @@ def api(function=None):
             )
         try:
             participant = Participant(**request.get_json(force=True))
-            print(request.get_json(force=True))
             if not request.get_json(force=True).get('validDate'):
                 return make_response(
                     jsonify(errormessage='Error'),

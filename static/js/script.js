@@ -15,7 +15,7 @@ var AlertMessage = React.createClass({
       ),
       2: (
         <div className="alert alert-success">
-          Die Email wurde noch einmal versandt und sollte in ein
+          Die E-Mail wurde noch einmal versandt und sollte in ein
           paar Minuten in deinem Postfach sein.
         </div>
       ),
@@ -40,20 +40,20 @@ var AlertMessage = React.createClass({
       ),
       10: (
         <div className="alert alert-warning">
-          Diese Email wurde bereits eingetragen.
+          Diese E-Mail wurde bereits eingetragen.
           Du solltest eine Bestätigungsmail in deinem
           Postfach finden, in der ein Link zur Änderung
           deiner Daten aufgeführt ist.  <a
             href="#"
             className="alert-link"
             onClick={this.props.callback}>
-            Email erneut versenden.
+            E-Mail erneut versenden.
           </a>
         </div>
       ),
       20: (
         <div className="alert alert-danger">
-          Der Versand der Email ist fehlgeschlagen.
+          Der Versand der E-Mail ist fehlgeschlagen.
         </div>
       ),
       30: (
@@ -207,7 +207,7 @@ var EmailInput = React.createClass({
       if(!this.state.email){
         hint = (
           <span className="help-block"><small>
-            Bitte trage deine Emailadresse ein.
+            Bitte trage deine E-Mail-Adresse ein.
           </small></span>);
       } else {
         hint = (
@@ -353,13 +353,22 @@ var ChairSelect = React.createClass({
           Triff bitte eine Auswahl.
         </small></span>
       );
+    var hint_lehramt = this.state.chair && this.state.chairs[this.state.chair].name === 'Lehramt' ? (
+        <span className="help-block"><small>
+          Als Lehramtsstudierender können wir dir aus organisatorischen Gründen
+          dein Zeugnis nicht während der Absolventenfeier überreichen. Du wirst
+          dennoch eine leere Zeugnismappe mit dem Hinweis "Bitte lächeln und
+          winken" erhalten.
+        </small></span>
+      ) : '';
     return (
       <div className={classes} disabled={this.props.readOnly}>
-        <label className="control-label">Lehrstuhl</label>
+        <label className="control-label">Lehrstuhl/Studiengang</label>
         <select name="chair" ref="chair" className="form-control"
           onChange={this.handleChange} value={this.state.chair} >
           {chairs}
         </select>
+        {hint_lehramt}
         {hint}
       </div>
     );
@@ -517,9 +526,9 @@ var DateCheck = React.createClass({
     });
     var hint = this.state.error ? (
       <span className="help-block"><small>
-        Falls du deine letzte Prüfung im Jahr 2017 hattest oder noch
-        haben wirst, bist du herzlich zur Absolventenfeier 2017
-        eingeladen, die Anfang 2018 stattfinden wird.
+        Falls du deine letzte Prüfung im Jahr 2019 hattest oder noch
+        haben wirst, bist du herzlich zur Absolventenfeier 2019
+        eingeladen, die Anfang 2020 stattfinden wird.
       </small></span>
     ) : '';
     return (
@@ -531,7 +540,7 @@ var DateCheck = React.createClass({
               onChange={this.handleChange}
               checked={this.state.checked}
             />
-            Meine letzte Prüfung ist beziehungsweise war im Jahr 2016.<br />
+            Meine letzte Prüfung war im Jahr 2018.<br />
             {hint}
           </label>
         </div>
@@ -566,7 +575,7 @@ var EmailCheck = React.createClass({
     });
     var hint =  (
       <span className="help-block"><small>
-        Zu diesem Zweck wird deine Email-Adresse von einigen Mitgliedern des PeP-Vorstandes
+        Zu diesem Zweck wird deine E-Mail-Adresse von einigen Mitgliedern des PeP-Vorstandes
         einsehbar sein. Die Adresse wird an keine Dritten weitergegeben.
       </small></span>
     );
@@ -580,7 +589,7 @@ var EmailCheck = React.createClass({
           checked={this.state.checked}
         />
           Ich bin über die Absolventenfeier hinaus damit einverstanden, per
-          Email von PeP et al. e.V.  auf dem Laufenden gehalten zu werden.<br />
+          E-Mail von PeP et al. e.V.  auf dem Laufenden gehalten zu werden.<br />
           {hint}
         </label>
       </div>
@@ -635,7 +644,7 @@ var GuestInput = React.createClass({
           key={i}
           type="button"
           className={classes}
-          style={{padding: "6px 8px"}}
+          style={{padding: "6px 8px", width: "10%"}}
           value={i + 1}
           onClick={this.handleChange}>
           {i + 1}
@@ -651,7 +660,7 @@ var GuestInput = React.createClass({
           Anzahl der Gäste (inklusive dir){number}
         </label>
         <div className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-          <div className="btn-group" role="group" aria-label="First group">
+          <div className="btn-group" role="group" aria-label="First group" style={{width: "100%"}}>
             {buttons}
           </div>
         </div>
@@ -866,13 +875,11 @@ var ParticipantForm = React.createClass({
                 />
               <DegreeSelect
                 ref="degrees"
-                source="/api/degrees/"
                 onUserInput={this.handleDegreeInput}
                 readOnly={!this.state.registrationIsActive}
                 />
               <ChairSelect
                 ref="chairs"
-                source="/api/chairs/"
                 onUserInput={this.handleUserInput}
                 readOnly={!this.state.registrationIsActive}
                 />
