@@ -1,3 +1,6 @@
+""" Adjust and copy this file to `config.py`
+"""
+
 class Config(object):
     MAXIMUM_GUESTS = 10
     MAIL_PORT = 587
