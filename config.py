@@ -15,10 +15,10 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    MAIL_ADDRESS = 'absolventenfeier@pep-dortmund.org'
-    MAIL_SERVER = 'pepdo.elnath.uberspace.de'
-    MAIL_LOGIN = 'absolventenfeier@pepdo.elnath.uberspace.de'
-    MAIL_PASSWORD = 'bronx5-9fume-shoot-Loan-Beirut6-picky9-Cull0-tuff'
+    MAIL_ADDRESS = ''
+    MAIL_SERVER = ''
+    MAIL_LOGIN = ''
+    MAIL_PASSWORD = ''
     TEST_MAIL_ADDRESS = ''
     DEBUG = True
     MAIL_DEBUG = True
