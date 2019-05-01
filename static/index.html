@@ -23,19 +23,14 @@
           Zukunft nicht per Mail kontaktieren sollen, werden eure Daten nach der
           Veranstaltung gelöscht.
           </p>
-          {#
           <p class="lead">
           Für Anmeldungen nach dem 02.02.18 können wir nicht garantieren, dass
           das Abschlusszeugnis rechtzeitig zur Feier fertiggestellt ist. Das
           Zeugnis kann dann nachträglich im Dekanat abgeholt werden.
           </p>
-          #}
-          {% if date.today() > date(2019, 2, 1) %}
           <p class="text-warning">
           Die Anmeldung ist lediglich bis zum 08.02.19 möglich.
           </p>
-          {% endif %}
-          {#
           <p class="lead text-danger">
           Der offizielle Anmeldeschluss war der 15.01.16. Für Anmeldungen nach
           diesem Datum können wir nicht garantieren, dass das Abschlusszeugnis
@@ -50,16 +45,13 @@
           Die Anmeldung ist momentan im Testbetrieb. Alle eingetragenen Daten
           werden in Kürze gelöscht!
           </p>
-          #}
         </div>
       </div>
       <div class="row">
         <div id="alert"></div>
         <div id="loader"></div>
       </div>
-      {% block main %}
       <div id="main"></div>
-      {% endblock %}
       <div class="row">
         <div class="col-md-12 col-lg-10 col-lg-offset-1 col-xl-8 col-xl-offset-2">
           <ul id="links" class="list-inline">
