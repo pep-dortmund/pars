@@ -733,7 +733,7 @@ var ParticipantForm = React.createClass({
     };
   },
   componentDidMount: function(){
-    $.getJSON('/api/config/', function(data){
+    $.getJSON('http://127.0.0.1:5000/config/pars/', function(data){
       this.refs.degrees.setState({degrees: data.degrees});
       this.refs.chairs.setState({chairs: data.chairs});
       this.refs.courses.setState({courses: data.courses});
