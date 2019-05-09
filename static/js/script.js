@@ -60,6 +60,11 @@ var AlertMessage = React.createClass({
         <div className="alert alert-danger">
           Aktualisieren fehlgeschlagen.
         </div>
+      ),
+      90: (
+        <div className="alert alert-danger">
+          Unbekannter Fehler
+        </div>
       )
     }
     return messages[this.props.code];
@@ -835,8 +840,12 @@ var ParticipantForm = React.createClass({
           loader.setState({display: false});
         });
       } else {
-        $.post('/api/', JSON.stringify(this.state.participant), function(){
-          this.setState({alerts: [{code: 1}]});
+        $.post('http://127.0.0.1:5000/event_registration', JSON.stringify(this.state.participant), function(data){
+          if(data.status == 'success'){
+            this.setState({alerts: [{code: 1}]});
+          } else {
+            this.setState({alerts: [{code: 90}]});
+          }
         }.bind(this))
         .fail(function(data){
           if(data.status == 400){
