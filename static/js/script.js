@@ -2,6 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var katex = require('katex');
 var classNames = require('classnames');
+var Config = require('Config');
 
 var AlertMessage = React.createClass({
   render: function(){
@@ -63,9 +64,14 @@ var AlertMessage = React.createClass({
       ),
       90: (
         <div className="alert alert-danger">
-          Unbekannter Fehler
+          Unbekannter Fehler.
         </div>
-      )
+      ),
+      100: (
+        <div className="alert alert-danger">
+          Ein Fehler ist aufgetreten.
+        </div>
+      ),
     }
     return messages[this.props.code];
   }
@@ -252,7 +258,7 @@ var DegreeSelect = React.createClass({
   getInitialState: function(){
     return {
       degree: 0,
-      degrees: {},
+      degrees: [],
       error: false,
     };
   },
@@ -271,11 +277,8 @@ var DegreeSelect = React.createClass({
     return !error;
   },
   render: function(){
-    const degreeArray = Object.keys(this.state.degrees).map((i) => (
-      this.state.degrees[i]
-    ));
-    var degrees = degreeArray.map((degree, i) => {
-      var checked = +this.state.degree === +degree.id;
+    var degrees = this.state.degrees.map((degree, i) => {
+      var checked = +this.state.degree === +i;
       const classes = classNames("btn", checked ? "btn-info" : "btn-secondary");
       return (
         <button
@@ -283,9 +286,9 @@ var DegreeSelect = React.createClass({
           type="button"
           className={classes}
           style={{padding: "6px 8px"}}
-          value={degree.id}
+          value={i}
           onClick={this.handleChange}>
-          {degree.name}
+          {degree}
         </button>
       );
     });
@@ -299,8 +302,7 @@ var DegreeSelect = React.createClass({
         </small></span>
       );
     const selection = this.state.degree ?
-      ": " + this.state.degrees[this.state.degree].name :
-      "";
+      ": " + this.state.degrees[this.state.degree] : "";
     return (
       <fieldset className={classes} disabled={this.props.readOnly}>
         <label className="control-label">Abschluss{selection}</label>
@@ -319,7 +321,7 @@ var DegreeSelect = React.createClass({
 var CourseSelect = React.createClass({
   getInitialState: function(){
     return {
-      course: 0,
+      course: undefined,
       courses: [],
       error: false,
     };
@@ -340,14 +342,11 @@ var CourseSelect = React.createClass({
   },
   render: function(){
     var courses = [<option key='NONE'>---</option>];
-    for(var key in this.state.courses){
-      var course = this.state.courses[key];
-      courses.push(
-          <option value={course.id} key={key}>
-            {course.name}
-          </option>
-      )
-    }
+    courses = courses.concat(this.state.courses.map((course, i) => (
+      <option value={i} key={i}>
+        {course}
+      </option>
+    )));
     var classes = classNames({
       'form-group': true,
       'has-error': this.state.error
@@ -357,7 +356,7 @@ var CourseSelect = React.createClass({
           Triff bitte eine Auswahl.
         </small></span>
       );
-    var hint_lehramt = this.state.course && this.state.courses[this.state.course].name === 'Lehramt' ? (
+    var hint_lehramt = this.state.course && this.state.courses[this.state.course] === 'Lehramt' ? (
         <span className="help-block"><small>
           Als Lehramtsstudierender können wir dir aus organisatorischen Gründen
           dein Zeugnis nicht während der Absolventenfeier überreichen. Du wirst
@@ -382,7 +381,7 @@ var CourseSelect = React.createClass({
 var ChairSelect = React.createClass({
   getInitialState: function(){
     return {
-      chair: 0,
+      chair: undefined,
       chairs: [],
       error: false,
     };
@@ -403,14 +402,11 @@ var ChairSelect = React.createClass({
   },
   render: function(){
     var chairs = [<option key='NONE'>---</option>];
-    for(var key in this.state.chairs){
-      var chair = this.state.chairs[key];
-      chairs.push(
-          <option value={chair.id} key={key}>
-            {chair.name}
-          </option>
-      )
-    }
+    chairs = chairs.concat(this.state.chairs.map((chair, i) => (
+      <option value={i} key={i}>
+        {chair}
+      </option>
+    )));
     var classes = classNames({
       'form-group': true,
       'has-error': this.state.error
@@ -524,7 +520,7 @@ var TitleInput = React.createClass({
     }
     var degreeText = '';
     if(this.state.degree in this.state.degrees){
-      degreeText = this.state.degrees[this.state.degree].name + '-';
+      degreeText = this.state.degrees[this.state.degree] + '-';
     };
     var classes = classNames({
       'form-group': true,
@@ -738,15 +734,16 @@ var ParticipantForm = React.createClass({
     };
   },
   componentDidMount: function(){
-    $.getJSON('http://127.0.0.1:5000/config/pars/', function(data){
-      this.refs.degrees.setState({degrees: data.degrees});
-      this.refs.chairs.setState({chairs: data.chairs});
-      this.refs.courses.setState({courses: data.courses});
-      this.refs.title.setState({degrees: data.degrees});
-      this.refs.email.setState({mailExtension: data.allowed_mail});
-      this.refs.guests.setState({maxGuests: data.maximum_guests});
-      this.setState({registrationIsActive: data.registration_is_active});
-      if(!data.registration_is_active){
+    $.getJSON(Config.appConfigURL, function(data){
+      let config = data.config;
+      this.refs.degrees.setState({degrees: config.degrees});
+      this.refs.chairs.setState({chairs: config.chairs});
+      this.refs.courses.setState({courses: config.courses});
+      this.refs.title.setState({degrees: config.degrees});
+      this.refs.email.setState({mailExtension: config.allowed_mail});
+      this.refs.guests.setState({maxGuests: config.maximum_guests});
+      this.setState({registrationIsActive: config.registration_is_active});
+      if(!config.registration_is_active){
         this.setState({alerts: [{code: 4}]});
       }
     }.bind(this))
@@ -840,24 +837,33 @@ var ParticipantForm = React.createClass({
           loader.setState({display: false});
         });
       } else {
-        $.post('http://127.0.0.1:5000/event_registration', JSON.stringify(this.state.participant), function(data){
-          if(data.status == 'success'){
-            this.setState({alerts: [{code: 1}]});
-          } else {
-            this.setState({alerts: [{code: 90}]});
-          }
-        }.bind(this))
-        .fail(function(data){
-          if(data.status == 400){
-            this.setState({alerts: [{code: 10, callback: this.resendMail}]});
-          };
-          if(data.status == 500){
-            this.setState({alerts: [
-              {code: 1},
-              {code: 20}
-            ]});
-          };
-        }.bind(this))
+        $.ajax({
+          url: Config.eventRegistrationURL,
+          type: 'POST',
+          data: JSON.stringify(this.state.participant),
+          success: function(data){
+            if(data.status == 'success'){
+              this.setState({alerts: [{code: 1}]});
+            } else {
+              this.setState({alerts: [{code: 90}]});
+            }
+          }.bind(this),
+          contentType: 'application/json',
+          dataType: 'json',
+          error: function(jqXHR, textStatus, errorThrown){
+            var alerts = [{code: 100}];
+            if(jqXHR.status == 400){
+              alerts.push({code: 10, callback: this.resendMail});
+            };
+            if(jqXHR.status == 500){
+              alerts = alerts.concat([
+                {code: 1},
+                {code: 20}
+              ]);
+            };
+            this.setState({alerts: alerts});
+          }.bind(this)
+        })
         .always(function(){
           loader.setState({display: false});
         });

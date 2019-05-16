@@ -1,0 +1,14 @@
+{
+    "degrees": [
+        "Bachelor"
+    ],
+    "chairs": [
+        "E5"
+    ],
+    "courses": [
+        "Medizinphysik"
+    ],
+    "allowed_mail": "tu-dortmund.de",
+    "maximum_guests": 10,
+    "registration_is_active": true
+}
