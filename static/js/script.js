@@ -117,27 +117,24 @@ var loader = ReactDOM.render(<Loader />, document.getElementById('loader'));
 var NameInput = React.createClass({
   getInitialState: function(){
     return {
-      firstname: '',
-      lastname: '',
+      name: '',
       error: false
     }
   },
   handleChange: function() {
     this.setState({
-      firstname: this.refs.firstname.value,
-      lastname: this.refs.lastname.value
+      name: this.refs.name.value,
     }, function(){
       if(this.state.error){
         this.validate();
       }
     });
     this.props.onUserInput({
-      firstname: this.refs.firstname.value,
-      lastname: this.refs.lastname.value
+      name: this.refs.name.value,
     });
   },
   validate: function() {
-    var error = (!this.state.firstname || !this.state.lastname);
+    var error = !this.state.name;
     this.setState({error: error});
     return !error;
   },
@@ -146,13 +143,9 @@ var NameInput = React.createClass({
       'form-group': true,
       'has-error': this.state.error
     });
-    var firstnameClasses = classNames({
+    var nameClasses = classNames({
       'form-control': true,
-      'form-control-error': this.state.error && !this.state.firstname
-    });
-    var lastnameClasses = classNames({
-      'form-control': true,
-      'form-control-error': this.state.error && !this.state.lastname,
+      'form-control-error': this.state.error && !this.state.name
     });
     var hint = !this.state.error ? '' : (
       <span className="help-block"><small>
@@ -163,22 +156,13 @@ var NameInput = React.createClass({
       <fieldset className={classes} disabled={this.props.readOnly}>
         <label className="control-label">Name</label>
         <div className="row">
-          <div className="col-sm-6">
+          <div className="col-sm-12">
             <input
-              className={firstnameClasses}
-              placeholder="Max"
-              ref="firstname"
+              className={nameClasses}
+              placeholder="Max Mustermann"
+              ref="name"
               onChange={this.handleChange}
-              value={this.state.firstname}
-              />
-          </div>
-          <div className="col-sm-6">
-            <input
-              className={lastnameClasses}
-              placeholder="Mustermann"
-              ref="lastname"
-              value={this.state.lastname}
-              onChange={this.handleChange}
+              value={this.state.name}
               />
           </div>
         </div>
@@ -521,6 +505,9 @@ var TitleInput = React.createClass({
     var degreeText = '';
     if(this.state.degree in this.state.degrees){
       degreeText = this.state.degrees[this.state.degree] + '-';
+      if(degreeText === 'Promotion-'){
+        degreeText = 'Doktor-';
+      }
     };
     var classes = classNames({
       'form-group': true,
@@ -735,15 +722,15 @@ var ParticipantForm = React.createClass({
   },
   componentDidMount: function(){
     $.getJSON(Config.appConfigURL, function(data){
-      let config = data.config;
-      this.refs.degrees.setState({degrees: config.degrees});
-      this.refs.chairs.setState({chairs: config.chairs});
-      this.refs.courses.setState({courses: config.courses});
-      this.refs.title.setState({degrees: config.degrees});
-      this.refs.email.setState({mailExtension: config.allowed_mail});
-      this.refs.guests.setState({maxGuests: config.maximum_guests});
-      this.setState({registrationIsActive: config.registration_is_active});
-      if(!config.registration_is_active){
+      let schema = data.event.registration_schema.properties;
+      this.refs.degrees.setState({degrees: schema.degree.enum});
+      this.refs.chairs.setState({chairs: schema.chair.enum});
+      this.refs.courses.setState({courses: schema.course.enum});
+      this.refs.title.setState({degrees: schema.degree.enum});
+      // this.refs.email.setState({mailExtension: config.allowed_mail});
+      this.refs.guests.setState({maxGuests: schema.guests.maximum});
+      this.setState({registrationIsActive: data.event.registration_open});
+      if(!data.event.registration_open){
         this.setState({alerts: [{code: 4}]});
       }
     }.bind(this))
@@ -765,8 +752,7 @@ var ParticipantForm = React.createClass({
       $.get(requestUrl, function(data){
         this.setState({participant: data});
         this.refs.name.setState({
-          firstname: data.firstname,
-          lastname: data.lastname
+          name: data.name,
         });
         this.refs.email.setState({
           email: data.email,
@@ -842,6 +828,7 @@ var ParticipantForm = React.createClass({
           type: 'POST',
           data: JSON.stringify(this.state.participant),
           success: function(data){
+            console.log(data);
             if(data.status == 'success'){
               this.setState({alerts: [{code: 1}]});
             } else {
@@ -861,10 +848,12 @@ var ParticipantForm = React.createClass({
                 {code: 20}
               ]);
             };
+            console.log(jqXHR, textStatus);
             this.setState({alerts: alerts});
           }.bind(this)
         })
-        .always(function(){
+        .always(function(data){
+          console.log(data);
           loader.setState({display: false});
         });
       }
